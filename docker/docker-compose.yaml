@@ -1,0 +1,85 @@
+name: test-rlp
+
+include:
+  - ./docker-compose.base.yaml
+
+services:
+  spicedb-crdb:
+    image: authzed/spicedb:v1.46.2
+    # container_name: spicedb-crdb
+    # ports:
+    #   - "50051:50051"
+    command: serve
+      --grpc-preshared-key "spicdbgrpcpwd123"
+      --grpc-tls-cert-path /spicedb/cert.pem
+      --grpc-tls-key-path /spicedb/key.pem
+    environment:
+      - SPICEDB_LOG_LEVEL=debug
+      - SPICEDB_GRPC_PRESHARED_KEY=spicdbgrpcpwd123
+      - SPICEDB_DATASTORE_ENGINE=cockroachdb
+      - SPICEDB_DATASTORE_CONN_URI=postgresql://root:cockroachdbpwd123@cockroachdb:26257/rls_spicedb?sslmode=disable
+    depends_on:
+      - cockroachdb
+    volumes:
+      - ./spicedb:/spicedb
+    restart: always
+    user: "0:0"
+
+  spicedb-crdb-envoy:
+    image: envoyproxy/envoy:v1.33-latest
+    container_name: spicedb-crdb-envoy
+    ports:
+      - "50051:50051"  # gRPC Cockroach-backed SpiceDB
+    volumes:
+      - ./config/envoy-crdb.yaml:/etc/envoy/envoy.yaml:ro
+    depends_on:
+      - spicedb-crdb
+    restart: always
+
+  spicedb-pgdb:
+    image: authzed/spicedb:v1.46.2
+    # container_name: spicedb-pgdb
+    # ports:
+    #   - "50052:50051"
+    command: serve
+      --grpc-preshared-key "spicdbgrpcpwd123"
+      --grpc-tls-cert-path /spicedb/cert.pem
+      --grpc-tls-key-path /spicedb/key.pem
+    environment:
+      - SPICEDB_LOG_LEVEL=debug
+      - SPICEDB_GRPC_PRESHARED_KEY=spicdbgrpcpwd123
+      - SPICEDB_DATASTORE_ENGINE=postgres
+      - SPICEDB_DATASTORE_CONN_URI=postgres://root:postgrespwd123@postgres:5432/rls_spicedb?sslmode=disable
+    depends_on:
+      - postgres
+    volumes:
+      - ./spicedb:/spicedb
+    restart: always
+    user: "0:0"
+
+  spicedb-pgdb-envoy:
+    image: envoyproxy/envoy:v1.33-latest
+    container_name: spicedb-pgdb-envoy
+    ports:
+      - "50052:50052"  # gRPC Postgres-backed SpiceDB
+    volumes:
+      - ./config/envoy-pgdb.yaml:/etc/envoy/envoy.yaml:ro
+    depends_on:
+      - spicedb-pgdb
+    restart: always
+
+  # spicedb-debug:
+  #   image: authzed/spicedb:v1.46.2-debug
+  #   entrypoint: sh
+  #   stdin_open: true
+  #   tty: true
+  #   environment:
+  #     - SPICEDB_GRPC_PRESHARED_KEY=spicdbgrpcpwd123
+  #   restart: always
+
+  spicedb-playground:
+    image: ghcr.io/authzed/spicedb-playground:v0.2.0
+    container_name: spicedb-playground
+    ports:
+      - "3000:3000"
+    restart: always

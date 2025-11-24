@@ -1,0 +1,55 @@
+❯ go run ./cmd/main.go authzed_crdb_1 create-schema
+2025/11/19 20:29:41 [authzed_crdb_1] == Writing schema to SpiceDB from cmd/authzed_crdb_1/schemas.zed ==
+2025/11/19 20:29:41 [authzed_crdb_1] Schema written at revision: GioKHjE3NjM1NTg5ODE0NzMxODA0MjEuMDAwMDAwMDAwMBIINWYyNjUyNDA=
+
+❯ go run ./cmd/main.go authzed_pgdb_1 create-schema
+2025/11/19 20:29:42 [authzed_pgdb_1] == Writing schema to SpiceDB from cmd/authzed_pgdb_1/schemas.zed ==
+2025/11/19 20:29:42 [authzed_pgdb_1] Schema written at revision: GhAKBENOb0cSCDYyYjZkNTIx
+
+❯ go run ./cmd/main.go clickhouse_1 create-schema
+2025/11/19 20:29:42 [clickhouse_1] Schemas created successfully.
+
+❯ go run ./cmd/main.go cockroachdb_1 create-schema
+2025/11/19 20:29:43 [cockroachdb] Connected host=localhost port=26257 db="rlp" user="root" sslmode=disable
+2025/11/19 20:29:43 [cockroachdb_1] Creating schemas using cmd/cockroachdb_1/schemas.sql ...
+2025/11/19 20:29:48 [cockroachdb_1] Schemas created successfully.
+
+❯ go run ./cmd/main.go elasticsearch_1 create-schema
+2025/11/19 20:29:48 [elasticsearch] Using addresses=[http://localhost:9200] cloud_id_set=false auth_user=true timeout=5s insecure_tls=false
+2025/11/19 20:29:49 [elasticsearch_1] == Creating Elasticsearch index and mappings ==
+2025/11/19 20:29:49 [elasticsearch_1] Index "rls_resources" created successfully.
+
+❯ go run ./cmd/main.go postgres_1 create-schema
+2025/11/19 20:29:49 [postgres_1] Creating schemas using cmd/postgres_1/schemas.sql ...
+2025/11/19 20:29:49 [postgres_1] Schemas created successfully.
+
+❯ go run ./cmd/main.go mongodb_1 create-schema
+2025/11/19 20:29:50 [mongodb_1] == Creating MongoDB collections and indexes ==
+2025/11/19 20:29:50 [mongodb_1] Created collection: organizations
+2025/11/19 20:29:50 [mongodb_1] Created collection: users
+2025/11/19 20:29:50 [mongodb_1] Created collection: groups
+2025/11/19 20:29:50 [mongodb_1] Created collection: org_memberships
+2025/11/19 20:29:50 [mongodb_1] Created collection: group_memberships
+2025/11/19 20:29:50 [mongodb_1] Created collection: resources
+2025/11/19 20:29:50 [mongodb_1] Created collection: resource_acl
+2025/11/19 20:29:50 [mongodb_1] Created collection: user_resource_perms
+2025/11/19 20:29:50 [mongodb_1] Index created on users: ix_users_org_id
+2025/11/19 20:29:50 [mongodb_1] Index created on groups: ix_groups_org_id
+2025/11/19 20:29:50 [mongodb_1] Index created on org_memberships: ix_om_org_user
+2025/11/19 20:29:50 [mongodb_1] Index created on org_memberships: ix_om_user_org
+2025/11/19 20:29:50 [mongodb_1] Index created on org_memberships: ix_om_org_role
+2025/11/19 20:29:50 [mongodb_1] Index created on group_memberships: ix_gm_group_user
+2025/11/19 20:29:50 [mongodb_1] Index created on group_memberships: ix_gm_user_group
+2025/11/19 20:29:50 [mongodb_1] Index created on resources: ix_resources_org_id
+2025/11/19 20:29:50 [mongodb_1] Index created on resource_acl: ix_racl_res_subject_rel
+2025/11/19 20:29:50 [mongodb_1] Index created on resource_acl: ix_racl_subject_rel_res
+2025/11/19 20:29:50 [mongodb_1] Index created on user_resource_perms: ux_urp_user_resource
+2025/11/19 20:29:50 [mongodb_1] Index created on user_resource_perms: ix_urp_user_manage_res
+2025/11/19 20:29:50 [mongodb_1] Index created on user_resource_perms: ix_urp_user_view_res
+2025/11/19 20:29:50 [mongodb_1] MongoDB schema and indexes created
+
+❯ go run ./cmd/main.go scylladb_1 create-schema
+2025/11/19 20:29:51 [scylladb] Using hosts=[localhost] port=9042 keyspace="rlp" consistency=LOCAL_QUORUM
+2025/11/19 20:29:51 [scylladb_1] == Creating ScyllaDB schemas ==
+2025/11/19 20:29:51 [scylladb_1] ScyllaDB schemas created successfully.
+

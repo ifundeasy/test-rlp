@@ -1,0 +1,104 @@
+❯ go run ./cmd/main.go authzed_crdb_1 load-data
+2025/11/19 20:29:56 [authzed_crdb_1] == Starting Authzed data import from CSV in "data" ==
+2025/11/19 20:29:56 [authzed_crdb_1] Loaded org_memberships: 2420 relationships (cumulative=2420)
+2025/11/19 20:29:56 [authzed_crdb_1] Loaded groups -> org.member_group: 332 relationships (cumulative=2752)
+2025/11/19 20:29:57 [authzed_crdb_1] Loaded group_memberships: 9110 relationships (cumulative=11862)
+2025/11/19 20:29:59 [authzed_crdb_1] Loaded resources -> resource.org: 29370 relationships (cumulative=41232)
+2025/11/19 20:31:01 [authzed_crdb_1] Loaded resource_acl: 457366 relationships (cumulative=498598)
+2025/11/19 20:31:01 [authzed_crdb_1] Authzed data import DONE: totalRelationships=498598 elapsed=1m5s
+
+❯ go run ./cmd/main.go authzed_pgdb_1 load-data
+2025/11/19 20:31:02 [authzed_pgdb_1] == Starting Authzed data import from CSV in "data" ==
+2025/11/19 20:31:02 [authzed_pgdb_1] Loaded org_memberships: 2420 relationships (cumulative=2420)
+2025/11/19 20:31:02 [authzed_pgdb_1] Loaded groups -> org.member_group: 332 relationships (cumulative=2752)
+2025/11/19 20:31:03 [authzed_pgdb_1] Loaded group_memberships: 9110 relationships (cumulative=11862)
+2025/11/19 20:31:04 [authzed_pgdb_1] Loaded resources -> resource.org: 29370 relationships (cumulative=41232)
+2025/11/19 20:31:37 [authzed_pgdb_1] Loaded resource_acl: 457366 relationships (cumulative=498598)
+2025/11/19 20:31:37 [authzed_pgdb_1] Authzed data import DONE: totalRelationships=498598 elapsed=35s
+
+❯ go run ./cmd/main.go clickhouse_1 load-data
+2025/11/19 20:31:39 [clickhouse_1] create_data: loading CSV data from "data" ...
+2025/11/19 20:31:39 [clickhouse_1] organizations: inserted 16 rows in 13ms
+2025/11/19 20:31:39 [clickhouse_1] users: inserted 1141 rows in 11ms
+2025/11/19 20:31:39 [clickhouse_1] groups: inserted 332 rows in 57ms
+2025/11/19 20:31:40 [clickhouse_1] org_memberships: inserted 2420 rows in 62ms
+2025/11/19 20:31:40 [clickhouse_1] group_memberships: inserted 9110 rows in 36ms
+2025/11/19 20:31:40 [clickhouse_1] resources: inserted 29370 rows in 85ms
+2025/11/19 20:31:41 [clickhouse_1] resource_acl: inserted 457366 rows in 962ms
+2025/11/19 20:31:41 [clickhouse_1] create_data: ALL DONE in 1.231s
+
+❯ go run ./cmd/main.go cockroachdb_1 load-data
+2025/11/19 20:31:41 [cockroachdb] Connected host=localhost port=26257 db="rlp" user="root" sslmode=disable
+2025/11/19 20:31:41 [cockroachdb_1] load_data: loading CSV data from "data" ...
+2025/11/19 20:31:41 [cockroachdb_1] organizations: inserted 16 rows in 6ms
+2025/11/19 20:31:41 [cockroachdb_1] users: inserted 1141 rows in 38ms
+2025/11/19 20:31:41 [cockroachdb_1] groups: inserted 332 rows in 24ms
+2025/11/19 20:31:41 [cockroachdb_1] org_memberships: inserted 2420 rows in 164ms
+2025/11/19 20:31:42 [cockroachdb_1] group_memberships: inserted 9110 rows in 788ms
+2025/11/19 20:31:44 [cockroachdb_1] resources: inserted 29370 rows in 1.382s
+2025/11/19 20:33:23 [cockroachdb_1] resource_acl: inserted 457366 rows in 1m39.306s
+2025/11/19 20:33:23 [cockroachdb_1] load_data: ALL DONE in 1m41.713s
+
+❯ go run ./cmd/main.go elasticsearch_1 load-data
+2025/11/19 20:33:25 [elasticsearch] Using addresses=[http://localhost:9200] cloud_id_set=false auth_user=true timeout=5s insecure_tls=false
+2025/11/19 20:33:25 [elasticsearch_1] == Loading CSV data into Elasticsearch index "rls_resources" ==
+2025/11/19 20:33:25 [elasticsearch_1] org_memberships: loaded 2420 rows
+2025/11/19 20:33:25 [elasticsearch_1] group_memberships: loaded 9110 rows
+2025/11/19 20:33:25 [elasticsearch_1] resources: loaded 29370 rows
+2025/11/19 20:33:25 [elasticsearch_1] resource_acl: loaded 457366 rows
+2025/11/19 20:33:26 [elasticsearch_1] Cleared existing documents in index "rls_resources"
+2025/11/19 20:33:42 [elasticsearch_1] Indexed 29370 resource docs into "rls_resources" in 16.258s
+2025/11/19 20:33:42 [elasticsearch_1] Elasticsearch data load DONE: elapsed=17s
+
+❯ go run ./cmd/main.go postgres_1 load-data
+2025/11/19 20:33:44 [postgres_1] load_data: loading CSV data from "data" ...
+2025/11/19 20:33:44 [postgres_1] organizations: inserted 16 rows in 33ms
+2025/11/19 20:33:44 [postgres_1] users: inserted 1141 rows in 51ms
+2025/11/19 20:33:44 [postgres_1] groups: inserted 332 rows in 17ms
+2025/11/19 20:33:44 [postgres_1] org_memberships: inserted 2420 rows in 120ms
+2025/11/19 20:33:44 [postgres_1] group_memberships: inserted 9110 rows in 289ms
+2025/11/19 20:33:45 [postgres_1] resources: inserted 29370 rows in 408ms
+2025/11/19 20:33:53 [postgres_1] resource_acl: inserted 457366 rows in 8.262s
+2025/11/19 20:33:53 [postgres_1] load_data: ALL DONE in 9.185s
+
+❯ go run ./cmd/main.go mongodb_1 load-data
+2025/11/19 20:33:54 [mongodb_1] == Loading MongoDB data from CSV in "data" ==
+2025/11/19 20:33:54 [mongodb_1] Cleared collection: organizations
+2025/11/19 20:33:54 [mongodb_1] Cleared collection: users
+2025/11/19 20:33:54 [mongodb_1] Cleared collection: groups
+2025/11/19 20:33:54 [mongodb_1] Cleared collection: org_memberships
+2025/11/19 20:33:54 [mongodb_1] Cleared collection: group_memberships
+2025/11/19 20:33:54 [mongodb_1] Cleared collection: resources
+2025/11/19 20:33:54 [mongodb_1] Cleared collection: resource_acl
+2025/11/19 20:33:54 [mongodb_1] Cleared collection: user_resource_perms
+2025/11/19 20:33:54 [mongodb_1] Loaded organizations: 16 documents
+2025/11/19 20:33:54 [mongodb_1] Loaded users: 1141 documents
+2025/11/19 20:33:54 [mongodb_1] Loaded groups: 332 documents
+2025/11/19 20:33:54 [mongodb_1] Loaded org_memberships: 2420 documents
+2025/11/19 20:33:54 [mongodb_1] Loaded group_memberships: 9110 documents
+2025/11/19 20:33:54 [mongodb_1] Loaded resources: 29370 documents
+2025/11/19 20:34:02 [mongodb_1] Loaded resource_acl: 457366 documents
+2025/11/19 20:35:57 [mongodb_1] Loaded user_resource_perms: 3144573 documents
+2025/11/19 20:35:57 [mongodb_1] MongoDB data load DONE: elapsed=2m2s
+
+❯ go run ./cmd/main.go scylladb_1 load-data
+2025/11/19 20:35:58 [scylladb] Using hosts=[localhost] port=9042 keyspace="rlp" consistency=LOCAL_QUORUM
+2025/11/19 20:35:58 [scylladb_1] == Loading CSV data into ScyllaDB ==
+2025/11/19 20:35:58 [scylladb_1] Truncated organizations
+2025/11/19 20:35:58 [scylladb_1] Truncated users
+2025/11/19 20:35:58 [scylladb_1] Truncated groups
+2025/11/19 20:35:59 [scylladb_1] Truncated org_memberships
+2025/11/19 20:35:59 [scylladb_1] Truncated group_memberships
+2025/11/19 20:35:59 [scylladb_1] Truncated resources
+2025/11/19 20:35:59 [scylladb_1] Truncated resource_acl_by_resource
+2025/11/19 20:35:59 [scylladb_1] Truncated resource_acl_by_subject
+2025/11/19 20:35:59 [scylladb_1] Truncated user_resource_perms_by_user
+2025/11/19 20:35:59 [scylladb_1] Truncated user_resource_perms_by_resource
+2025/11/19 20:35:59 [scylladb_1] organizations: inserted 16 rows
+2025/11/19 20:36:00 [scylladb_1] users: inserted 1141 rows
+2025/11/19 20:36:00 [scylladb_1] groups: inserted 332 rows
+2025/11/19 20:36:03 [scylladb_1] org_memberships: inserted 2420 rows
+2025/11/19 20:36:10 [scylladb_1] group_memberships: inserted 9110 rows
+2025/11/19 20:36:35 [scylladb_1] resources: inserted 29370 rows
+2025/11/19 20:45:58 [scylladb_1] resource_acl_by_subject: insert failed: context deadline exceeded
+exit status 1

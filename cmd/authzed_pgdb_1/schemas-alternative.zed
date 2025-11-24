@@ -1,0 +1,95 @@
+definition user {}
+
+definition resource {
+    relation manager: user | usergroup#member | usergroup#manager
+    relation viewer: user | usergroup#member | usergroup#manager
+
+    permission manage = manager
+    permission view = viewer + manager
+}
+
+definition usergroup {
+    relation manager: user | usergroup#member | usergroup#manager
+    relation direct_member: user | usergroup#member | usergroup#manager
+
+    permission member = direct_member + manager
+}
+
+definition organization {
+    relation group: usergroup
+    relation administrator: user | usergroup#member | usergroup#manager
+    relation direct_member: user
+    relation resource: resource
+
+    permission admin = administrator
+    permission member = direct_member + administrator + group->member
+}
+
+// ─────────────────────────────────────────────────────────────
+// used in authzed_1
+
+definition user {}
+
+definition resource {
+    relation org: organization
+    relation manager_user: user
+    relation manager_group: usergroup#member | usergroup#admin
+    relation viewer_user: user
+    relation viewer_group: usergroup#member | usergroup#admin
+
+    permission manage = manager_user + manager_group + org->admin
+    permission view = viewer_user + viewer_group + manage + org->member
+}
+
+definition usergroup {
+    relation member_user: user
+    relation admin_user: user
+
+    permission admin = admin_user
+    permission member = member_user + admin
+}
+
+definition organization {
+    relation admin_user: user
+    relation admin_group: usergroup#admin
+    relation member_user: user
+    relation member_group: usergroup#member
+
+    permission admin = admin_user + admin_group
+    permission member = member_user + member_group + admin
+}
+
+// ─────────────────────────────────────────────────────────────
+
+definition user {}
+
+definition usergroup {
+    relation direct_member_user: user
+    relation direct_manager_user: user
+    relation member_group: usergroup
+    relation manager_group: usergroup
+
+    permission member = direct_member_user + member_group->member + manager
+    permission manager = direct_manager_user + manager_group->manager
+}
+
+definition organization {
+    relation admin_user: user
+    relation admin_group: usergroup#manager
+    relation member_user: user
+    relation member_group: usergroup#member
+
+    permission admin = admin_user + admin_group
+    permission member = member_user + member_group + admin
+}
+
+definition resource {
+    relation org: organization
+    relation manager_user: user
+    relation manager_group: usergroup#manager
+    relation viewer_user: user
+    relation viewer_group: usergroup#member
+
+    permission manage = manager_user + manager_group + org->admin
+    permission view = viewer_user + viewer_group + manage + org->member
+}

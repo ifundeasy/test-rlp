@@ -1,0 +1,92 @@
+services:
+  mongodb:
+    image: mongo:8.2.1
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=mongodbpwd123
+    volumes:
+      - mongodb-data:/data/db
+    restart: always
+
+  postgres:
+    # compatible with spicedb v1.46.2; see https://github.com/authzed/spicedb/blob/v1.46.2/internal/datastore/postgres/version/version.go
+    image: postgres:17.2
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=postgrespwd123
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
+    restart: always
+  
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.10
+    container_name: clickhouse
+    ports:
+      - "8123:8123"   # HTTP
+      - "9000:9000"   # native TCP
+    environment:
+      - CLICKHOUSE_USER=root
+      - CLICKHOUSE_PASSWORD=clickhousepwd123
+      - CLICKHOUSE_DB=rlp
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    restart: always
+
+  cockroachdb:
+    # compatible with spicedb v1.46.2; see https://github.com/authzed/spicedb/blob/v1.46.2/internal/datastore/crdb/version/version.go
+    image: cockroachdb/cockroach:v25.3.2
+    container_name: cockroachdb
+    command: start-single-node --insecure
+    ports:
+      - "26257:26257"
+      - "8080:8081"
+    environment:
+      - COCKROACHDB_PASSWORD=cockroachdbpwd123
+    volumes:
+      - cockroach-data:/cockroach
+    restart: always
+
+  elasticsearch:
+    image: elasticsearch:9.2.1
+    container_name: elasticsearch
+    environment:
+      - ELASTIC_PASSWORD=elasticsearchpwd123
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    restart: always
+
+  scylladb:
+    image: scylladb/scylla:2025.3
+    container_name: scylladb
+    ports:
+      - "9042:9042"   # CQL
+    volumes:
+      - scylladb-data:/var/lib/scylla
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESC KEYSPACES' 127.0.0.1 9042 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  mongodb-data:
+  postgres-data:
+  clickhouse-data:
+  cockroach-data:
+  elasticsearch-data:
+  scylladb-data:
