@@ -15,18 +15,18 @@ import (
 // High-level dataset configuration (defaults).
 // You can override these via environment variables:
 //
-//	RLS_NUM_ORGS
-//	RLS_USERS_PER_ORG             // target "typical" users per org
-//	RLS_GROUPS_PER_ORG
-//	RLS_RESOURCES_PER_ORG
-//	RLS_GROUPS_PER_USER
-//	RLS_ADMINS_PER_ORG
-//	RLS_MANAGER_USERS_PER_RESOURCE
-//	RLS_MANAGER_GROUPS_PER_RESOURCE
-//	RLS_VIEWER_USERS_PER_RESOURCE
-//	RLS_VIEWER_GROUPS_PER_RESOURCE
-//	RLS_AVG_ORGS_PER_USER         // average orgs per user (default 2)
-//	RLS_RANDOM_SEED               // optional: fixed random seed for reproducibility
+//	RLP_NUM_ORGS
+//	RLP_USERS_PER_ORG             // target "typical" users per org
+//	RLP_GROUPS_PER_ORG
+//	RLP_RESOURCES_PER_ORG
+//	RLP_GROUPS_PER_USER
+//	RLP_ADMINS_PER_ORG
+//	RLP_MANAGER_USERS_PER_RESOURCE
+//	RLP_MANAGER_GROUPS_PER_RESOURCE
+//	RLP_VIEWER_USERS_PER_RESOURCE
+//	RLP_VIEWER_GROUPS_PER_RESOURCE
+//	RLP_AVG_ORGS_PER_USER         // average orgs per user (default 2)
+//	RLP_RANDOM_SEED               // optional: fixed random seed for reproducibility
 const (
 	defaultNumOrgs                 = 16
 	defaultUsersPerOrg             = 200
@@ -57,17 +57,17 @@ type config struct {
 
 func loadConfig() config {
 	cfg := config{
-		NumOrgs:                 getEnvInt("RLS_NUM_ORGS", defaultNumOrgs),
-		UsersPerOrg:             getEnvInt("RLS_USERS_PER_ORG", defaultUsersPerOrg),
-		GroupsPerOrg:            getEnvInt("RLS_GROUPS_PER_ORG", defaultGroupsPerOrg),
-		ResourcesPerOrg:         getEnvInt("RLS_RESOURCES_PER_ORG", defaultResourcesPerOrg),
-		GroupsPerUser:           getEnvInt("RLS_GROUPS_PER_USER", defaultGroupsPerUser),
-		AdminsPerOrg:            getEnvInt("RLS_ADMINS_PER_ORG", defaultAdminsPerOrg),
-		ManagerUsersPerResource: getEnvInt("RLS_MANAGER_USERS_PER_RESOURCE", defaultManagerUsersPerResource),
-		ManagerGroupsPerRes:     getEnvInt("RLS_MANAGER_GROUPS_PER_RESOURCE", defaultManagerGroupsPerRes),
-		ViewerUsersPerResource:  getEnvInt("RLS_VIEWER_USERS_PER_RESOURCE", defaultViewerUsersPerResource),
-		ViewerGroupsPerRes:      getEnvInt("RLS_VIEWER_GROUPS_PER_RESOURCE", defaultViewerGroupsPerRes),
-		AvgOrgsPerUser:          getEnvInt("RLS_AVG_ORGS_PER_USER", defaultAvgOrgsPerUser),
+		NumOrgs:                 getEnvInt("RLP_NUM_ORGS", defaultNumOrgs),
+		UsersPerOrg:             getEnvInt("RLP_USERS_PER_ORG", defaultUsersPerOrg),
+		GroupsPerOrg:            getEnvInt("RLP_GROUPS_PER_ORG", defaultGroupsPerOrg),
+		ResourcesPerOrg:         getEnvInt("RLP_RESOURCES_PER_ORG", defaultResourcesPerOrg),
+		GroupsPerUser:           getEnvInt("RLP_GROUPS_PER_USER", defaultGroupsPerUser),
+		AdminsPerOrg:            getEnvInt("RLP_ADMINS_PER_ORG", defaultAdminsPerOrg),
+		ManagerUsersPerResource: getEnvInt("RLP_MANAGER_USERS_PER_RESOURCE", defaultManagerUsersPerResource),
+		ManagerGroupsPerRes:     getEnvInt("RLP_MANAGER_GROUPS_PER_RESOURCE", defaultManagerGroupsPerRes),
+		ViewerUsersPerResource:  getEnvInt("RLP_VIEWER_USERS_PER_RESOURCE", defaultViewerUsersPerResource),
+		ViewerGroupsPerRes:      getEnvInt("RLP_VIEWER_GROUPS_PER_RESOURCE", defaultViewerGroupsPerRes),
+		AvgOrgsPerUser:          getEnvInt("RLP_AVG_ORGS_PER_USER", defaultAvgOrgsPerUser),
 	}
 
 	// Basic safety clamps.
@@ -462,9 +462,9 @@ func CsvCreateData() {
 	cfg := loadConfig()
 	start := time.Now()
 
-	// Random source: from env RLS_RANDOM_SEED if set, else time-based.
+	// Random source: from env RLP_RANDOM_SEED if set, else time-based.
 	var seed int64
-	if seedStr := os.Getenv("RLS_RANDOM_SEED"); seedStr != "" {
+	if seedStr := os.Getenv("RLP_RANDOM_SEED"); seedStr != "" {
 		if s, err := strconv.ParseInt(seedStr, 10, 64); err == nil {
 			seed = s
 		}
@@ -764,7 +764,7 @@ func CsvCreateData() {
 		}
 	}
 
-	elapsed := time.Since(start).Truncate(time.Second)
+	elapsed := time.Since(start).Truncate(time.Millisecond)
 
 	log.Printf("[csv] CSV data generation DONE: elapsed=%s", elapsed)
 	log.Printf("[csv] organizations:        %d", cfg.NumOrgs)

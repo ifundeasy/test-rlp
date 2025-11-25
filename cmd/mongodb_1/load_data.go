@@ -102,7 +102,7 @@ func MongodbCreateData() {
 		groupViewers,
 	)
 
-	elapsed := time.Since(start).Truncate(time.Second)
+	elapsed := time.Since(start).Truncate(time.Millisecond)
 	log.Printf("[mongodb_1] MongoDB data load DONE: elapsed=%s", elapsed)
 }
 

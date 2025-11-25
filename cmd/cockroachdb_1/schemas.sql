@@ -1,4 +1,4 @@
--- cmd/postgres_1/schemas.sql
+-- cmd/cockroachdb_1/schemas.sql
 -- Schema untuk dataset RLS (mirror dari cmd/csv/load_data.go)
 
 -- 1) Core entities
@@ -77,3 +77,44 @@ CREATE INDEX IF NOT EXISTS idx_resource_acl_by_resource_subject
 -- resource_acl: list resources by subject
 CREATE INDEX IF NOT EXISTS idx_resource_acl_by_subject
     ON resource_acl (subject_type, subject_id, relation, resource_id);
+
+-- ----------------------------------------
+-- Additional recommended indexes
+-- ----------------------------------------
+
+-- 1) Lookup permission by (resource, relation, subject)
+CREATE INDEX IF NOT EXISTS idx_resource_acl_res_rel_type_subject
+    ON resource_acl (resource_id, relation, subject_type, subject_id);
+
+-- 2) Fast lookup of users by primary org (helps org-scoped queries/joins)
+CREATE INDEX IF NOT EXISTS idx_users_org
+    ON users (org_id);
+
+-- ----------------------------------------
+-- Materialized view: resolved user permissions
+-- This precomputes effective permissions per (user,resource,relation)
+-- It expands group ACLs into user entries using `group_memberships`.
+-- Use `REFRESH MATERIALIZED VIEW user_resource_permissions;` to populate.
+-- ----------------------------------------
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS user_resource_permissions AS
+-- direct user ACLs
+SELECT r.resource_id, r.org_id, ra.subject_id AS user_id, ra.relation
+FROM resource_acl ra
+JOIN resources r ON r.resource_id = ra.resource_id
+WHERE ra.subject_type = 'user'
+
+UNION
+
+-- group ACLs expanded to users
+SELECT r.resource_id, r.org_id, gm.user_id, ra.relation
+FROM resource_acl ra
+JOIN resources r ON r.resource_id = ra.resource_id
+JOIN group_memberships gm ON ra.subject_type = 'group' AND ra.subject_id = gm.group_id;
+
+-- Useful access patterns on the materialized view
+CREATE INDEX IF NOT EXISTS idx_urp_user_rel_res
+    ON user_resource_permissions (user_id, relation, resource_id);
+
+CREATE INDEX IF NOT EXISTS idx_urp_org_user_rel
+    ON user_resource_permissions (org_id, user_id, relation, resource_id);

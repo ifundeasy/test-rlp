@@ -345,7 +345,7 @@ func loadBenchDataset(db *sql.DB) *benchDataset {
 		}
 	}
 
-	elapsed := time.Since(start).Truncate(time.Second)
+	elapsed := time.Since(start).Truncate(time.Millisecond)
 	log.Printf("[clickhouse_1] Benchmark dataset loaded in %s: directManagerPairs=%d orgAdminPairs=%d groupViewPairs=%d heavyManageUser=%q regularViewUser=%q",
 		elapsed, len(directManagerPairs), len(orgAdminPairs), len(groupViewPairs),
 		heavyStr, regStr)
@@ -390,8 +390,8 @@ func runCheckManageDirectUser(db *sql.DB, data *benchDataset) {
 
 		row := db.QueryRowContext(ctx, `
 			SELECT 1
-			FROM resource_acl
-			WHERE resource_id = ? AND subject_type = 'user' AND subject_id = ? AND relation = 'manager'
+			FROM user_resource_permissions
+			WHERE resource_id = ? AND user_id = ? AND relation = 'manager'
 			LIMIT 1
 		`, resID, userID)
 
@@ -443,12 +443,8 @@ func runCheckManageOrgAdmin(db *sql.DB, data *benchDataset) {
 
 		row := db.QueryRowContext(ctx, `
 			SELECT 1
-			FROM resources r
-			JOIN org_memberships om
-				ON om.org_id = r.org_id
-				AND om.user_id = ?
-				AND om.role = 'admin'
-			WHERE r.resource_id = ?
+			FROM user_resource_permissions
+			WHERE resource_id = ? AND user_id = ? AND relation = 'manager'
 			LIMIT 1
 		`, userID, resID)
 
@@ -500,13 +496,8 @@ func runCheckViewViaGroupMember(db *sql.DB, data *benchDataset) {
 
 		row := db.QueryRowContext(ctx, `
 			SELECT 1
-			FROM resource_acl ra
-			JOIN group_memberships gm
-				ON gm.group_id = ra.subject_id
-			WHERE ra.resource_id = ?
-			  AND ra.subject_type = 'group'
-			  AND ra.relation = 'viewer'
-			  AND gm.user_id = ?
+			FROM user_resource_permissions
+			WHERE resource_id = ? AND user_id = ? AND relation = 'viewer'
 			LIMIT 1
 		`, resID, userID)
 
@@ -560,44 +551,18 @@ func runLookupResourcesManageHeavyUser(db *sql.DB, data *benchDataset) {
 	var total time.Duration
 	var lastCount int
 
-	query := `
-		SELECT DISTINCT resource_id
-		FROM (
-			-- manage via direct user
-			SELECT ra.resource_id
-			FROM resource_acl ra
-			WHERE ra.subject_type = 'user'
-			  AND ra.relation = 'manager'
-			  AND ra.subject_id = ?
-
-			UNION ALL
-
-			-- manage via group
-			SELECT ra.resource_id
-			FROM resource_acl ra
-			JOIN group_memberships gm
-				ON gm.group_id = ra.subject_id
-			WHERE ra.subject_type = 'group'
-			  AND ra.relation = 'manager'
-			  AND gm.user_id = ?
-
-			UNION ALL
-
-			-- manage via org admin
-			SELECT r.resource_id
-			FROM resources r
-			JOIN org_memberships om
-				ON om.org_id = r.org_id
-			WHERE om.user_id = ?
-			  AND om.role = 'admin'
-		)
-	`
+	// flattened query replaced by user_resource_permissions usage
 
 	for i := 0; i < iters; i++ {
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		start := time.Now()
 
-		rows, err := db.QueryContext(ctx, query, userID, userID, userID)
+		// Use flattened user_resource_permissions to avoid joins and unions
+		rows, err := db.QueryContext(ctx, `
+			SELECT DISTINCT resource_id
+			FROM user_resource_permissions
+			WHERE user_id = ? AND relation = 'manager'
+		`, userID)
 		if err != nil {
 			cancel()
 			log.Fatalf("[clickhouse_1] [%s] query failed: %v", name, err)
@@ -664,75 +629,18 @@ func runLookupResourcesViewRegularUser(db *sql.DB, data *benchDataset) {
 	var total time.Duration
 	var lastCount int
 
-	query := `
-		SELECT DISTINCT resource_id
-		FROM (
-			-- view via manage (direct user)
-			SELECT ra.resource_id
-			FROM resource_acl ra
-			WHERE ra.subject_type = 'user'
-			  AND ra.relation = 'manager'
-			  AND ra.subject_id = ?
-
-			UNION ALL
-
-			-- view via manage (group)
-			SELECT ra.resource_id
-			FROM resource_acl ra
-			JOIN group_memberships gm
-				ON gm.group_id = ra.subject_id
-			WHERE ra.subject_type = 'group'
-			  AND ra.relation = 'manager'
-			  AND gm.user_id = ?
-
-			UNION ALL
-
-			-- view via manage (org admin)
-			SELECT r.resource_id
-			FROM resources r
-			JOIN org_memberships om
-				ON om.org_id = r.org_id
-			WHERE om.user_id = ?
-			  AND om.role = 'admin'
-
-			UNION ALL
-
-			-- view via org membership (member or admin)
-			SELECT r.resource_id
-			FROM resources r
-			JOIN org_memberships om
-				ON om.org_id = r.org_id
-			WHERE om.user_id = ?
-
-			UNION ALL
-
-			-- view via viewer_user ACL
-			SELECT ra.resource_id
-			FROM resource_acl ra
-			WHERE ra.subject_type = 'user'
-			  AND ra.relation = 'viewer'
-			  AND ra.subject_id = ?
-
-			UNION ALL
-
-			-- view via viewer_group ACL
-			SELECT ra.resource_id
-			FROM resource_acl ra
-			JOIN group_memberships gm
-				ON gm.group_id = ra.subject_id
-			WHERE ra.subject_type = 'group'
-			  AND ra.relation = 'viewer'
-			  AND gm.user_id = ?
-		)
-	`
+	// flattened query replaced by user_resource_permissions usage
 
 	for i := 0; i < iters; i++ {
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		start := time.Now()
 
-		rows, err := db.QueryContext(ctx, query,
-			userID, userID, userID, userID, userID, userID,
-		)
+		// Use flattened user_resource_permissions to capture manager+viewer
+		rows, err := db.QueryContext(ctx, `
+			SELECT DISTINCT resource_id
+			FROM user_resource_permissions
+			WHERE user_id = ? AND relation IN ('viewer','manager')
+		`, userID)
 		if err != nil {
 			cancel()
 			log.Fatalf("[clickhouse_1] [%s] query failed: %v", name, err)

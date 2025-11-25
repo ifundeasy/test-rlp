@@ -19,6 +19,10 @@ const (
 	dataDir = "data"
 )
 
+const (
+	insertBatchSize = 1000
+)
+
 // small int-set helper
 type intSet map[int]struct{}
 
@@ -97,7 +101,7 @@ func ScylladbCreateData() {
 		groupViewers,
 	)
 
-	elapsed := time.Since(start).Truncate(time.Second)
+	elapsed := time.Since(start).Truncate(time.Millisecond)
 	log.Printf("[scylladb_1] ScyllaDB data load DONE: elapsed=%s", elapsed)
 }
 
@@ -149,6 +153,17 @@ func mustAtoi(s, field string) int {
 	return v
 }
 
+// execBatch executes the provided batch (if not empty) and returns a fresh batch.
+func execBatch(session *gocql.Session, b *gocql.Batch, name string) *gocql.Batch {
+	if b == nil || len(b.Entries) == 0 {
+		return session.NewBatch(gocql.UnloggedBatch)
+	}
+	if err := session.ExecuteBatch(b); err != nil {
+		log.Fatalf("[scylladb_1] ExecuteBatch %s failed: %v", name, err)
+	}
+	return session.NewBatch(gocql.UnloggedBatch)
+}
+
 // =========================
 // Load organizations
 // =========================
@@ -163,6 +178,7 @@ func loadOrganizations(ctx context.Context, session *gocql.Session) {
 	}
 
 	count := 0
+	batch := session.NewBatch(gocql.UnloggedBatch)
 	for {
 		rec, err := r.Read()
 		if err == io.EOF {
@@ -177,15 +193,17 @@ func loadOrganizations(ctx context.Context, session *gocql.Session) {
 
 		orgID := mustAtoi(rec[0], "organizations.org_id")
 
-		if err := session.
-			Query("INSERT INTO organizations (org_id) VALUES (?)", orgID).
-			WithContext(ctx).
-			Exec(); err != nil {
-			log.Fatalf("[scylladb_1] organizations: insert failed: %v", err)
-		}
+		batch.Query("INSERT INTO organizations (org_id) VALUES (?)", orgID)
 		count++
+
+		if len(batch.Entries) >= insertBatchSize {
+			batch = execBatch(session, batch, "organizations")
+		}
 	}
 
+	if len(batch.Entries) > 0 {
+		_ = execBatch(session, batch, "organizations")
+	}
 	log.Printf("[scylladb_1] organizations: inserted %d rows", count)
 }
 
@@ -203,6 +221,7 @@ func loadUsers(ctx context.Context, session *gocql.Session) {
 	}
 
 	count := 0
+	batch := session.NewBatch(gocql.UnloggedBatch)
 	for {
 		rec, err := r.Read()
 		if err == io.EOF {
@@ -218,15 +237,17 @@ func loadUsers(ctx context.Context, session *gocql.Session) {
 		userID := mustAtoi(rec[0], "users.user_id")
 		orgID := mustAtoi(rec[1], "users.org_id")
 
-		if err := session.
-			Query("INSERT INTO users (user_id, org_id) VALUES (?, ?)", userID, orgID).
-			WithContext(ctx).
-			Exec(); err != nil {
-			log.Fatalf("[scylladb_1] users: insert failed: %v", err)
-		}
+		batch.Query("INSERT INTO users (user_id, org_id) VALUES (?, ?)", userID, orgID)
 		count++
+
+		if len(batch.Entries) >= insertBatchSize {
+			batch = execBatch(session, batch, "users")
+		}
 	}
 
+	if len(batch.Entries) > 0 {
+		_ = execBatch(session, batch, "users")
+	}
 	log.Printf("[scylladb_1] users: inserted %d rows", count)
 }
 
@@ -244,6 +265,7 @@ func loadGroups(ctx context.Context, session *gocql.Session) {
 	}
 
 	count := 0
+	batch := session.NewBatch(gocql.UnloggedBatch)
 	for {
 		rec, err := r.Read()
 		if err == io.EOF {
@@ -259,15 +281,17 @@ func loadGroups(ctx context.Context, session *gocql.Session) {
 		groupID := mustAtoi(rec[0], "groups.group_id")
 		orgID := mustAtoi(rec[1], "groups.org_id")
 
-		if err := session.
-			Query("INSERT INTO groups (group_id, org_id) VALUES (?, ?)", groupID, orgID).
-			WithContext(ctx).
-			Exec(); err != nil {
-			log.Fatalf("[scylladb_1] groups: insert failed: %v", err)
-		}
+		batch.Query("INSERT INTO groups (group_id, org_id) VALUES (?, ?)", groupID, orgID)
 		count++
+
+		if len(batch.Entries) >= insertBatchSize {
+			batch = execBatch(session, batch, "groups")
+		}
 	}
 
+	if len(batch.Entries) > 0 {
+		_ = execBatch(session, batch, "groups")
+	}
 	log.Printf("[scylladb_1] groups: inserted %d rows", count)
 }
 
@@ -294,6 +318,7 @@ func loadOrgMemberships(ctx context.Context, session *gocql.Session) (map[int]in
 	orgMembers := make(map[int]intSet)
 
 	count := 0
+	batch := session.NewBatch(gocql.UnloggedBatch)
 	for {
 		rec, err := r.Read()
 		if err == io.EOF {
@@ -310,13 +335,11 @@ func loadOrgMemberships(ctx context.Context, session *gocql.Session) (map[int]in
 		userID := mustAtoi(rec[1], "org_memberships.user_id")
 		role := rec[2]
 
-		if err := session.
-			Query("INSERT INTO org_memberships (org_id, user_id, role) VALUES (?, ?, ?)", orgID, userID, role).
-			WithContext(ctx).
-			Exec(); err != nil {
-			log.Fatalf("[scylladb_1] org_memberships: insert failed: %v", err)
-		}
+		batch.Query("INSERT INTO org_memberships (org_id, user_id, role) VALUES (?, ?, ?)", orgID, userID, role)
 		count++
+		if len(batch.Entries) >= insertBatchSize {
+			batch = execBatch(session, batch, "org_memberships")
+		}
 
 		switch role {
 		case "admin":
@@ -337,7 +360,9 @@ func loadOrgMemberships(ctx context.Context, session *gocql.Session) (map[int]in
 			log.Fatalf("[scylladb_1] org_memberships: unknown role %q", role)
 		}
 	}
-
+	if len(batch.Entries) > 0 {
+		_ = execBatch(session, batch, "org_memberships")
+	}
 	log.Printf("[scylladb_1] org_memberships: inserted %d rows", count)
 	return orgAdmins, orgMembers
 }
@@ -363,6 +388,7 @@ func loadGroupMemberships(ctx context.Context, session *gocql.Session) map[int]i
 	groupMembers := make(map[int]intSet)
 
 	count := 0
+	batch := session.NewBatch(gocql.UnloggedBatch)
 	for {
 		rec, err := r.Read()
 		if err == io.EOF {
@@ -379,13 +405,11 @@ func loadGroupMemberships(ctx context.Context, session *gocql.Session) map[int]i
 		userID := mustAtoi(rec[1], "group_memberships.user_id")
 		role := rec[2]
 
-		if err := session.
-			Query("INSERT INTO group_memberships (user_id, group_id, role) VALUES (?, ?, ?)", userID, groupID, role).
-			WithContext(ctx).
-			Exec(); err != nil {
-			log.Fatalf("[scylladb_1] group_memberships: insert failed: %v", err)
-		}
+		batch.Query("INSERT INTO group_memberships (user_id, group_id, role) VALUES (?, ?, ?)", userID, groupID, role)
 		count++
+		if len(batch.Entries) >= insertBatchSize {
+			batch = execBatch(session, batch, "group_memberships")
+		}
 
 		// role is currently always "member"
 		s, ok := groupMembers[groupID]
@@ -394,6 +418,10 @@ func loadGroupMemberships(ctx context.Context, session *gocql.Session) map[int]i
 			groupMembers[groupID] = s
 		}
 		s.add(userID)
+	}
+
+	if len(batch.Entries) > 0 {
+		_ = execBatch(session, batch, "group_memberships")
 	}
 
 	log.Printf("[scylladb_1] group_memberships: inserted %d rows", count)
@@ -420,6 +448,7 @@ func loadResources(ctx context.Context, session *gocql.Session) map[int]int {
 
 	resourceOrg := make(map[int]int)
 	count := 0
+	batch := session.NewBatch(gocql.UnloggedBatch)
 
 	for {
 		rec, err := r.Read()
@@ -436,15 +465,18 @@ func loadResources(ctx context.Context, session *gocql.Session) map[int]int {
 		resID := mustAtoi(rec[0], "resources.resource_id")
 		orgID := mustAtoi(rec[1], "resources.org_id")
 
-		if err := session.
-			Query("INSERT INTO resources (resource_id, org_id) VALUES (?, ?)", resID, orgID).
-			WithContext(ctx).
-			Exec(); err != nil {
-			log.Fatalf("[scylladb_1] resources: insert failed: %v", err)
-		}
+		batch.Query("INSERT INTO resources (resource_id, org_id) VALUES (?, ?)", resID, orgID)
 		count++
 
+		if len(batch.Entries) >= insertBatchSize {
+			batch = execBatch(session, batch, "resources")
+		}
+
 		resourceOrg[resID] = orgID
+	}
+
+	if len(batch.Entries) > 0 {
+		_ = execBatch(session, batch, "resources")
 	}
 
 	log.Printf("[scylladb_1] resources: inserted %d rows", count)
@@ -486,6 +518,8 @@ func loadResourceACL(
 	groupViewers := make(map[int]intSet)
 
 	count := 0
+	batchByResource := session.NewBatch(gocql.UnloggedBatch)
+	batchBySubject := session.NewBatch(gocql.UnloggedBatch)
 	for {
 		rec, err := r.Read()
 		if err == io.EOF {
@@ -503,29 +537,25 @@ func loadResourceACL(
 		subjectID := mustAtoi(rec[2], "resource_acl.subject_id")
 		relation := rec[3]
 
-		// Insert into resource_acl_by_resource
-		if err := session.
-			Query(
-				"INSERT INTO resource_acl_by_resource (resource_id, relation, subject_type, subject_id) VALUES (?, ?, ?, ?)",
-				resID, relation, subjectType, subjectID,
-			).
-			WithContext(ctx).
-			Exec(); err != nil {
-			log.Fatalf("[scylladb_1] resource_acl_by_resource: insert failed: %v", err)
-		}
-
-		// Insert into resource_acl_by_subject
-		if err := session.
-			Query(
-				"INSERT INTO resource_acl_by_subject (subject_type, subject_id, relation, resource_id) VALUES (?, ?, ?, ?)",
-				subjectType, subjectID, relation, resID,
-			).
-			WithContext(ctx).
-			Exec(); err != nil {
-			log.Fatalf("[scylladb_1] resource_acl_by_subject: insert failed: %v", err)
-		}
+		// Insert into resource_acl_by_resource (batched)
+		batchByResource.Query(
+			"INSERT INTO resource_acl_by_resource (resource_id, relation, subject_type, subject_id) VALUES (?, ?, ?, ?)",
+			resID, relation, subjectType, subjectID,
+		)
+		// Insert into resource_acl_by_subject (batched)
+		batchBySubject.Query(
+			"INSERT INTO resource_acl_by_subject (subject_type, subject_id, relation, resource_id) VALUES (?, ?, ?, ?)",
+			subjectType, subjectID, relation, resID,
+		)
 
 		count++
+
+		if len(batchByResource.Entries) >= insertBatchSize {
+			batchByResource = execBatch(session, batchByResource, "resource_acl_by_resource")
+		}
+		if len(batchBySubject.Entries) >= insertBatchSize {
+			batchBySubject = execBatch(session, batchBySubject, "resource_acl_by_subject")
+		}
 
 		switch subjectType {
 		case "user":
@@ -571,6 +601,13 @@ func loadResourceACL(
 		default:
 			log.Fatalf("[scylladb_1] resource_acl: unknown subject_type: %q", subjectType)
 		}
+	}
+
+	if len(batchByResource.Entries) > 0 {
+		_ = execBatch(session, batchByResource, "resource_acl_by_resource")
+	}
+	if len(batchBySubject.Entries) > 0 {
+		_ = execBatch(session, batchBySubject, "resource_acl_by_subject")
 	}
 
 	log.Printf("[scylladb_1] resource_acl: inserted %d rows", count)

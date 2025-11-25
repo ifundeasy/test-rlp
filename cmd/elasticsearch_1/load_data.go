@@ -38,7 +38,7 @@ type aclEntry struct {
 	SubjectID   int    `json:"subject_id"`
 }
 
-// resourceDoc is the Elasticsearch document stored in rls_resources index.
+// resourceDoc is the Elasticsearch document stored in rlp_resources index.
 type resourceDoc struct {
 	ResourceID          int        `json:"resource_id"`
 	OrgID               int        `json:"org_id"`
@@ -95,7 +95,7 @@ func ElasticsearchCreateData() {
 	// Build and index documents per resource.
 	indexResourceDocs(rootCtx, es, resourceOrg, orgAdmins, orgMembers, groupMembers, directUserManagers, directUserViewers, groupManagers, groupViewers, resourceACL)
 
-	elapsed := time.Since(start).Truncate(time.Second)
+	elapsed := time.Since(start).Truncate(time.Millisecond)
 	log.Printf("[elasticsearch_1] Elasticsearch data load DONE: elapsed=%s", elapsed)
 }
 

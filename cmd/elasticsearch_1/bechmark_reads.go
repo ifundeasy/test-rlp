@@ -81,7 +81,7 @@ func ElasticsearchBenchmarkReads() {
 	log.Println("[elasticsearch_1] == Elasticsearch read benchmarks DONE ==")
 }
 
-// buildBenchDatasetFromElasticsearch scans the rls_resources index and builds
+// buildBenchDatasetFromElasticsearch scans the rlp_resources index and builds
 // a benchmark dataset from the compiled permission closure stored in ES:
 //
 //	directManagerPairs: all (user, resource) where user can manage resource
@@ -226,7 +226,7 @@ func buildBenchDatasetFromElasticsearch(ctx context.Context, es *elasticsearch.C
 		regular = v
 	}
 
-	elapsed := time.Since(start).Truncate(time.Second)
+	elapsed := time.Since(start).Truncate(time.Millisecond)
 	log.Printf("[elasticsearch_1] Benchmark dataset loaded in %s: directManagerPairs=%d orgAdminPairs=%d groupViewPairs=%d heavyManageUser=%q regularViewUser=%q",
 		elapsed, len(managePairs), 0, 0, heavy, regular)
 

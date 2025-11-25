@@ -120,6 +120,60 @@ func ClickhouseCreateSchemas() {
 			ON resource_acl (resource_id)
 			TYPE minmax
 			GRANULARITY 1`,
+
+		// 8) user_resource_permissions: flattened per-user permissions
+		// This materialized view expands group memberships and org-based
+		// permissions into a simple (user_id, resource_id, relation) table
+		// optimized for point-checks and resource lookups by user.
+		`CREATE TABLE IF NOT EXISTS user_resource_permissions (
+			resource_id UInt32,
+			user_id UInt32,
+			relation Enum8('viewer' = 1, 'manager' = 2)
+		) ENGINE = MergeTree
+		PARTITION BY intDiv(user_id, 10000)
+		ORDER BY (user_id, resource_id, relation)`,
+
+		// Materialized view that populates user_resource_permissions from
+		// resource_acl, group_memberships and org_memberships. It should be
+		// created before bulk-loading the underlying tables so inserts
+		// automatically populate the flattened table.
+		`CREATE MATERIALIZED VIEW IF NOT EXISTS user_resource_permissions_mv
+		TO user_resource_permissions AS
+		SELECT
+			ra.resource_id AS resource_id,
+			ra.subject_id AS user_id,
+			ra.relation AS relation
+		FROM resource_acl AS ra
+		WHERE ra.subject_type = 'user'
+		UNION ALL
+		SELECT
+			ra.resource_id AS resource_id,
+			gm.user_id AS user_id,
+			ra.relation AS relation
+		FROM resource_acl AS ra
+		JOIN group_memberships AS gm
+			ON gm.group_id = ra.subject_id
+		WHERE ra.subject_type = 'group'
+		UNION ALL
+		-- org-admins become managers
+		SELECT
+			r.resource_id AS resource_id,
+			om.user_id AS user_id,
+			'manager' AS relation
+		FROM resources AS r
+		JOIN org_memberships AS om
+			ON om.org_id = r.org_id
+		WHERE om.role = 'admin'
+		UNION ALL
+		-- org-members (and admins) become viewers
+		SELECT
+			r.resource_id AS resource_id,
+			om.user_id AS user_id,
+			'viewer' AS relation
+		FROM resources AS r
+		JOIN org_memberships AS om
+			ON om.org_id = r.org_id
+		WHERE om.role = 'member' OR om.role = 'admin'`,
 	}
 
 	for _, stmt := range stmts {

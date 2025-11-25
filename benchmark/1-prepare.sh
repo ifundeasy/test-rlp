@@ -4,6 +4,9 @@ set -euo pipefail
 LOGFILE="benchmark/1-prepare.log"
 ENVFILE="benchmark/bench.env"
 
+# Make log always fresh for each run
+: > "$LOGFILE"
+
 if [[ -f benchmark/bench.env ]]; then
   # shellcheck disable=SC1091
   source $ENVFILE

@@ -12,7 +12,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v9"
 )
 
-const IndexName = "rls_resources"
+const IndexName = "rlp_resources"
 
 // =========================
 // Build and index resource docs
@@ -45,6 +45,7 @@ func indexResourceDocs(
 
 		res, err := es.Bulk(bytes.NewReader(buf.Bytes()),
 			es.Bulk.WithContext(bulkCtx),
+			es.Bulk.WithRefresh("false"),
 		)
 		if err != nil {
 			log.Fatalf("[elasticsearch_1] bulk index failed: %v", err)
@@ -168,6 +169,17 @@ func indexResourceDocs(
 	}
 
 	flush()
+
+	// Ensure documents are visible for subsequent searches (benchmarks).
+	refreshCtx, cancelRefresh := context.WithTimeout(ctx, 30*time.Second)
+	defer cancelRefresh()
+	if _, err := es.Indices.Refresh(
+		es.Indices.Refresh.WithIndex([]string{IndexName}...),
+		es.Indices.Refresh.WithContext(refreshCtx),
+	); err != nil {
+		log.Printf("[elasticsearch_1] index refresh failed: %v", err)
+	}
+
 	elapsed := time.Since(start).Truncate(time.Millisecond)
 	log.Printf("[elasticsearch_1] Indexed %d resource docs into %q in %s", docCount, IndexName, elapsed)
 }

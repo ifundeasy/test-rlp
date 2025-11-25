@@ -149,13 +149,21 @@ func buildBenchDataset(ctx context.Context, session *gocql.Session) *benchDatase
 		regularViewCount:   regularCount,
 	}
 
-	elapsed := time.Since(start).Truncate(time.Second)
+	elapsed := time.Since(start).Truncate(time.Millisecond)
+	// For comparability with other backends, report the same set of
+	// benchmark dataset fields. Scylla's builder doesn't currently
+	// compute `orgAdminPairs` or `groupViewPairs`, so report 0 for them.
+	orgAdminPairs := 0
+	groupViewPairs := 0
+
 	log.Printf(
-		"[scylladb_1] Benchmark dataset loaded in %s: directManagerPairs=%d heavyManageUser=\"%s\" (manage=%d) regularViewUser=\"%s\" (view=%d)",
+		"[scylladb_1] Benchmark dataset loaded in %s: directManagerPairs=%d orgAdminPairs=%d groupViewPairs=%d heavyManageUser=%q regularViewUser=%q",
 		elapsed,
 		len(data.directManagerPairs),
-		data.heavyManageUser, data.heavyManageCount,
-		data.regularViewUser, data.regularViewCount,
+		orgAdminPairs,
+		groupViewPairs,
+		data.heavyManageUser,
+		data.regularViewUser,
 	)
 
 	return data
@@ -279,20 +287,33 @@ func runListViewUser(ctx context.Context, session *gocql.Session, benchName stri
 }
 
 func listViewResources(ctx context.Context, session *gocql.Session, userID int) (int, error) {
-	// Single-partition scan by user_id, limited to a reasonable page.
+	// Single-partition scan by user_id. can_view is not part of the
+	// primary key, so filtering in CQL would require ALLOW FILTERING.
+	// Instead we fetch rows for the user and filter client-side, with
+	// a sensible page size and an early exit once we've collected
+	// `listLimit` visible resources.
+
 	iter := session.
 		Query(
-			"SELECT resource_id FROM user_resource_perms_by_user WHERE user_id = ? AND can_view = true LIMIT 100",
+			"SELECT resource_id, can_view FROM user_resource_perms_by_user WHERE user_id = ?",
 			userID,
 		).
 		WithContext(ctx).
 		Consistency(gocql.LocalOne).
+		PageSize(500).
 		Iter()
 
 	count := 0
 	var resID int
-	for iter.Scan(&resID) {
-		count++
+	var canView bool
+	for iter.Scan(&resID, &canView) {
+		if canView {
+			count++
+			if count >= listLimit {
+				// we have enough rows for this list request; stop early
+				break
+			}
+		}
 	}
 	if err := iter.Close(); err != nil {
 		return 0, err

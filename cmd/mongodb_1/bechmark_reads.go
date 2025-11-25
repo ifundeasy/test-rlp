@@ -246,7 +246,7 @@ func buildBenchDatasetFromMongo(ctx context.Context, db *mongo.Database) (*bench
 	// ---- 6) Determine heavyManageUser & regularViewUser (with env override) ----
 	heavy, regular := pickLookupUsers(manageCount, viewCount)
 
-	elapsed := time.Since(start).Truncate(time.Second)
+	elapsed := time.Since(start).Truncate(time.Millisecond)
 	log.Printf("[mongodb_1] Benchmark dataset loaded in %s: directManagerPairs=%d orgAdminPairs=%d groupViewPairs=%d heavyManageUser=%q regularViewUser=%q",
 		elapsed, len(directManagerPairs), len(orgAdminPairs), len(groupViewPairs), heavy, regular)
 
@@ -309,17 +309,17 @@ func runCheckManageDirectUser(parent context.Context, db *mongo.Database, data *
 	start := time.Now()
 	allowed := 0
 
-	coll := db.Collection("resource_acl")
+	// Use denormalized user_resource_perms for fast, indexed checks.
+	coll := db.Collection("user_resource_perms")
 
 	for i := 0; i < iters; i++ {
 		p := pairs[rnd.Intn(len(pairs))]
 
 		ctx, cancel := context.WithTimeout(parent, 2*time.Second)
 		count, err := coll.CountDocuments(ctx, bson.M{
-			"resource_id":  p.ResourceID,
-			"subject_type": "user",
-			"subject_id":   p.UserID,
-			"relation":     "manager",
+			"user_id":     p.UserID,
+			"resource_id": p.ResourceID,
+			"can_manage":  true,
 		})
 		cancel()
 		if err != nil {
@@ -355,38 +355,24 @@ func runCheckManageOrgAdmin(parent context.Context, db *mongo.Database, data *be
 	start := time.Now()
 	allowed := 0
 
-	resColl := db.Collection("resources")
-	orgMemberships := db.Collection("org_memberships")
+	// Denormalized check against user_resource_perms (includes org-admin path)
+	coll := db.Collection("user_resource_perms")
 
 	for i := 0; i < iters; i++ {
 		p := pairs[rnd.Intn(len(pairs))]
 
 		ctx, cancel := context.WithTimeout(parent, 2*time.Second)
-
-		// 1) Fetch org_id of resource
-		var r resourceDoc
-		// err := resColl.FindOne(ctx, bson.M{"resource_id": p.ResourceID}).Decode(&r)
-		err := resColl.FindOne(ctx, bson.M{"_id": p.ResourceID}).Decode(&r)
-		if err != nil {
-			cancel()
-			if err == mongo.ErrNoDocuments {
-				log.Fatalf("[mongodb_1] [check_manage_org_admin] resource not found: %s", p.ResourceID)
-			}
-			log.Fatalf("[mongodb_1] [check_manage_org_admin] find resource error: %v", err)
-		}
-
-		// 2) Check if user is admin of that org
-		count, err := orgMemberships.CountDocuments(ctx, bson.M{
-			"org_id":  r.OrgID,
-			"user_id": p.UserID,
-			"role":    "admin",
+		count, err := coll.CountDocuments(ctx, bson.M{
+			"user_id":     p.UserID,
+			"resource_id": p.ResourceID,
+			"can_manage":  true,
 		})
 		cancel()
 		if err != nil {
 			log.Fatalf("[mongodb_1] [check_manage_org_admin] query error: %v", err)
 		}
 		if count == 0 {
-			log.Fatalf("[mongodb_1] [check_manage_org_admin] unexpected deny for pair (resource=%s,user=%s,org=%s)", p.ResourceID, p.UserID, r.OrgID)
+			log.Fatalf("[mongodb_1] [check_manage_org_admin] unexpected deny for pair (resource=%s,user=%s)", p.ResourceID, p.UserID)
 		}
 		allowed++
 	}
@@ -415,48 +401,17 @@ func runCheckViewViaGroupMember(parent context.Context, db *mongo.Database, data
 	start := time.Now()
 	allowed := 0
 
-	groupMemberships := db.Collection("group_memberships")
-	resourceACL := db.Collection("resource_acl")
+	// Use denormalized user_resource_perms for fast view checks.
+	coll := db.Collection("user_resource_perms")
 
 	for i := 0; i < iters; i++ {
 		p := pairs[rnd.Intn(len(pairs))]
 
 		ctx, cancel := context.WithTimeout(parent, 2*time.Second)
-
-		// 1) Find groups where user is a member
-		gCur, err := groupMemberships.Find(ctx, bson.M{"user_id": p.UserID})
-		if err != nil {
-			cancel()
-			log.Fatalf("[mongodb_1] [check_view_via_group_member] find groups error: %v", err)
-		}
-
-		groupIDs := make([]string, 0, 8)
-		for gCur.Next(ctx) {
-			var gm groupMembershipDoc
-			if err := gCur.Decode(&gm); err != nil {
-				gCur.Close(ctx)
-				cancel()
-				log.Fatalf("[mongodb_1] [check_view_via_group_member] decode group_membership error: %v", err)
-			}
-			groupIDs = append(groupIDs, gm.GroupID)
-		}
-		gCur.Close(ctx)
-		if err := gCur.Err(); err != nil {
-			cancel()
-			log.Fatalf("[mongodb_1] [check_view_via_group_member] cursor error: %v", err)
-		}
-
-		if len(groupIDs) == 0 {
-			cancel()
-			log.Fatalf("[mongodb_1] [check_view_via_group_member] user=%s has no groups (expected at least one)", p.UserID)
-		}
-
-		// 2) Check if any of those groups has viewer ACL on the resource
-		count, err := resourceACL.CountDocuments(ctx, bson.M{
-			"resource_id":  p.ResourceID,
-			"subject_type": "group",
-			"relation":     "viewer",
-			"subject_id":   bson.M{"$in": groupIDs},
+		count, err := coll.CountDocuments(ctx, bson.M{
+			"user_id":     p.UserID,
+			"resource_id": p.ResourceID,
+			"can_view":    true,
 		})
 		cancel()
 		if err != nil {
@@ -524,123 +479,12 @@ func runLookupResourcesManageSuper(parent context.Context, db *mongo.Database, d
 }
 
 func mongoLookupManageResourcesForUser(ctx context.Context, db *mongo.Database, userID string) ([]string, error) {
-	resourceACL := db.Collection("resource_acl")
-	orgMemberships := db.Collection("org_memberships")
-	groupMemberships := db.Collection("group_memberships")
-	resources := db.Collection("resources")
-
-	resultSet := make(map[string]struct{})
-
-	// 1) Direct manager ACLs
-	rCur, err := resourceACL.Find(ctx, bson.M{
-		"subject_type": "user",
-		"subject_id":   userID,
-		"relation":     "manager",
+	// Use denormalized user_resource_perms which already encodes all paths.
+	coll := db.Collection("user_resource_perms")
+	return distinctStrings(ctx, coll, "resource_id", bson.M{
+		"user_id":    userID,
+		"can_manage": true,
 	})
-	if err != nil {
-		return nil, err
-	}
-	for rCur.Next(ctx) {
-		var ra resourceACLDoc
-		if err := rCur.Decode(&ra); err != nil {
-			rCur.Close(ctx)
-			return nil, err
-		}
-		resultSet[ra.ResourceID] = struct{}{}
-	}
-	rCur.Close(ctx)
-	if err := rCur.Err(); err != nil {
-		return nil, err
-	}
-
-	// 2) Group-based manager ACLs
-	gCur, err := groupMemberships.Find(ctx, bson.M{"user_id": userID})
-	if err != nil {
-		return nil, err
-	}
-	groupIDs := make([]string, 0, 8)
-	for gCur.Next(ctx) {
-		var gm groupMembershipDoc
-		if err := gCur.Decode(&gm); err != nil {
-			gCur.Close(ctx)
-			return nil, err
-		}
-		groupIDs = append(groupIDs, gm.GroupID)
-	}
-	gCur.Close(ctx)
-	if err := gCur.Err(); err != nil {
-		return nil, err
-	}
-	if len(groupIDs) > 0 {
-		rCur2, err := resourceACL.Find(ctx, bson.M{
-			"subject_type": "group",
-			"relation":     "manager",
-			"subject_id":   bson.M{"$in": groupIDs},
-		})
-		if err != nil {
-			return nil, err
-		}
-		for rCur2.Next(ctx) {
-			var ra resourceACLDoc
-			if err := rCur2.Decode(&ra); err != nil {
-				rCur2.Close(ctx)
-				return nil, err
-			}
-			resultSet[ra.ResourceID] = struct{}{}
-		}
-		rCur2.Close(ctx)
-		if err := rCur2.Err(); err != nil {
-			return nil, err
-		}
-	}
-
-	// 3) Org admin path
-	omCur, err := orgMemberships.Find(ctx, bson.M{
-		"user_id": userID,
-		"role":    "admin",
-	})
-	if err != nil {
-		return nil, err
-	}
-	adminOrgs := make([]string, 0, 4)
-	for omCur.Next(ctx) {
-		var om orgMembershipDoc
-		if err := omCur.Decode(&om); err != nil {
-			omCur.Close(ctx)
-			return nil, err
-		}
-		adminOrgs = append(adminOrgs, om.OrgID)
-	}
-	omCur.Close(ctx)
-	if err := omCur.Err(); err != nil {
-		return nil, err
-	}
-	if len(adminOrgs) > 0 {
-		resCur, err := resources.Find(ctx, bson.M{
-			"org_id": bson.M{"$in": adminOrgs},
-		})
-		if err != nil {
-			return nil, err
-		}
-		for resCur.Next(ctx) {
-			var r resourceDoc
-			if err := resCur.Decode(&r); err != nil {
-				resCur.Close(ctx)
-				return nil, err
-			}
-			resultSet[r.ResourceID] = struct{}{}
-		}
-		resCur.Close(ctx)
-		if err := resCur.Err(); err != nil {
-			return nil, err
-		}
-	}
-
-	out := make([]string, 0, len(resultSet))
-	for rid := range resultSet {
-		out = append(out, rid)
-	}
-	return out, nil
 }
 
 // ================================
@@ -775,80 +619,11 @@ func runLookupResourcesViewRegular(parent context.Context, db *mongo.Database, d
 }
 
 func mongoLookupViewResourcesForUser(ctx context.Context, db *mongo.Database, userID string) ([]string, error) {
-	resourceACL := db.Collection("resource_acl")
-	groupMemberships := db.Collection("group_memberships")
-
-	resultSet := make(map[string]struct{})
-
-	// 1) Direct viewer ACLs
-	rCur, err := resourceACL.Find(ctx, bson.M{
-		"subject_type": "user",
-		"subject_id":   userID,
-		"relation":     "viewer",
+	coll := db.Collection("user_resource_perms")
+	return distinctStrings(ctx, coll, "resource_id", bson.M{
+		"user_id":  userID,
+		"can_view": true,
 	})
-	if err != nil {
-		return nil, err
-	}
-	for rCur.Next(ctx) {
-		var ra resourceACLDoc
-		if err := rCur.Decode(&ra); err != nil {
-			rCur.Close(ctx)
-			return nil, err
-		}
-		resultSet[ra.ResourceID] = struct{}{}
-	}
-	rCur.Close(ctx)
-	if err := rCur.Err(); err != nil {
-		return nil, err
-	}
-
-	// 2) Viewer via groups
-	gCur, err := groupMemberships.Find(ctx, bson.M{"user_id": userID})
-	if err != nil {
-		return nil, err
-	}
-	groupIDs := make([]string, 0, 8)
-	for gCur.Next(ctx) {
-		var gm groupMembershipDoc
-		if err := gCur.Decode(&gm); err != nil {
-			gCur.Close(ctx)
-			return nil, err
-		}
-		groupIDs = append(groupIDs, gm.GroupID)
-	}
-	gCur.Close(ctx)
-	if err := gCur.Err(); err != nil {
-		return nil, err
-	}
-
-	if len(groupIDs) > 0 {
-		rCur2, err := resourceACL.Find(ctx, bson.M{
-			"subject_type": "group",
-			"relation":     "viewer",
-			"subject_id":   bson.M{"$in": groupIDs},
-		})
-		if err != nil {
-			return nil, err
-		}
-		for rCur2.Next(ctx) {
-			var ra resourceACLDoc
-			if err := rCur2.Decode(&ra); err != nil {
-				rCur2.Close(ctx)
-				return nil, err
-			}
-			resultSet[ra.ResourceID] = struct{}{}
-		}
-		rCur2.Close(ctx)
-		if err := rCur2.Err(); err != nil {
-			return nil, err
-		}
-	}
-
-	out := make([]string, 0, len(resultSet))
-	for rid := range resultSet {
-		out = append(out, rid)
-	}
-	return out, nil
 }
 
 // ====================

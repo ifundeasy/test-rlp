@@ -41,13 +41,13 @@
 
 ❯ go run ./cmd/main.go elasticsearch_1 load-data
 2025/11/19 20:33:25 [elasticsearch] Using addresses=[http://localhost:9200] cloud_id_set=false auth_user=true timeout=5s insecure_tls=false
-2025/11/19 20:33:25 [elasticsearch_1] == Loading CSV data into Elasticsearch index "rls_resources" ==
+2025/11/19 20:33:25 [elasticsearch_1] == Loading CSV data into Elasticsearch index "rlp_resources" ==
 2025/11/19 20:33:25 [elasticsearch_1] org_memberships: loaded 2420 rows
 2025/11/19 20:33:25 [elasticsearch_1] group_memberships: loaded 9110 rows
 2025/11/19 20:33:25 [elasticsearch_1] resources: loaded 29370 rows
 2025/11/19 20:33:25 [elasticsearch_1] resource_acl: loaded 457366 rows
-2025/11/19 20:33:26 [elasticsearch_1] Cleared existing documents in index "rls_resources"
-2025/11/19 20:33:42 [elasticsearch_1] Indexed 29370 resource docs into "rls_resources" in 16.258s
+2025/11/19 20:33:26 [elasticsearch_1] Cleared existing documents in index "rlp_resources"
+2025/11/19 20:33:42 [elasticsearch_1] Indexed 29370 resource docs into "rlp_resources" in 16.258s
 2025/11/19 20:33:42 [elasticsearch_1] Elasticsearch data load DONE: elapsed=17s
 
 ❯ go run ./cmd/main.go postgres_1 load-data

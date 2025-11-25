@@ -46,7 +46,7 @@ SpiceDB’s Watch API on CockroachDB relies on Cockroach’s `rangefeed` / chang
 
    ```sql
    CREATE DATABASE rlp;
-   CREATE DATABASE rls_spicedb;
+   CREATE DATABASE rlp_spicedb;
 
    -- optional: show them
    SHOW DATABASES;

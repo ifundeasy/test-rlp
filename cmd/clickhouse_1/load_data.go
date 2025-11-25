@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"test-tls/infrastructure"
@@ -463,29 +464,48 @@ func loadResourceACL(ctx context.Context, db *sql.DB) {
 		log.Fatalf("[clickhouse_1] resource_acl: read header failed: %v", err)
 	}
 
+	// We'll batch inserts into multi-row VALUES statements to reduce RPCs
+	const batchSize = 1000
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		log.Fatalf("[clickhouse_1] resource_acl: begin tx failed: %v", err)
 	}
 
-	stmt, err := tx.PrepareContext(ctx, `
-		INSERT INTO resource_acl (resource_id, org_id, subject_type, subject_id, relation)
-		VALUES (?, ?, ?, ?, ?)
-	`)
-	if err != nil {
-		log.Fatalf("[clickhouse_1] resource_acl: prepare insert failed: %v", err)
-	}
+	defer func() {
+		// ensure commit on success
+		if err := tx.Commit(); err != nil {
+			log.Fatalf("[clickhouse_1] resource_acl: commit failed: %v", err)
+		}
+	}()
 
 	count := 0
+	vals := make([]string, 0, batchSize)
+	args := make([]interface{}, 0, batchSize*5)
+
+	flushBatch := func() {
+		if len(vals) == 0 {
+			return
+		}
+		q := "INSERT INTO resource_acl (resource_id, org_id, subject_type, subject_id, relation) VALUES " + strings.Join(vals, ",")
+		if _, err := tx.ExecContext(ctx, q, args...); err != nil {
+			tx.Rollback()
+			log.Fatalf("[clickhouse_1] resource_acl: batch insert failed: %v", err)
+		}
+		vals = vals[:0]
+		args = args[:0]
+	}
+
 	for {
 		rec, err := r.Read()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
+			tx.Rollback()
 			log.Fatalf("[clickhouse_1] resource_acl: read row failed: %v", err)
 		}
 		if len(rec) < 4 {
+			tx.Rollback()
 			log.Fatalf("[clickhouse_1] resource_acl: invalid row: %#v", rec)
 		}
 
@@ -496,6 +516,7 @@ func loadResourceACL(ctx context.Context, db *sql.DB) {
 
 		orgIDStr, ok := resOrg[resIDStr]
 		if !ok {
+			tx.Rollback()
 			log.Fatalf("[clickhouse_1] resource_acl: missing org_id for resource_id=%s", resIDStr)
 		}
 
@@ -503,18 +524,17 @@ func loadResourceACL(ctx context.Context, db *sql.DB) {
 		orgID := mustParseUint32(orgIDStr, "resource_acl.org_id")
 		subjectID := mustParseUint32(subjectIDStr, "resource_acl.subject_id")
 
-		if _, err := stmt.ExecContext(ctx, resourceID, orgID, subjectType, subjectID, relation); err != nil {
-			log.Fatalf("[clickhouse_1] resource_acl: insert failed: %v", err)
-		}
+		vals = append(vals, "(?, ?, ?, ?, ?)")
+		args = append(args, resourceID, orgID, subjectType, subjectID, relation)
 		count++
+
+		if len(vals) >= batchSize {
+			flushBatch()
+		}
 	}
 
-	if err := stmt.Close(); err != nil {
-		log.Fatalf("[clickhouse_1] resource_acl: close stmt failed: %v", err)
-	}
-	if err := tx.Commit(); err != nil {
-		log.Fatalf("[clickhouse_1] resource_acl: commit failed: %v", err)
-	}
+	// flush remaining
+	flushBatch()
 
 	log.Printf("[clickhouse_1] resource_acl: inserted %d rows in %s",
 		count, time.Since(start).Truncate(time.Millisecond))

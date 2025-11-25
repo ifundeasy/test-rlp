@@ -324,7 +324,7 @@ func loadBenchDataset(client *authzed.Client) *benchDataset {
 		regularViewUser = v
 	}
 
-	elapsed := time.Since(start).Truncate(time.Second)
+	elapsed := time.Since(start).Truncate(time.Millisecond)
 	log.Printf("[authzed_pgdb_1] Benchmark dataset loaded in %s: directManagerPairs=%d orgAdminPairs=%d groupViewPairs=%d heavyManageUser=%q regularViewUser=%q",
 		elapsed, len(directManagerPairs), len(orgAdminPairs), len(groupViewPairs),
 		heavyManageUser, regularViewUser)
@@ -374,6 +374,11 @@ func runCheckManageDirectUser(client *authzed.Client, data *benchDataset) {
 				Object: &v1.ObjectReference{
 					ObjectType: "user",
 					ObjectId:   userID,
+				},
+			},
+			Consistency: &v1.Consistency{
+				Requirement: &v1.Consistency_FullyConsistent{
+					FullyConsistent: true,
 				},
 			},
 		})
@@ -432,6 +437,11 @@ func runCheckManageOrgAdmin(client *authzed.Client, data *benchDataset) {
 					ObjectId:   userID,
 				},
 			},
+			Consistency: &v1.Consistency{
+				Requirement: &v1.Consistency_FullyConsistent{
+					FullyConsistent: true,
+				},
+			},
 		})
 		cancel()
 		if err != nil {
@@ -488,6 +498,11 @@ func runCheckViewViaGroupMember(client *authzed.Client, data *benchDataset) {
 					ObjectId:   userID,
 				},
 			},
+			Consistency: &v1.Consistency{
+				Requirement: &v1.Consistency_FullyConsistent{
+					FullyConsistent: true,
+				},
+			},
 		})
 		cancel()
 		if err != nil {
@@ -539,6 +554,11 @@ func runLookupResourcesManageHeavyUser(client *authzed.Client, data *benchDatase
 				Object: &v1.ObjectReference{
 					ObjectType: "user",
 					ObjectId:   userID,
+				},
+			},
+			Consistency: &v1.Consistency{
+				Requirement: &v1.Consistency_FullyConsistent{
+					FullyConsistent: true,
 				},
 			},
 		})
@@ -608,6 +628,11 @@ func runLookupResourcesViewRegularUser(client *authzed.Client, data *benchDatase
 				Object: &v1.ObjectReference{
 					ObjectType: "user",
 					ObjectId:   userID,
+				},
+			},
+			Consistency: &v1.Consistency{
+				Requirement: &v1.Consistency_FullyConsistent{
+					FullyConsistent: true,
 				},
 			},
 		})

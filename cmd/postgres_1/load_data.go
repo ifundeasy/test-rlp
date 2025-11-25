@@ -51,6 +51,9 @@ func PostgresCreateData() {
 	loadResources(db)
 	loadResourceACL(db)
 
+	// Refresh materialized view to precompute resolved user permissions
+	refreshUserResourcePermissions(db)
+
 	log.Printf("[postgres_1] load_data: ALL DONE in %s", time.Since(startAll).Truncate(time.Millisecond))
 }
 
@@ -441,4 +444,18 @@ func loadResourceACL(db *sql.DB) {
 
 	log.Printf("[postgres_1] resource_acl: inserted %d rows in %s",
 		count, time.Since(start).Truncate(time.Millisecond))
+}
+
+// refreshUserResourcePermissions calls the convenience function in the DB
+// that refreshes the materialized view `user_resource_permissions`.
+func refreshUserResourcePermissions(db *sql.DB) {
+	start := time.Now()
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
+	if _, err := db.ExecContext(ctx, `SELECT refresh_user_resource_permissions()`); err != nil {
+		log.Fatalf("[postgres_1] refresh_user_resource_permissions: failed: %v", err)
+	}
+
+	log.Printf("[postgres_1] refresh_user_resource_permissions: DONE in %s", time.Since(start).Truncate(time.Millisecond))
 }

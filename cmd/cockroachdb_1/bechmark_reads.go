@@ -343,7 +343,7 @@ func loadBenchDataset(db *sql.DB) *benchDataset {
 		regularViewUser = v
 	}
 
-	elapsed := time.Since(start).Truncate(time.Second)
+	elapsed := time.Since(start).Truncate(time.Millisecond)
 	log.Printf("[cockroachdb_1] Benchmark dataset loaded in %s: directManagerPairs=%d orgAdminPairs=%d groupViewPairs=%d heavyManageUser=%q regularViewUser=%q",
 		elapsed, len(directManagerPairs), len(orgAdminPairs), len(groupViewPairs),
 		heavyManageUser, regularViewUser)
@@ -376,14 +376,9 @@ func runCheckManageDirectUser(db *sql.DB, data *benchDataset) {
 	var total time.Duration
 	allowedCount := 0
 
-	for i := 0; i < iters; i++ {
-		pair := pairs[i%len(pairs)]
-
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		start := time.Now()
-
-		var dummy int
-		err := db.QueryRowContext(ctx, `
+	// prepare statement once to avoid repeated parse/plan overhead
+	prepCtx := context.Background()
+	stmt, err := db.PrepareContext(prepCtx, `
 			SELECT 1
 			FROM resource_acl
 			WHERE resource_id = $1
@@ -391,7 +386,20 @@ func runCheckManageDirectUser(db *sql.DB, data *benchDataset) {
 			  AND subject_id = $2
 			  AND relation = 'manager'
 			LIMIT 1
-		`, pair.ResourceID, pair.UserID).Scan(&dummy)
+		`)
+	if err != nil {
+		log.Fatalf("[cockroachdb_1] [%s] prepare failed: %v", name, err)
+	}
+	defer stmt.Close()
+
+	for i := 0; i < iters; i++ {
+		pair := pairs[i%len(pairs)]
+
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		start := time.Now()
+
+		var dummy int
+		err := stmt.QueryRowContext(ctx, pair.ResourceID, pair.UserID).Scan(&dummy)
 		cancel()
 
 		if err != nil && err != sql.ErrNoRows {
@@ -429,14 +437,9 @@ func runCheckManageOrgAdmin(db *sql.DB, data *benchDataset) {
 	var total time.Duration
 	allowedCount := 0
 
-	for i := 0; i < iters; i++ {
-		pair := pairs[i%len(pairs)]
-
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		start := time.Now()
-
-		var dummy int
-		err := db.QueryRowContext(ctx, `
+	// prepare once
+	prepCtx := context.Background()
+	stmt, err := db.PrepareContext(prepCtx, `
 			SELECT 1
 			FROM resources r
 			JOIN org_memberships om
@@ -445,7 +448,20 @@ func runCheckManageOrgAdmin(db *sql.DB, data *benchDataset) {
 			  AND om.user_id = $2
 			  AND om.role = 'admin'
 			LIMIT 1
-		`, pair.ResourceID, pair.UserID).Scan(&dummy)
+		`)
+	if err != nil {
+		log.Fatalf("[cockroachdb_1] [%s] prepare failed: %v", name, err)
+	}
+	defer stmt.Close()
+
+	for i := 0; i < iters; i++ {
+		pair := pairs[i%len(pairs)]
+
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		start := time.Now()
+
+		var dummy int
+		err := stmt.QueryRowContext(ctx, pair.ResourceID, pair.UserID).Scan(&dummy)
 		cancel()
 
 		if err != nil && err != sql.ErrNoRows {
@@ -483,14 +499,9 @@ func runCheckViewViaGroupMember(db *sql.DB, data *benchDataset) {
 	var total time.Duration
 	allowedCount := 0
 
-	for i := 0; i < iters; i++ {
-		pair := pairs[i%len(pairs)]
-
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		start := time.Now()
-
-		var dummy int
-		err := db.QueryRowContext(ctx, `
+	// prepare once
+	prepCtx := context.Background()
+	stmt, err := db.PrepareContext(prepCtx, `
 			SELECT 1
 			FROM resource_acl ra
 			JOIN group_memberships gm
@@ -500,7 +511,20 @@ func runCheckViewViaGroupMember(db *sql.DB, data *benchDataset) {
 			  AND ra.relation = 'viewer'
 			  AND gm.user_id = $2
 			LIMIT 1
-		`, pair.ResourceID, pair.UserID).Scan(&dummy)
+		`)
+	if err != nil {
+		log.Fatalf("[cockroachdb_1] [%s] prepare failed: %v", name, err)
+	}
+	defer stmt.Close()
+
+	for i := 0; i < iters; i++ {
+		pair := pairs[i%len(pairs)]
+
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		start := time.Now()
+
+		var dummy int
+		err := stmt.QueryRowContext(ctx, pair.ResourceID, pair.UserID).Scan(&dummy)
 		cancel()
 
 		if err != nil && err != sql.ErrNoRows {
@@ -541,9 +565,10 @@ func runLookupResourcesManageHeavyUser(db *sql.DB, data *benchDataset) {
 	var total time.Duration
 	var lastCount int
 
+	// Use COUNT(DISTINCT ...) so DB does the aggregation and we avoid
+	// transferring potentially large result sets back to the client.
 	query := `
-		SELECT resource_id
-		FROM (
+		SELECT COUNT(DISTINCT resource_id) FROM (
 			-- org->admin (org admins manage all org resources)
 			SELECT r.resource_id
 			FROM resources r
@@ -574,32 +599,23 @@ func runLookupResourcesManageHeavyUser(db *sql.DB, data *benchDataset) {
 		) AS t;
 	`
 
+	prepCtx := context.Background()
+	stmt, err := db.PrepareContext(prepCtx, query)
+	if err != nil {
+		log.Fatalf("[cockroachdb_1] [%s] prepare count query failed: %v", name, err)
+	}
+	defer stmt.Close()
+
 	for i := 0; i < iters; i++ {
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		start := time.Now()
 
-		rows, err := db.QueryContext(ctx, query, userID)
-		if err != nil {
+		var count int
+		if err := stmt.QueryRowContext(ctx, userID).Scan(&count); err != nil {
 			cancel()
-			log.Fatalf("[cockroachdb_1] [%s] query failed: %v", name, err)
+			log.Fatalf("[cockroachdb_1] [%s] count query failed: %v", name, err)
 		}
-
-		count := 0
-		for rows.Next() {
-			var resID string
-			if err := rows.Scan(&resID); err != nil {
-				rows.Close()
-				cancel()
-				log.Fatalf("[cockroachdb_1] [%s] scan failed: %v", name, err)
-			}
-			count++
-		}
-		err = rows.Err()
-		rows.Close()
 		cancel()
-		if err != nil {
-			log.Fatalf("[cockroachdb_1] [%s] rows error: %v", name, err)
-		}
 
 		dur := time.Since(start)
 		total += dur
@@ -636,10 +652,9 @@ func runLookupResourcesViewRegularUser(db *sql.DB, data *benchDataset) {
 	var total time.Duration
 	var lastCount int
 
-	// view = viewer_user + viewer_group + manage + org->member
+	// Use COUNT(DISTINCT ...) to avoid transferring large result sets.
 	query := `
-		SELECT resource_id
-		FROM (
+		SELECT COUNT(DISTINCT resource_id) FROM (
 			-- org->member (member_user + member_group + admin)
 			--  a) direct org_memberships
 			SELECT r.resource_id
@@ -711,32 +726,23 @@ func runLookupResourcesViewRegularUser(db *sql.DB, data *benchDataset) {
 		) AS t;
 	`
 
+	prepCtx := context.Background()
+	stmt, err := db.PrepareContext(prepCtx, query)
+	if err != nil {
+		log.Fatalf("[cockroachdb_1] [%s] prepare count query failed: %v", name, err)
+	}
+	defer stmt.Close()
+
 	for i := 0; i < iters; i++ {
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		start := time.Now()
 
-		rows, err := db.QueryContext(ctx, query, userID)
-		if err != nil {
+		var count int
+		if err := stmt.QueryRowContext(ctx, userID).Scan(&count); err != nil {
 			cancel()
-			log.Fatalf("[cockroachdb_1] [%s] query failed: %v", name, err)
+			log.Fatalf("[cockroachdb_1] [%s] count query failed: %v", name, err)
 		}
-
-		count := 0
-		for rows.Next() {
-			var resID string
-			if err := rows.Scan(&resID); err != nil {
-				rows.Close()
-				cancel()
-				log.Fatalf("[cockroachdb_1] [%s] scan failed: %v", name, err)
-			}
-			count++
-		}
-		err = rows.Err()
-		rows.Close()
 		cancel()
-		if err != nil {
-			log.Fatalf("[cockroachdb_1] [%s] rows error: %v", name, err)
-		}
 
 		dur := time.Since(start)
 		total += dur

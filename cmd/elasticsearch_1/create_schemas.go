@@ -21,7 +21,7 @@ import (
 //     inverted index on user IDs, nested ACL edges for authzed-style graph queries.
 //   - Avoid any "relational-style" normalization that would require joins.
 //
-// Index: rls_resources
+// Index: rlp_resources
 //
 //   - One document per resource.
 //
@@ -115,10 +115,12 @@ func ElasticsearchCreateSchemas() {
         }
       },
       "allowed_user_ids_manage": {
-        "type": "long"
+				"type": "long",
+				"doc_values": true
       },
       "allowed_user_ids_view": {
-        "type": "long"
+				"type": "long",
+				"doc_values": true
       }
     }
   }

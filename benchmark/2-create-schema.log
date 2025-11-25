@@ -17,7 +17,7 @@
 ❯ go run ./cmd/main.go elasticsearch_1 create-schema
 2025/11/19 20:29:48 [elasticsearch] Using addresses=[http://localhost:9200] cloud_id_set=false auth_user=true timeout=5s insecure_tls=false
 2025/11/19 20:29:49 [elasticsearch_1] == Creating Elasticsearch index and mappings ==
-2025/11/19 20:29:49 [elasticsearch_1] Index "rls_resources" created successfully.
+2025/11/19 20:29:49 [elasticsearch_1] Index "rlp_resources" created successfully.
 
 ❯ go run ./cmd/main.go postgres_1 create-schema
 2025/11/19 20:29:49 [postgres_1] Creating schemas using cmd/postgres_1/schemas.sql ...

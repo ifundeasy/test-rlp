@@ -40,5 +40,10 @@ func CockroachdbCreateSchemas() {
 		log.Fatalf("[cockroachdb_1] create_schemas: executing schemas.sql failed: %v", err)
 	}
 
+	// Refresh materialized view to populate it with initial (empty) state.
+	if _, err := db.ExecContext(ctx, "REFRESH MATERIALIZED VIEW user_resource_permissions;"); err != nil {
+		log.Fatalf("[cockroachdb_1] create_schemas: refresh materialized view failed: %v", err)
+	}
+
 	log.Println("[cockroachdb_1] Schemas created successfully.")
 }

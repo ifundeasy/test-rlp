@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 
 	"test-tls/cmd/authzed_crdb_1"
@@ -33,6 +34,10 @@ var modules = map[string]handler{
 }
 
 func main() {
+	// Configure global logger to include date, time and sub-second precision.
+	// Use microsecond precision (includes milliseconds) for readable timing.
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+
 	if err := dispatch(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, "error:", err)
 		fmt.Fprintln(os.Stderr)
