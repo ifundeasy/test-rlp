@@ -6,15 +6,15 @@ import (
 	"log"
 	"os"
 
-	"test-tls/cmd/authzed_crdb_1"
-	"test-tls/cmd/authzed_pgdb_1"
-	"test-tls/cmd/clickhouse_1"
-	"test-tls/cmd/cockroachdb_1"
+	"test-tls/cmd/authzed_crdb"
+	"test-tls/cmd/authzed_pgdb"
+	"test-tls/cmd/clickhouse"
+	"test-tls/cmd/cockroachdb"
 	"test-tls/cmd/csv"
-	"test-tls/cmd/elasticsearch_1"
-	"test-tls/cmd/mongodb_1"
-	"test-tls/cmd/postgres_1"
-	"test-tls/cmd/scylladb_1"
+	"test-tls/cmd/elasticsearch"
+	"test-tls/cmd/mongodb"
+	"test-tls/cmd/postgres"
+	"test-tls/cmd/scylladb"
 )
 
 // handler is a function that handles a module/subcommand.
@@ -22,15 +22,15 @@ type handler func(args []string) error
 
 // modules maps module names to their handlers.
 var modules = map[string]handler{
-	"csv":             runCsv,
-	"authzed_crdb_1":  runAuthzedCrdb1,
-	"authzed_pgdb_1":  runAuthzedPgdb1,
-	"clickhouse_1":    runClickhouse1,
-	"cockroachdb_1":   runCockroachdb1,
-	"postgres_1":      runPostgres1,
-	"mongodb_1":       runMongodb1,
-	"scylladb_1":      runScylladb1,
-	"elasticsearch_1": runElasticsearch1,
+	"csv":           runCsv,
+	"authzed_crdb":  runAuthzedCrdb1,
+	"authzed_pgdb":  runAuthzedPgdb1,
+	"clickhouse":    runClickhouse1,
+	"cockroachdb":   runCockroachdb1,
+	"postgres":      runPostgres1,
+	"mongodb":       runMongodb1,
+	"scylladb":      runScylladb1,
+	"elasticsearch": runElasticsearch1,
 }
 
 func main() {
@@ -63,13 +63,13 @@ func dispatch(args []string) error {
 
 func runCsv(args []string) error {
 	if len(args) == 0 {
-		return errors.New(`missing action for csv (expected: "load-data")`)
+		return errors.New(`missing action for csv (expected: "generate")`)
 	}
 
 	action := args[0]
 
 	switch action {
-	case "load-data":
+	case "generate":
 		csv.CsvCreateData()
 		return nil
 	default:
@@ -79,22 +79,22 @@ func runCsv(args []string) error {
 
 func runAuthzedCrdb1(args []string) error {
 	if len(args) == 0 {
-		return errors.New(`missing action for authzed_crdb_1 (expected: "drop|create-schema|load-data|benchmark")`)
+		return errors.New(`missing action for authzed_crdb (expected: "drop|create-schema|load-data|benchmark")`)
 	}
 
 	action := args[0]
 
 	switch action {
 	case "drop":
-		authzed_crdb_1.AuthzedDropSchemas()
+		authzed_crdb.AuthzedDropSchemas()
 	case "create-schema":
-		authzed_crdb_1.AuthzedCreateSchema()
+		authzed_crdb.AuthzedCreateSchema()
 	case "load-data":
-		authzed_crdb_1.AuthzedCreateData()
+		authzed_crdb.AuthzedCreateData()
 	case "benchmark":
-		authzed_crdb_1.AuthzedBenchmarkReads()
+		authzed_crdb.AuthzedBenchmarkReads()
 	default:
-		return fmt.Errorf("unknown action for authzed_crdb_1: %s", action)
+		return fmt.Errorf("unknown action for authzed_crdb: %s", action)
 	}
 
 	return nil
@@ -102,22 +102,22 @@ func runAuthzedCrdb1(args []string) error {
 
 func runAuthzedPgdb1(args []string) error {
 	if len(args) == 0 {
-		return errors.New(`missing action for authzed_pgdb_1 (expected: "drop|create-schema|load-data|benchmark")`)
+		return errors.New(`missing action for authzed_pgdb (expected: "drop|create-schema|load-data|benchmark")`)
 	}
 
 	action := args[0]
 
 	switch action {
 	case "drop":
-		authzed_pgdb_1.AuthzedDropSchemas()
+		authzed_pgdb.AuthzedDropSchemas()
 	case "create-schema":
-		authzed_pgdb_1.AuthzedCreateSchema()
+		authzed_pgdb.AuthzedCreateSchema()
 	case "load-data":
-		authzed_pgdb_1.AuthzedCreateData()
+		authzed_pgdb.AuthzedCreateData()
 	case "benchmark":
-		authzed_pgdb_1.AuthzedBenchmarkReads()
+		authzed_pgdb.AuthzedBenchmarkReads()
 	default:
-		return fmt.Errorf("unknown action for authzed_pgdb_1: %s", action)
+		return fmt.Errorf("unknown action for authzed_pgdb: %s", action)
 	}
 
 	return nil
@@ -125,22 +125,22 @@ func runAuthzedPgdb1(args []string) error {
 
 func runClickhouse1(args []string) error {
 	if len(args) == 0 {
-		return errors.New(`missing action for clickhouse_1 (expected: "drop|create-schema|load-data|benchmark")`)
+		return errors.New(`missing action for clickhouse (expected: "drop|create-schema|load-data|benchmark")`)
 	}
 
 	action := args[0]
 
 	switch action {
 	case "drop":
-		clickhouse_1.ClickhouseDropSchemas()
+		clickhouse.ClickhouseDropSchemas()
 	case "create-schema":
-		clickhouse_1.ClickhouseCreateSchemas()
+		clickhouse.ClickhouseCreateSchemas()
 	case "load-data":
-		clickhouse_1.ClickhouseCreateData()
+		clickhouse.ClickhouseCreateData()
 	case "benchmark":
-		clickhouse_1.ClickhouseBenchmarkReads()
+		clickhouse.ClickhouseBenchmarkReads()
 	default:
-		return fmt.Errorf("unknown action for clickhouse_1: %s", action)
+		return fmt.Errorf("unknown action for clickhouse: %s", action)
 	}
 
 	return nil
@@ -148,22 +148,23 @@ func runClickhouse1(args []string) error {
 
 func runCockroachdb1(args []string) error {
 	if len(args) == 0 {
-		return errors.New(`missing action for cockroachdb_1 (expected: "drop|create-schema|load-data|benchmark")`)
+		return errors.New(`missing action for cockroachdb (expected: "drop|create-schema|load-data|benchmark")`)
 	}
 
 	action := args[0]
 
 	switch action {
 	case "drop":
-		cockroachdb_1.CockroachdbDropSchemas()
+		cockroachdb.CockroachdbDropSchemas()
 	case "create-schema":
-		cockroachdb_1.CockroachdbCreateSchemas()
+		cockroachdb.CockroachdbCreateSchemas()
 	case "load-data":
-		cockroachdb_1.CockroachdbCreateData()
+		cockroachdb.CockroachdbCreateData()
+		cockroachdb.CockroachdbRefreshUserResourcePermissions()
 	case "benchmark":
-		cockroachdb_1.CockroachdbBenchmarkReads()
+		cockroachdb.CockroachdbBenchmarkReads()
 	default:
-		return fmt.Errorf("unknown action for cockroachdb_1: %s", action)
+		return fmt.Errorf("unknown action for cockroachdb: %s", action)
 	}
 
 	return nil
@@ -171,22 +172,22 @@ func runCockroachdb1(args []string) error {
 
 func runPostgres1(args []string) error {
 	if len(args) == 0 {
-		return errors.New(`missing action for postgres_1 (expected: "drop|create-schema|load-data|benchmark")`)
+		return errors.New(`missing action for postgres (expected: "drop|create-schema|load-data|benchmark")`)
 	}
 
 	action := args[0]
 
 	switch action {
 	case "drop":
-		postgres_1.PostgresDropSchemas()
+		postgres.PostgresDropSchemas()
 	case "create-schema":
-		postgres_1.PostgresCreateSchemas()
+		postgres.PostgresCreateSchemas()
 	case "load-data":
-		postgres_1.PostgresCreateData()
+		postgres.PostgresCreateData()
 	case "benchmark":
-		postgres_1.PostgresBenchmarkReads()
+		postgres.PostgresBenchmarkReads()
 	default:
-		return fmt.Errorf("unknown action for postgres_1: %s", action)
+		return fmt.Errorf("unknown action for postgres: %s", action)
 	}
 
 	return nil
@@ -194,22 +195,22 @@ func runPostgres1(args []string) error {
 
 func runMongodb1(args []string) error {
 	if len(args) == 0 {
-		return errors.New(`missing action for mongodb_1 (expected: "drop|create-schema|load-data|benchmark")`)
+		return errors.New(`missing action for mongodb (expected: "drop|create-schema|load-data|benchmark")`)
 	}
 
 	action := args[0]
 
 	switch action {
 	case "drop":
-		mongodb_1.MongodbDropSchemas()
+		mongodb.MongodbDropSchemas()
 	case "create-schema":
-		mongodb_1.MongodbCreateSchemas()
+		mongodb.MongodbCreateSchemas()
 	case "load-data":
-		mongodb_1.MongodbCreateData()
+		mongodb.MongodbCreateData()
 	case "benchmark":
-		mongodb_1.MongodbBenchmarkReads()
+		mongodb.MongodbBenchmarkReads()
 	default:
-		return fmt.Errorf("unknown action for scylla_1: %s", action)
+		return fmt.Errorf("unknown action for scylla: %s", action)
 	}
 
 	return nil
@@ -217,22 +218,22 @@ func runMongodb1(args []string) error {
 
 func runScylladb1(args []string) error {
 	if len(args) == 0 {
-		return errors.New(`missing action for scylladb_1 (expected: "drop|create-schema|load-data|benchmark")`)
+		return errors.New(`missing action for scylladb (expected: "drop|create-schema|load-data|benchmark")`)
 	}
 
 	action := args[0]
 
 	switch action {
 	case "drop":
-		scylladb_1.ScylladbDropSchemas()
+		scylladb.ScylladbDropSchemas()
 	case "create-schema":
-		scylladb_1.ScylladbCreateSchemas()
+		scylladb.ScylladbCreateSchemas()
 	case "load-data":
-		scylladb_1.ScylladbCreateData()
+		scylladb.ScylladbCreateData()
 	case "benchmark":
-		scylladb_1.ScylladbBenchmarkReads()
+		scylladb.ScylladbBenchmarkReads()
 	default:
-		return fmt.Errorf("unknown action for scylla_1: %s", action)
+		return fmt.Errorf("unknown action for scylla: %s", action)
 	}
 
 	return nil
@@ -240,22 +241,22 @@ func runScylladb1(args []string) error {
 
 func runElasticsearch1(args []string) error {
 	if len(args) == 0 {
-		return errors.New(`missing action for elasticsearch_1 (expected: "drop|create-schema|load-data|benchmark")`)
+		return errors.New(`missing action for elasticsearch (expected: "drop|create-schema|load-data|benchmark")`)
 	}
 
 	action := args[0]
 
 	switch action {
 	case "drop":
-		elasticsearch_1.ElasticsearchDropSchemas()
+		elasticsearch.ElasticsearchDropSchemas()
 	case "create-schema":
-		elasticsearch_1.ElasticsearchCreateSchemas()
+		elasticsearch.ElasticsearchCreateSchemas()
 	case "load-data":
-		elasticsearch_1.ElasticsearchCreateData()
+		elasticsearch.ElasticsearchCreateData()
 	case "benchmark":
-		elasticsearch_1.ElasticsearchBenchmarkReads()
+		elasticsearch.ElasticsearchBenchmarkReads()
 	default:
-		return fmt.Errorf("unknown action for elasticsearch_1: %s", action)
+		return fmt.Errorf("unknown action for elasticsearch: %s", action)
 	}
 
 	return nil
@@ -264,9 +265,9 @@ func runElasticsearch1(args []string) error {
 func usage() {
 	prog := os.Args[0]
 	fmt.Println("usage:")
-	fmt.Printf("  %s csv load-data\n", prog)
-	fmt.Printf("  %s authzed_crdb_1 drop\n", prog)
-	fmt.Printf("  %s authzed_crdb_1 create-schema\n", prog)
-	fmt.Printf("  %s authzed_crdb_1 load-data\n", prog)
-	fmt.Printf("  %s authzed_crdb_1 benchmark\n", prog)
+	fmt.Printf("  %s csv generate\n", prog)
+	fmt.Printf("  %s authzed_crdb drop\n", prog)
+	fmt.Printf("  %s authzed_crdb create-schema\n", prog)
+	fmt.Printf("  %s authzed_crdb load-data\n", prog)
+	fmt.Printf("  %s authzed_crdb benchmark\n", prog)
 }

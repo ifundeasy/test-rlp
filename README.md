@@ -24,25 +24,25 @@ Rough structure:
 ├── cmd
 │   ├── csv/
 │   │   └── load_data.go
-│   ├── authzed_crdb_1/
+│   ├── authzed_crdb/
 │   │   ├── benchmark_reads.go
 │   │   ├── create_schemas.go
 │   │   ├── load_data.go
 │   │   ├── ...
 │   │   └── drop_schemas.go
-│   ├── authzed_pgdb_1/
+│   ├── authzed_pgdb/
 │   │   └── ...
 │   ├── clickhouse/
 │   │   └── ...
 │   ├── cockroackdb/
 │   │   └── ...
-│   ├── elasticsearch_1/
+│   ├── elasticsearch/
 │   │   └── ...
-│   ├── mongodb_1/
+│   ├── mongodb/
 │   │   └── ...
-│   ├── postgres_1/
+│   ├── postgres/
 │   │   └── ...
-│   ├── scylladb_1/
+│   ├── scylladb/
 │   │   └── ...
 │   └── main.go
 ├── data
@@ -110,40 +110,40 @@ Basic lifecycle:
 
 ```bash
 # Drop all schemas (dangerous, one-time / cleanup use)
-go run ./cmd/main.go authzed_crdb_1 drop
+go run ./cmd/main.go authzed_crdb drop
 
 # Create schemas
-go run ./cmd/main.go authzed_crdb_1 create-schema
+go run ./cmd/main.go authzed_crdb create-schema
 
 # Load test data
-go run ./cmd/main.go authzed_crdb_1 load-data
+go run ./cmd/main.go authzed_crdb load-data
 
 # Run read benchmarks
-go run ./cmd/main.go authzed_crdb_1 benchmark
+go run ./cmd/main.go authzed_crdb benchmark
 ```
 
 ### PostgreSQL (when wired)
 
 ```bash
-go run ./cmd/main.go postgres_1 drop
-go run ./cmd/main.go postgres_1 create-schema
-go run ./cmd/main.go postgres_1 load-data
-go run ./cmd/main.go postgres_1 benchmark
+go run ./cmd/main.go postgres drop
+go run ./cmd/main.go postgres create-schema
+go run ./cmd/main.go postgres load-data
+go run ./cmd/main.go postgres benchmark
 ```
 
 ### MongoDB (when wired)
 
 ```bash
-go run ./cmd/main.go mongodb_1 drop
-go run ./cmd/main.go mongodb_1 create-schema
-go run ./cmd/main.go mongodb_1 load-data
-go run ./cmd/main.go mongodb_1 benchmark
+go run ./cmd/main.go mongodb drop
+go run ./cmd/main.go mongodb create-schema
+go run ./cmd/main.go mongodb load-data
+go run ./cmd/main.go mongodb benchmark
 ```
 
 You can mirror the same pattern for:
 
-* `authzed_crdb_1`
-* `authzed_pgdb_1`
+* `authzed_crdb`
+* `authzed_pgdb`
 * `clickhouse`
 * `cockroachdb`
 * `elasticsearch`
@@ -182,7 +182,7 @@ particular backend:
 * `postgres.go` – PostgreSQL client and helpers
 * `scylladb.go` – ScyllaDB client and helpers
 
-Command files under `cmd/*_1` should:
+Command files under `cmd/*` should:
 
 * focus on orchestration (create schema, load_data, run benchmarks)
 * delegate all connectivity and low-level details to the corresponding
@@ -195,7 +195,7 @@ implementations or tune clients.
 
 ## Extending
 
-To add a new backend `foo_1`:
+To add a new backend `foo`:
 
 1. Add an infrastructure client:
 
@@ -203,18 +203,18 @@ To add a new backend `foo_1`:
    infrastructure/foo.go
    ```
 
-2. Add commands under `cmd/foo_1/`:
+2. Add commands under `cmd/foo/`:
 
    ```text
-   cmd/foo_1/create_schemas.go
-   cmd/foo_1/drop_schemas.go
-   cmd/foo_1/load_data.go
-   cmd/foo_1/benchmark_reads.go
+   cmd/foo/create_schemas.go
+   cmd/foo/drop_schemas.go
+   cmd/foo/load_data.go
+   cmd/foo/benchmark_reads.go
    ```
 
 3. Wire it in `cmd/main.go`:
 
-   * add a new module case `foo_1`
+   * add a new module case `foo`
    * support the standard actions: `drop`, `create-schema`, `load-data`, `benchmark`
 
 Stick to the same naming and action semantics and the CLI stays predictable
@@ -225,7 +225,7 @@ as the playground grows.
 This version:
 
 - matches the `main.go` CLI shape (`<module> <action>`)
-- documents `csv` and `authzed_1` explicitly
+- documents `csv` and `authzed` explicitly
 - keeps Postgres/Mongo/etc. as clearly “when wired” / future modules
 - removes the outdated inline `main.go` example and fixes the Markdown issues (broken code fence, etc.)
 

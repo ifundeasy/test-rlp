@@ -1,0 +1,42 @@
+definition user {}
+
+definition usergroup {
+    // Direct membership: explicit user assignments
+    relation direct_member_user: user
+    relation direct_manager_user: user
+    
+    // Nested groups: support organizational hierarchy
+    relation member_group: usergroup      // groups that are members of this group
+    relation manager_group: usergroup     // groups whose managers are managers here
+
+    // Permission computation: combines direct + transitive membership
+    permission member = direct_member_user + member_group->member + manager
+    permission manager = direct_manager_user + manager_group->manager
+}
+
+definition organization {
+    relation admin_user: user
+    relation admin_group: usergroup#manager
+    relation member_user: user
+    relation member_group: usergroup#member
+
+    permission admin = admin_user + admin_group
+    permission member = member_user + member_group + admin
+}
+
+definition resource {
+    relation org: organization
+    
+    // Explicit user access: who directly manages/views this resource
+    relation manager_user: user
+    relation viewer_user: user
+    
+    // Group-based access: which groups can manage/view
+    // usergroup#manager = users with manager permission in that group
+    // usergroup#member = users with member permission (includes managers)
+    relation manager_group: usergroup#manager
+    relation viewer_group: usergroup#member
+
+    permission manage = manager_user + manager_group + org->admin
+    permission view = viewer_user + viewer_group + manage + org->member
+}

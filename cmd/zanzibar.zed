@@ -1,0 +1,263 @@
+// ═════════════════════════════════════════════════════════════════════════════
+// SCHEMA 1: Generic Wildcard Approach (from authzed docs playground)
+// ═════════════════════════════════════════════════════════════════════════════
+// 
+// DESIGN PHILOSOPHY:
+// - Role-agnostic relations: manager/viewer relations accept ANY combination
+//   of direct users OR any transitive membership from groups
+// - Permissions computed implicitly through relation membership
+// - Minimal schema verbosity
+//
+// KEY CHARACTERISTICS:
+// - resource.manager can be: direct user OR group member OR group manager
+// - Conflates different permission levels in single relation
+// - Harder to audit: "who directly manages resource_5?" requires SQL analysis
+// - No explicit user vs. group distinction in relations
+//
+// PROS:
+// ✓ Fewer relation definitions (simpler schema)
+// ✓ Flexible: new group types don't require schema changes
+// ✓ Compact data: single relation covers multiple role types
+//
+// CONS:
+// ✗ Implicit permissions: hard to audit "who can do what"
+// ✗ Permission escalation risk: unclear which group role grants access
+// ✗ Compliance nightmare: can't easily query direct vs. transitive access
+// ✗ Hard to revoke: unclear which relation to delete without breaking others
+//
+// USE CASES:
+// - Small internal tools with trusted teams
+// - Prototype/MVP where auditability is secondary
+// - Systems where role types rarely change
+//
+// NOT RECOMMENDED FOR:
+// - Regulatory/compliance requirements (HIPAA, SOC2, GDPR)
+// - Multi-tenant SaaS with external users
+// - Systems needing detailed access logs
+
+definition user {}
+
+definition resource {
+    relation manager: user | usergroup#member | usergroup#manager
+    relation viewer: user | usergroup#member | usergroup#manager
+
+    permission manage = manager
+    permission view = viewer + manager
+}
+
+definition usergroup {
+    relation manager: user | usergroup#member | usergroup#manager
+    relation direct_member: user | usergroup#member | usergroup#manager
+
+    permission member = direct_member + manager
+}
+
+definition organization {
+    relation group: usergroup
+    relation administrator: user | usergroup#member | usergroup#manager
+    relation direct_member: user
+    relation resource: resource
+
+    permission admin = administrator
+    permission member = direct_member + administrator + group->member
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SCHEMA 2: Explicit User/Group Split (Non-Nested)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// DESIGN PHILOSOPHY:
+// - Deliberately separate all *_user and *_group relations
+// - Each user type (admin, member) gets explicit relation to avoid confusion
+// - Single-level groups: groups contain ONLY users, not other groups
+// - Flat permission model: simple access computation
+//
+// KEY CHARACTERISTICS:
+// - resource.manager_user vs. resource.manager_group (EXPLICIT SPLIT)
+// - usergroup has NO nested group support (no member_group, manager_group)
+// - Easy to answer: "which users directly manage this resource?"
+// - Perfect for compliance auditing and permission inventories
+//
+// PROS:
+// ✓ Crystal clear auditability: manager_user = direct user access
+// ✓ Minimal permission logic: no transitive group nesting to compute
+// ✓ Easy to revoke: delete exact relation without side effects
+// ✓ Compliance-friendly: HIPAA, SOC2, etc. audit requirements
+// ✓ Simple to understand: new developers grasp quickly
+// ✓ Efficient queries: no recursive group lookups
+//
+// CONS:
+// ✗ More relations to manage: separate relations for each user type
+// ✗ No nested groups: can't represent org chart hierarchies
+// ✗ Verbose schema: duplication in permission definitions
+// ✗ Doesn't scale: large hierarchies require many relations
+//
+// USE CASES:
+// - Enterprise SaaS (Slack, GitHub, etc. permission models)
+// - Regulated industries (finance, healthcare, legal)
+// - Systems requiring detailed audit logs
+// - Multi-tenant platforms with external users
+// - Organizations with flat team structures
+//
+// NOT RECOMMENDED FOR:
+// - Complex org charts with nested teams
+// - Highly dynamic permission structures
+// - Systems where group hierarchy reflects org structure
+
+definition user {}
+
+definition resource {
+    relation org: organization
+    relation manager_user: user
+    relation manager_group: usergroup#member | usergroup#admin
+    relation viewer_user: user
+    relation viewer_group: usergroup#member | usergroup#admin
+
+    permission manage = manager_user + manager_group + org->admin
+    permission view = viewer_user + viewer_group + manage + org->member
+}
+
+definition usergroup {
+    relation member_user: user
+    relation admin_user: user
+
+    permission admin = admin_user
+    permission member = member_user + admin
+}
+
+definition organization {
+    relation admin_user: user
+    relation admin_group: usergroup#admin
+    relation member_user: user
+    relation member_group: usergroup#member
+
+    permission admin = admin_user + admin_group
+    permission member = member_user + member_group + admin
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SCHEMA 3: Hierarchical Group Model with Nested Permissions (RECOMMENDED)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// DESIGN PHILOSOPHY:
+// - Supports recursive group nesting: groups can contain other groups
+// - Transitive membership computation: group A → group B → user
+// - Separates direct_member from manager roles
+// - Combines auditability (explicit user roles) with flexibility (nested groups)
+// - Aligns with how real organizations structure teams/departments
+//
+// KEY CHARACTERISTICS:
+// - usergroup.member_group: a group can contain other groups
+// - usergroup.manager_group: hierarchical manager roles
+// - permission member = direct_member_user + member_group->member + manager
+//   (users get membership via: direct membership OR nested group membership OR as manager)
+// - Resource permissions reference specific group roles: usergroup#manager, usergroup#member
+//
+// CORE BENEFITS:
+// ✓ Org chart friendly: departments contain teams contain users
+// ✓ Auditability + Flexibility: explicit user roles + nested group support
+// ✓ Transitive permissions: automatically computed through group hierarchy
+// ✓ Scalable: large hierarchies handled elegantly
+// ✓ Role clarity: manager_group vs. member_group distinction
+// ✓ Enterprise-ready: supports complex organizational structures
+// ✓ Dynamic structure: reorganization doesn't require schema changes
+//
+// HOW IT WORKS:
+// When checking if user can view resource:
+// 1. Direct check: user in resource.viewer_user? → YES, allow
+// 2. Group check: resource.viewer_group = usergroup#member
+//    → Find user's groups, check if member permission
+// 3. Membership computed transitively:
+//    - user_5 in group_10 (direct_member_user)
+//    - group_10 in group_5 (member_group)
+//    → user_5 has group_5.member permission transitively
+// 4. Manager escalation: direct_manager_user grants member + manager perms
+//
+// EXAMPLE SCENARIO (Org Chart):
+// Organization: Acme Corp
+// ├── Engineering Dept (group_1)
+// │   ├── Backend Team (group_2)
+// │   │   ├── user_10 (direct_member)
+// │   │   └── user_11 (direct_member)
+// │   └── Frontend Team (group_3)
+// │       ├── user_12 (direct_member)
+// │       └── group_3 is member_group of group_1
+// └── Sales Dept (group_4)
+//
+// Permission check for "can user_10 view engineering_resource?"
+// - Check resource.viewer_group = usergroup#member
+// - Find user_10's groups: [group_2]
+// - Check group_2.member permission: ✓ YES (direct_member_user)
+// - Since group_2 is member of group_1, user_10 also gets group_1.member
+// - If resource assigned to group_1, user_10 can view ✓
+//
+// COMPLEXITY CONSIDERATIONS:
+// ⚠ Query complexity: transitive lookups require recursive traversal
+//    (mitigated by SpiceDB's efficient graph algorithms)
+// ⚠ Potential for circular references: avoid group A contains group A
+//    (SpiceDB has built-in cycle detection)
+// ⚠ Steeper learning curve: nested permissions harder to understand initially
+//
+// USE CASES:
+// - Multi-level organizations (departments, teams, squads)
+// - Enterprise with complex hierarchies
+// - Matrix organizations with cross-functional groups
+// - Platforms scaling from startup to enterprise
+// - Systems needing both auditability AND flexibility
+//
+// RECOMMENDED FOR:
+// ✓ Most production systems
+// ✓ Any organization with 2+ levels of hierarchy
+// ✓ Systems planning for future growth
+// ✓ Requirements combining compliance + flexibility
+//
+// MIGRATION PATH:
+// Schema 2 (flat) → Schema 3 (nested):
+// 1. Add member_group, manager_group relations to usergroup
+// 2. Populate group hierarchies in existing groups
+// 3. Keep existing direct_member_user, direct_manager_user data
+// 4. Update resource relations to reference specific group roles
+// 5. Update permission logic to include transitive checks
+
+definition user {}
+
+definition usergroup {
+    // Direct membership: explicit user assignments
+    relation direct_member_user: user
+    relation direct_manager_user: user
+    
+    // Nested groups: support organizational hierarchy
+    relation member_group: usergroup      // groups that are members of this group
+    relation manager_group: usergroup     // groups whose managers are managers here
+
+    // Permission computation: combines direct + transitive membership
+    permission member = direct_member_user + member_group->member + manager
+    permission manager = direct_manager_user + manager_group->manager
+}
+
+definition organization {
+    relation admin_user: user
+    relation admin_group: usergroup#manager
+    relation member_user: user
+    relation member_group: usergroup#member
+
+    permission admin = admin_user + admin_group
+    permission member = member_user + member_group + admin
+}
+
+definition resource {
+    relation org: organization
+    
+    // Explicit user access: who directly manages/views this resource
+    relation manager_user: user
+    relation viewer_user: user
+    
+    // Group-based access: which groups can manage/view
+    // usergroup#manager = users with manager permission in that group
+    // usergroup#member = users with member permission (includes managers)
+    relation manager_group: usergroup#manager
+    relation viewer_group: usergroup#member
+
+    permission manage = manager_user + manager_group + org->admin
+    permission view = viewer_user + viewer_group + manage + org->member
+}

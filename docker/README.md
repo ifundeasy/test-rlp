@@ -51,6 +51,10 @@ SpiceDB’s Watch API on CockroachDB relies on Cockroach’s `rangefeed` / chang
    -- optional: show them
    SHOW DATABASES;
    SET CLUSTER SETTING kv.rangefeed.enabled = true;
+   
+   SHOW CLUSTER SETTING server.clock.max-offset;
+   -- UNSAFE! increase to 5s for dev
+   SET CLUSTER SETTING server.clock.max-offset = '5s';
    ```
 
 3. Exit the SQL shell:
@@ -107,7 +111,11 @@ Make sure **both** commands succeed before starting the long-running services.
 After migrations:
 
 ```sh
-docker compose up -d spicedb-crdb spicedb-pgdb spicedb-crdb-envoy spicedb-pgdb-envoy
+# for cockroachdb
+docker compose up -d spicedb-crdb spicedb-crdb-envoy
+
+# for postgres
+docker compose up -d spicedb-pgdb spicedb-pgdb-envoy
 ```
 
 This will:
