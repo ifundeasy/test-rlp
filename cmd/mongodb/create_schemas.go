@@ -1,4 +1,4 @@
-package mongodb_1
+package mongodb
 
 import (
 	"context"
@@ -46,11 +46,11 @@ func MongodbCreateSchemas() {
 
 	_, db, cleanup, err := infrastructure.NewMongoFromEnv(ctx)
 	if err != nil {
-		log.Fatalf("[mongodb_1] failed to create mongo client: %v", err)
+		log.Fatalf("[mongodb] failed to create mongo client: %v", err)
 	}
 	defer cleanup()
 
-	log.Printf("[mongodb_1] == Creating MongoDB collections and indexes ==")
+	log.Printf("[mongodb] == Creating MongoDB collections and indexes ==")
 
 	opTimeout := 30 * time.Second
 
@@ -72,9 +72,9 @@ func MongodbCreateSchemas() {
 		cancel()
 		if err != nil {
 			// most likely: (NamespaceExists) collection already exists
-			log.Printf("[mongodb_1] CreateCollection %s: %v (continuing)", name, err)
+			log.Printf("[mongodb] CreateCollection %s: %v (continuing)", name, err)
 		} else {
-			log.Printf("[mongodb_1] Created collection: %s", name)
+			log.Printf("[mongodb] Created collection: %s", name)
 		}
 	}
 
@@ -225,5 +225,5 @@ func MongodbCreateSchemas() {
 		CreateIndexesWithLog(ctx, coll, indexes, opTimeout, "user_resource_perms")
 	}
 
-	log.Printf("[mongodb_1] MongoDB schema and indexes created")
+	log.Printf("[mongodb] MongoDB schema and indexes created")
 }

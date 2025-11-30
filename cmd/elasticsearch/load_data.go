@@ -1,4 +1,4 @@
-package elasticsearch_1
+package elasticsearch
 
 import (
 	"context"
@@ -76,12 +76,12 @@ func ElasticsearchCreateData() {
 
 	es, cleanup, err := infrastructure.NewElasticsearchFromEnv(rootCtx)
 	if err != nil {
-		log.Fatalf("[elasticsearch_1] NewElasticsearchFromEnv failed: %v", err)
+		log.Fatalf("[elasticsearch] NewElasticsearchFromEnv failed: %v", err)
 	}
 	defer cleanup()
 
 	start := time.Now()
-	log.Printf("[elasticsearch_1] == Loading CSV data into Elasticsearch index %q ==", IndexName)
+	log.Printf("[elasticsearch] == Loading CSV data into Elasticsearch index %q ==", IndexName)
 
 	// Load membership and ACL graph into memory.
 	orgAdmins, orgMembers := loadOrgMemberships()
@@ -96,7 +96,7 @@ func ElasticsearchCreateData() {
 	indexResourceDocs(rootCtx, es, resourceOrg, orgAdmins, orgMembers, groupMembers, directUserManagers, directUserViewers, groupManagers, groupViewers, resourceACL)
 
 	elapsed := time.Since(start).Truncate(time.Millisecond)
-	log.Printf("[elasticsearch_1] Elasticsearch data load DONE: elapsed=%s", elapsed)
+	log.Printf("[elasticsearch] Elasticsearch data load DONE: elapsed=%s", elapsed)
 }
 
 // =========================
@@ -107,7 +107,7 @@ func openCSV(name string) (*csv.Reader, *os.File) {
 	full := filepath.Join(dataDir, name)
 	f, err := os.Open(full)
 	if err != nil {
-		log.Fatalf("[elasticsearch_1] open %s failed: %v", full, err)
+		log.Fatalf("[elasticsearch] open %s failed: %v", full, err)
 	}
 	r := csv.NewReader(f)
 	return r, f
@@ -116,7 +116,7 @@ func openCSV(name string) (*csv.Reader, *os.File) {
 func mustAtoi(s, field string) int {
 	v, err := strconv.Atoi(s)
 	if err != nil {
-		log.Fatalf("[elasticsearch_1] parse int for %s %q failed: %v", field, s, err)
+		log.Fatalf("[elasticsearch] parse int for %s %q failed: %v", field, s, err)
 	}
 	return v
 }
@@ -137,7 +137,7 @@ func loadOrgMemberships() (map[int]intSet, map[int]intSet) {
 
 	// header: org_id,user_id,role
 	if _, err := r.Read(); err != nil {
-		log.Fatalf("[elasticsearch_1] read org_memberships header: %v", err)
+		log.Fatalf("[elasticsearch] read org_memberships header: %v", err)
 	}
 
 	orgAdmins := make(map[int]intSet)
@@ -150,10 +150,10 @@ func loadOrgMemberships() (map[int]intSet, map[int]intSet) {
 			break
 		}
 		if err != nil {
-			log.Fatalf("[elasticsearch_1] org_memberships: read row failed: %v", err)
+			log.Fatalf("[elasticsearch] org_memberships: read row failed: %v", err)
 		}
 		if len(rec) < 3 {
-			log.Fatalf("[elasticsearch_1] org_memberships: invalid row: %#v", rec)
+			log.Fatalf("[elasticsearch] org_memberships: invalid row: %#v", rec)
 		}
 
 		orgID := mustAtoi(rec[0], "org_memberships.org_id")
@@ -176,13 +176,13 @@ func loadOrgMemberships() (map[int]intSet, map[int]intSet) {
 			}
 			s.add(userID)
 		default:
-			log.Fatalf("[elasticsearch_1] org_memberships: unknown role %q", role)
+			log.Fatalf("[elasticsearch] org_memberships: unknown role %q", role)
 		}
 
 		count++
 	}
 
-	log.Printf("[elasticsearch_1] org_memberships: loaded %d rows", count)
+	log.Printf("[elasticsearch] org_memberships: loaded %d rows", count)
 	return orgAdmins, orgMembers
 }
 
@@ -201,7 +201,7 @@ func loadGroupMemberships() map[int]intSet {
 
 	// header: group_id,user_id,role
 	if _, err := r.Read(); err != nil {
-		log.Fatalf("[elasticsearch_1] read group_memberships header: %v", err)
+		log.Fatalf("[elasticsearch] read group_memberships header: %v", err)
 	}
 
 	groupMembers := make(map[int]intSet)
@@ -213,10 +213,10 @@ func loadGroupMemberships() map[int]intSet {
 			break
 		}
 		if err != nil {
-			log.Fatalf("[elasticsearch_1] group_memberships: read row failed: %v", err)
+			log.Fatalf("[elasticsearch] group_memberships: read row failed: %v", err)
 		}
 		if len(rec) < 3 {
-			log.Fatalf("[elasticsearch_1] group_memberships: invalid row: %#v", rec)
+			log.Fatalf("[elasticsearch] group_memberships: invalid row: %#v", rec)
 		}
 
 		groupID := mustAtoi(rec[0], "group_memberships.group_id")
@@ -233,7 +233,7 @@ func loadGroupMemberships() map[int]intSet {
 		count++
 	}
 
-	log.Printf("[elasticsearch_1] group_memberships: loaded %d rows", count)
+	log.Printf("[elasticsearch] group_memberships: loaded %d rows", count)
 	return groupMembers
 }
 
@@ -252,7 +252,7 @@ func loadResources() map[int]int {
 
 	// header: resource_id,org_id
 	if _, err := r.Read(); err != nil {
-		log.Fatalf("[elasticsearch_1] read resources header: %v", err)
+		log.Fatalf("[elasticsearch] read resources header: %v", err)
 	}
 
 	resourceOrg := make(map[int]int)
@@ -264,10 +264,10 @@ func loadResources() map[int]int {
 			break
 		}
 		if err != nil {
-			log.Fatalf("[elasticsearch_1] resources: read row failed: %v", err)
+			log.Fatalf("[elasticsearch] resources: read row failed: %v", err)
 		}
 		if len(rec) < 2 {
-			log.Fatalf("[elasticsearch_1] resources: invalid row: %#v", rec)
+			log.Fatalf("[elasticsearch] resources: invalid row: %#v", rec)
 		}
 
 		resID := mustAtoi(rec[0], "resources.resource_id")
@@ -277,7 +277,7 @@ func loadResources() map[int]int {
 		count++
 	}
 
-	log.Printf("[elasticsearch_1] resources: loaded %d rows", count)
+	log.Printf("[elasticsearch] resources: loaded %d rows", count)
 	return resourceOrg
 }
 
@@ -306,7 +306,7 @@ func loadResourceACL() (
 
 	// header: resource_id,subject_type,subject_id,relation
 	if _, err := r.Read(); err != nil {
-		log.Fatalf("[elasticsearch_1] read resource_acl header: %v", err)
+		log.Fatalf("[elasticsearch] read resource_acl header: %v", err)
 	}
 
 	directUserManagers := make(map[int]intSet)
@@ -323,10 +323,10 @@ func loadResourceACL() (
 			break
 		}
 		if err != nil {
-			log.Fatalf("[elasticsearch_1] resource_acl: read row failed: %v", err)
+			log.Fatalf("[elasticsearch] resource_acl: read row failed: %v", err)
 		}
 		if len(rec) < 4 {
-			log.Fatalf("[elasticsearch_1] resource_acl: invalid row: %#v", rec)
+			log.Fatalf("[elasticsearch] resource_acl: invalid row: %#v", rec)
 		}
 
 		resID := mustAtoi(rec[0], "resource_acl.resource_id")
@@ -358,7 +358,7 @@ func loadResourceACL() (
 				}
 				s.add(subjectID)
 			default:
-				log.Fatalf("[elasticsearch_1] resource_acl: unknown relation for user: %q", relation)
+				log.Fatalf("[elasticsearch] resource_acl: unknown relation for user: %q", relation)
 			}
 
 		case "group":
@@ -378,16 +378,16 @@ func loadResourceACL() (
 				}
 				s.add(subjectID)
 			default:
-				log.Fatalf("[elasticsearch_1] resource_acl: unknown relation for group: %q", relation)
+				log.Fatalf("[elasticsearch] resource_acl: unknown relation for group: %q", relation)
 			}
 
 		default:
-			log.Fatalf("[elasticsearch_1] resource_acl: unknown subject_type: %q", subjectType)
+			log.Fatalf("[elasticsearch] resource_acl: unknown subject_type: %q", subjectType)
 		}
 
 		count++
 	}
 
-	log.Printf("[elasticsearch_1] resource_acl: loaded %d rows", count)
+	log.Printf("[elasticsearch] resource_acl: loaded %d rows", count)
 	return directUserManagers, directUserViewers, groupManagers, groupViewers, resourceACL
 }

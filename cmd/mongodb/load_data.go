@@ -1,4 +1,4 @@
-package mongodb_1
+package mongodb
 
 import (
 	"context"
@@ -68,12 +68,12 @@ func MongodbCreateData() {
 
 	_, db, cleanup, err := infrastructure.NewMongoFromEnv(ctx)
 	if err != nil {
-		log.Fatalf("[mongodb_1] failed to create mongo client: %v", err)
+		log.Fatalf("[mongodb] failed to create mongo client: %v", err)
 	}
 	defer cleanup()
 
 	start := time.Now()
-	log.Printf("[mongodb_1] == Loading MongoDB data from CSV in %q ==", dataDir)
+	log.Printf("[mongodb] == Loading MongoDB data from CSV in %q ==", dataDir)
 
 	// Clear collections so this run is idempotent.
 	clearCollections(ctx, db)
@@ -103,7 +103,7 @@ func MongodbCreateData() {
 	)
 
 	elapsed := time.Since(start).Truncate(time.Millisecond)
-	log.Printf("[mongodb_1] MongoDB data load DONE: elapsed=%s", elapsed)
+	log.Printf("[mongodb] MongoDB data load DONE: elapsed=%s", elapsed)
 }
 
 // =========================
@@ -128,9 +128,9 @@ func clearCollections(ctx context.Context, db *mongo.Database) {
 		_, err := coll.DeleteMany(ctxTimeout, bson.D{})
 		cancel()
 		if err != nil {
-			log.Fatalf("[mongodb_1] failed to clear collection %s: %v", name, err)
+			log.Fatalf("[mongodb] failed to clear collection %s: %v", name, err)
 		}
-		log.Printf("[mongodb_1] Cleared collection: %s", name)
+		log.Printf("[mongodb] Cleared collection: %s", name)
 	}
 }
 
@@ -142,7 +142,7 @@ func openCSV(name string) (*csv.Reader, *os.File) {
 	full := filepath.Join(dataDir, name)
 	f, err := os.Open(full)
 	if err != nil {
-		log.Fatalf("[mongodb_1] open %s: %v", full, err)
+		log.Fatalf("[mongodb] open %s: %v", full, err)
 	}
 	r := csv.NewReader(f)
 	return r, f
@@ -157,7 +157,7 @@ func flushInsertBatch(ctx context.Context, coll *mongo.Collection, batch []inter
 
 	_, err := coll.InsertMany(ctxTimeout, batch, options.InsertMany().SetOrdered(false))
 	if err != nil {
-		log.Fatalf("[mongodb_1] InsertMany into %s failed: %v", collName, err)
+		log.Fatalf("[mongodb] InsertMany into %s failed: %v", collName, err)
 	}
 	return len(batch)
 }
@@ -175,7 +175,7 @@ func loadOrganizations(ctx context.Context, db *mongo.Database) {
 
 	// header: org_id
 	if _, err := r.Read(); err != nil {
-		log.Fatalf("[mongodb_1] read organizations header: %v", err)
+		log.Fatalf("[mongodb] read organizations header: %v", err)
 	}
 
 	coll := db.Collection("organizations")
@@ -188,10 +188,10 @@ func loadOrganizations(ctx context.Context, db *mongo.Database) {
 			break
 		}
 		if err != nil {
-			log.Fatalf("[mongodb_1] read organizations row: %v", err)
+			log.Fatalf("[mongodb] read organizations row: %v", err)
 		}
 		if len(rec) < 1 {
-			log.Fatalf("[mongodb_1] invalid organizations row: %#v", rec)
+			log.Fatalf("[mongodb] invalid organizations row: %#v", rec)
 		}
 		orgID := rec[0]
 
@@ -205,7 +205,7 @@ func loadOrganizations(ctx context.Context, db *mongo.Database) {
 	if len(batch) > 0 {
 		total += flushInsertBatch(ctx, coll, batch, "organizations")
 	}
-	log.Printf("[mongodb_1] Loaded organizations: %d documents", total)
+	log.Printf("[mongodb] Loaded organizations: %d documents", total)
 }
 
 // =========================
@@ -221,7 +221,7 @@ func loadUsers(ctx context.Context, db *mongo.Database) {
 
 	// header: user_id,org_id
 	if _, err := r.Read(); err != nil {
-		log.Fatalf("[mongodb_1] read users header: %v", err)
+		log.Fatalf("[mongodb] read users header: %v", err)
 	}
 
 	coll := db.Collection("users")
@@ -234,10 +234,10 @@ func loadUsers(ctx context.Context, db *mongo.Database) {
 			break
 		}
 		if err != nil {
-			log.Fatalf("[mongodb_1] read users row: %v", err)
+			log.Fatalf("[mongodb] read users row: %v", err)
 		}
 		if len(rec) < 2 {
-			log.Fatalf("[mongodb_1] invalid users row: %#v", rec)
+			log.Fatalf("[mongodb] invalid users row: %#v", rec)
 		}
 
 		userID := rec[0]
@@ -256,7 +256,7 @@ func loadUsers(ctx context.Context, db *mongo.Database) {
 	if len(batch) > 0 {
 		total += flushInsertBatch(ctx, coll, batch, "users")
 	}
-	log.Printf("[mongodb_1] Loaded users: %d documents", total)
+	log.Printf("[mongodb] Loaded users: %d documents", total)
 }
 
 // =========================
@@ -272,7 +272,7 @@ func loadGroups(ctx context.Context, db *mongo.Database) {
 
 	// header: group_id,org_id
 	if _, err := r.Read(); err != nil {
-		log.Fatalf("[mongodb_1] read groups header: %v", err)
+		log.Fatalf("[mongodb] read groups header: %v", err)
 	}
 
 	coll := db.Collection("groups")
@@ -285,10 +285,10 @@ func loadGroups(ctx context.Context, db *mongo.Database) {
 			break
 		}
 		if err != nil {
-			log.Fatalf("[mongodb_1] read groups row: %v", err)
+			log.Fatalf("[mongodb] read groups row: %v", err)
 		}
 		if len(rec) < 2 {
-			log.Fatalf("[mongodb_1] invalid groups row: %#v", rec)
+			log.Fatalf("[mongodb] invalid groups row: %#v", rec)
 		}
 
 		groupID := rec[0]
@@ -307,7 +307,7 @@ func loadGroups(ctx context.Context, db *mongo.Database) {
 	if len(batch) > 0 {
 		total += flushInsertBatch(ctx, coll, batch, "groups")
 	}
-	log.Printf("[mongodb_1] Loaded groups: %d documents", total)
+	log.Printf("[mongodb] Loaded groups: %d documents", total)
 }
 
 // =========================
@@ -329,7 +329,7 @@ func loadOrgMemberships(ctx context.Context, db *mongo.Database) (map[string]str
 
 	// header: org_id,user_id,role
 	if _, err := r.Read(); err != nil {
-		log.Fatalf("[mongodb_1] read org_memberships header: %v", err)
+		log.Fatalf("[mongodb] read org_memberships header: %v", err)
 	}
 
 	coll := db.Collection("org_memberships")
@@ -345,10 +345,10 @@ func loadOrgMemberships(ctx context.Context, db *mongo.Database) (map[string]str
 			break
 		}
 		if err != nil {
-			log.Fatalf("[mongodb_1] read org_memberships row: %v", err)
+			log.Fatalf("[mongodb] read org_memberships row: %v", err)
 		}
 		if len(rec) < 3 {
-			log.Fatalf("[mongodb_1] invalid org_memberships row: %#v", rec)
+			log.Fatalf("[mongodb] invalid org_memberships row: %#v", rec)
 		}
 
 		orgID := rec[0]
@@ -389,7 +389,7 @@ func loadOrgMemberships(ctx context.Context, db *mongo.Database) (map[string]str
 	if len(batch) > 0 {
 		total += flushInsertBatch(ctx, coll, batch, "org_memberships")
 	}
-	log.Printf("[mongodb_1] Loaded org_memberships: %d documents", total)
+	log.Printf("[mongodb] Loaded org_memberships: %d documents", total)
 
 	return orgAdmins, orgMembers
 }
@@ -412,7 +412,7 @@ func loadGroupMemberships(ctx context.Context, db *mongo.Database) map[string]st
 
 	// header: group_id,user_id,role
 	if _, err := r.Read(); err != nil {
-		log.Fatalf("[mongodb_1] read group_memberships header: %v", err)
+		log.Fatalf("[mongodb] read group_memberships header: %v", err)
 	}
 
 	coll := db.Collection("group_memberships")
@@ -427,10 +427,10 @@ func loadGroupMemberships(ctx context.Context, db *mongo.Database) map[string]st
 			break
 		}
 		if err != nil {
-			log.Fatalf("[mongodb_1] read group_memberships row: %v", err)
+			log.Fatalf("[mongodb] read group_memberships row: %v", err)
 		}
 		if len(rec) < 3 {
-			log.Fatalf("[mongodb_1] invalid group_memberships row: %#v", rec)
+			log.Fatalf("[mongodb] invalid group_memberships row: %#v", rec)
 		}
 
 		groupID := rec[0]
@@ -458,7 +458,7 @@ func loadGroupMemberships(ctx context.Context, db *mongo.Database) map[string]st
 	if len(batch) > 0 {
 		total += flushInsertBatch(ctx, coll, batch, "group_memberships")
 	}
-	log.Printf("[mongodb_1] Loaded group_memberships: %d documents", total)
+	log.Printf("[mongodb] Loaded group_memberships: %d documents", total)
 
 	return groupMembers
 }
@@ -479,7 +479,7 @@ func loadResources(ctx context.Context, db *mongo.Database) map[string]string {
 
 	// header: resource_id,org_id
 	if _, err := r.Read(); err != nil {
-		log.Fatalf("[mongodb_1] read resources header: %v", err)
+		log.Fatalf("[mongodb] read resources header: %v", err)
 	}
 
 	coll := db.Collection("resources")
@@ -494,10 +494,10 @@ func loadResources(ctx context.Context, db *mongo.Database) map[string]string {
 			break
 		}
 		if err != nil {
-			log.Fatalf("[mongodb_1] read resources row: %v", err)
+			log.Fatalf("[mongodb] read resources row: %v", err)
 		}
 		if len(rec) < 2 {
-			log.Fatalf("[mongodb_1] invalid resources row: %#v", rec)
+			log.Fatalf("[mongodb] invalid resources row: %#v", rec)
 		}
 
 		resID := rec[0]
@@ -518,7 +518,7 @@ func loadResources(ctx context.Context, db *mongo.Database) map[string]string {
 	if len(batch) > 0 {
 		total += flushInsertBatch(ctx, coll, batch, "resources")
 	}
-	log.Printf("[mongodb_1] Loaded resources: %d documents", total)
+	log.Printf("[mongodb] Loaded resources: %d documents", total)
 
 	return resourceOrg
 }
@@ -549,7 +549,7 @@ func loadResourceACL(
 
 	// header: resource_id,subject_type,subject_id,relation
 	if _, err := r.Read(); err != nil {
-		log.Fatalf("[mongodb_1] read resource_acl header: %v", err)
+		log.Fatalf("[mongodb] read resource_acl header: %v", err)
 	}
 
 	coll := db.Collection("resource_acl")
@@ -567,10 +567,10 @@ func loadResourceACL(
 			break
 		}
 		if err != nil {
-			log.Fatalf("[mongodb_1] read resource_acl row: %v", err)
+			log.Fatalf("[mongodb] read resource_acl row: %v", err)
 		}
 		if len(rec) < 4 {
-			log.Fatalf("[mongodb_1] invalid resource_acl row: %#v", rec)
+			log.Fatalf("[mongodb] invalid resource_acl row: %#v", rec)
 		}
 
 		resID := rec[0]
@@ -608,7 +608,7 @@ func loadResourceACL(
 				}
 				s.add(subjectID)
 			default:
-				log.Fatalf("[mongodb_1] unknown ACL relation for user: %q", relation)
+				log.Fatalf("[mongodb] unknown ACL relation for user: %q", relation)
 			}
 
 		case "group":
@@ -628,17 +628,17 @@ func loadResourceACL(
 				}
 				s.add(subjectID)
 			default:
-				log.Fatalf("[mongodb_1] unknown ACL relation for group: %q", relation)
+				log.Fatalf("[mongodb] unknown ACL relation for group: %q", relation)
 			}
 
 		default:
-			log.Fatalf("[mongodb_1] unknown subject_type in resource_acl: %q", subjectType)
+			log.Fatalf("[mongodb] unknown subject_type in resource_acl: %q", subjectType)
 		}
 	}
 	if len(batch) > 0 {
 		total += flushInsertBatch(ctx, coll, batch, "resource_acl")
 	}
-	log.Printf("[mongodb_1] Loaded resource_acl: %d documents", total)
+	log.Printf("[mongodb] Loaded resource_acl: %d documents", total)
 
 	return directUserManagers, directUserViewers, groupManagers, groupViewers
 }
@@ -762,5 +762,5 @@ func buildUserResourcePerms(
 		total += flushInsertBatch(ctx, coll, batch, "user_resource_perms")
 	}
 
-	log.Printf("[mongodb_1] Loaded user_resource_perms: %d documents", total)
+	log.Printf("[mongodb] Loaded user_resource_perms: %d documents", total)
 }

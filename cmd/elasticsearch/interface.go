@@ -1,4 +1,4 @@
-package elasticsearch_1
+package elasticsearch
 
 import (
 	"bytes"
@@ -48,12 +48,12 @@ func indexResourceDocs(
 			es.Bulk.WithRefresh("false"),
 		)
 		if err != nil {
-			log.Fatalf("[elasticsearch_1] bulk index failed: %v", err)
+			log.Fatalf("[elasticsearch] bulk index failed: %v", err)
 		}
 		defer res.Body.Close()
 
 		if res.IsError() {
-			log.Fatalf("[elasticsearch_1] bulk index returned error: %s", res.Status())
+			log.Fatalf("[elasticsearch] bulk index returned error: %s", res.Status())
 		}
 
 		buf.Reset()
@@ -150,11 +150,11 @@ func indexResourceDocs(
 
 		metaBytes, err := json.Marshal(meta)
 		if err != nil {
-			log.Fatalf("[elasticsearch_1] marshal bulk meta failed: %v", err)
+			log.Fatalf("[elasticsearch] marshal bulk meta failed: %v", err)
 		}
 		docBytes, err := json.Marshal(doc)
 		if err != nil {
-			log.Fatalf("[elasticsearch_1] marshal resourceDoc failed: %v", err)
+			log.Fatalf("[elasticsearch] marshal resourceDoc failed: %v", err)
 		}
 
 		buf.Write(metaBytes)
@@ -177,11 +177,11 @@ func indexResourceDocs(
 		es.Indices.Refresh.WithIndex([]string{IndexName}...),
 		es.Indices.Refresh.WithContext(refreshCtx),
 	); err != nil {
-		log.Printf("[elasticsearch_1] index refresh failed: %v", err)
+		log.Printf("[elasticsearch] index refresh failed: %v", err)
 	}
 
 	elapsed := time.Since(start).Truncate(time.Millisecond)
-	log.Printf("[elasticsearch_1] Indexed %d resource docs into %q in %s", docCount, IndexName, elapsed)
+	log.Printf("[elasticsearch] Indexed %d resource docs into %q in %s", docCount, IndexName, elapsed)
 }
 
 // =========================
@@ -201,14 +201,14 @@ func ClearIndexDocs(ctx context.Context, es *elasticsearch.Client) {
 		es.DeleteByQuery.WithConflicts("proceed"),
 	)
 	if err != nil {
-		log.Fatalf("[elasticsearch_1] delete_by_query on %q failed: %v", IndexName, err)
+		log.Fatalf("[elasticsearch] delete_by_query on %q failed: %v", IndexName, err)
 	}
 	defer res.Body.Close()
 
 	// If index is missing, DeleteByQuery returns 404; that is acceptable.
 	if res.IsError() && !strings.Contains(res.Status(), "404") {
-		log.Fatalf("[elasticsearch_1] delete_by_query on %q returned error: %s", IndexName, res.Status())
+		log.Fatalf("[elasticsearch] delete_by_query on %q returned error: %s", IndexName, res.Status())
 	}
 
-	log.Printf("[elasticsearch_1] Cleared existing documents in index %q", IndexName)
+	log.Printf("[elasticsearch] Cleared existing documents in index %q", IndexName)
 }

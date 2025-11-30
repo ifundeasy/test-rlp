@@ -1,4 +1,4 @@
-package mongodb_1
+package mongodb
 
 import (
 	"context"
@@ -33,29 +33,29 @@ type benchDataset struct {
 }
 
 // MongoBenchmarkReads is the entry point: called from cmd/main.go
-// when you run `go run cmd/main.go mongodb_1 benchmark`.
+// when you run `go run cmd/main.go mongodb benchmark`.
 func MongodbBenchmarkReads() {
 	ctx := context.Background()
 
 	_, db, cleanup, err := infrastructure.NewMongoFromEnv(ctx)
 	if err != nil {
-		log.Fatalf("[mongodb_1] create mongo client: %v", err)
+		log.Fatalf("[mongodb] create mongo client: %v", err)
 	}
 	defer cleanup()
 
-	log.Printf("[mongodb_1] == Building benchmark dataset from MongoDB ==")
+	log.Printf("[mongodb] == Building benchmark dataset from MongoDB ==")
 	data, err := buildBenchDatasetFromMongo(ctx, db)
 	if err != nil {
-		log.Fatalf("[mongodb_1] build benchmark dataset: %v", err)
+		log.Fatalf("[mongodb] build benchmark dataset: %v", err)
 	}
 
-	log.Printf("[mongodb_1] == Running MongoDB read benchmarks on DB-backed dataset ==")
+	log.Printf("[mongodb] == Running MongoDB read benchmarks on DB-backed dataset ==")
 	runCheckManageDirectUser(ctx, db, data)
 	runCheckManageOrgAdmin(ctx, db, data)
 	runCheckViewViaGroupMember(ctx, db, data)
 	runLookupResourcesManageSuper(ctx, db, data)
 	runLookupResourcesViewRegular(ctx, db, data)
-	log.Printf("[mongodb_1] == MongoDB read benchmarks DONE ==")
+	log.Printf("[mongodb] == MongoDB read benchmarks DONE ==")
 }
 
 // ==============================
@@ -247,7 +247,7 @@ func buildBenchDatasetFromMongo(ctx context.Context, db *mongo.Database) (*bench
 	heavy, regular := pickLookupUsers(manageCount, viewCount)
 
 	elapsed := time.Since(start).Truncate(time.Millisecond)
-	log.Printf("[mongodb_1] Benchmark dataset loaded in %s: directManagerPairs=%d orgAdminPairs=%d groupViewPairs=%d heavyManageUser=%q regularViewUser=%q",
+	log.Printf("[mongodb] Benchmark dataset loaded in %s: directManagerPairs=%d orgAdminPairs=%d groupViewPairs=%d heavyManageUser=%q regularViewUser=%q",
 		elapsed, len(directManagerPairs), len(orgAdminPairs), len(groupViewPairs), heavy, regular)
 
 	return &benchDataset{
@@ -299,11 +299,11 @@ func runCheckManageDirectUser(parent context.Context, db *mongo.Database, data *
 	iters := envInt("BENCH_CHECK_DIRECT_SUPER_ITER", 1000)
 	pairs := data.directManagerPairs
 	if len(pairs) == 0 {
-		log.Printf("[mongodb_1] [check_manage_direct_user] SKIP: no directManagerPairs in dataset")
+		log.Printf("[mongodb] [check_manage_direct_user] SKIP: no directManagerPairs in dataset")
 		return
 	}
 
-	log.Printf("[mongodb_1] [check_manage_direct_user] iterations=%d samplePairs=%d", iters, len(pairs))
+	log.Printf("[mongodb] [check_manage_direct_user] iterations=%d samplePairs=%d", iters, len(pairs))
 
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 	start := time.Now()
@@ -323,17 +323,17 @@ func runCheckManageDirectUser(parent context.Context, db *mongo.Database, data *
 		})
 		cancel()
 		if err != nil {
-			log.Fatalf("[mongodb_1] [check_manage_direct_user] query error: %v", err)
+			log.Fatalf("[mongodb] [check_manage_direct_user] query error: %v", err)
 		}
 		if count == 0 {
-			log.Fatalf("[mongodb_1] [check_manage_direct_user] unexpected deny for pair (resource=%s,user=%s)", p.ResourceID, p.UserID)
+			log.Fatalf("[mongodb] [check_manage_direct_user] unexpected deny for pair (resource=%s,user=%s)", p.ResourceID, p.UserID)
 		}
 		allowed++
 	}
 
 	total := time.Since(start)
 	avg := total / time.Duration(iters)
-	log.Printf("[mongodb_1] [check_manage_direct_user] DONE: iters=%d allowed=%d avg=%s total=%s",
+	log.Printf("[mongodb] [check_manage_direct_user] DONE: iters=%d allowed=%d avg=%s total=%s",
 		iters, allowed, avg, total)
 }
 
@@ -345,11 +345,11 @@ func runCheckManageOrgAdmin(parent context.Context, db *mongo.Database, data *be
 	iters := envInt("BENCH_CHECK_ORGADMIN_ITER", 1000)
 	pairs := data.orgAdminPairs
 	if len(pairs) == 0 {
-		log.Printf("[mongodb_1] [check_manage_org_admin] SKIP: no orgAdminPairs in dataset")
+		log.Printf("[mongodb] [check_manage_org_admin] SKIP: no orgAdminPairs in dataset")
 		return
 	}
 
-	log.Printf("[mongodb_1] [check_manage_org_admin] iterations=%d samplePairs=%d", iters, len(pairs))
+	log.Printf("[mongodb] [check_manage_org_admin] iterations=%d samplePairs=%d", iters, len(pairs))
 
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 	start := time.Now()
@@ -369,17 +369,17 @@ func runCheckManageOrgAdmin(parent context.Context, db *mongo.Database, data *be
 		})
 		cancel()
 		if err != nil {
-			log.Fatalf("[mongodb_1] [check_manage_org_admin] query error: %v", err)
+			log.Fatalf("[mongodb] [check_manage_org_admin] query error: %v", err)
 		}
 		if count == 0 {
-			log.Fatalf("[mongodb_1] [check_manage_org_admin] unexpected deny for pair (resource=%s,user=%s)", p.ResourceID, p.UserID)
+			log.Fatalf("[mongodb] [check_manage_org_admin] unexpected deny for pair (resource=%s,user=%s)", p.ResourceID, p.UserID)
 		}
 		allowed++
 	}
 
 	total := time.Since(start)
 	avg := total / time.Duration(iters)
-	log.Printf("[mongodb_1] [check_manage_org_admin] DONE: iters=%d allowed=%d avg=%s total=%s",
+	log.Printf("[mongodb] [check_manage_org_admin] DONE: iters=%d allowed=%d avg=%s total=%s",
 		iters, allowed, avg, total)
 }
 
@@ -391,11 +391,11 @@ func runCheckViewViaGroupMember(parent context.Context, db *mongo.Database, data
 	iters := envInt("BENCH_CHECK_VIEW_GROUP_ITER", 1000)
 	pairs := data.groupViewPairs
 	if len(pairs) == 0 {
-		log.Printf("[mongodb_1] [check_view_via_group_member] SKIP: no groupViewPairs in dataset")
+		log.Printf("[mongodb] [check_view_via_group_member] SKIP: no groupViewPairs in dataset")
 		return
 	}
 
-	log.Printf("[mongodb_1] [check_view_via_group_member] iterations=%d samplePairs=%d", iters, len(pairs))
+	log.Printf("[mongodb] [check_view_via_group_member] iterations=%d samplePairs=%d", iters, len(pairs))
 
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 	start := time.Now()
@@ -415,17 +415,17 @@ func runCheckViewViaGroupMember(parent context.Context, db *mongo.Database, data
 		})
 		cancel()
 		if err != nil {
-			log.Fatalf("[mongodb_1] [check_view_via_group_member] query error: %v", err)
+			log.Fatalf("[mongodb] [check_view_via_group_member] query error: %v", err)
 		}
 		if count == 0 {
-			log.Fatalf("[mongodb_1] [check_view_via_group_member] unexpected deny for pair (resource=%s,user=%s)", p.ResourceID, p.UserID)
+			log.Fatalf("[mongodb] [check_view_via_group_member] unexpected deny for pair (resource=%s,user=%s)", p.ResourceID, p.UserID)
 		}
 		allowed++
 	}
 
 	total := time.Since(start)
 	avg := total / time.Duration(iters)
-	log.Printf("[mongodb_1] [check_view_via_group_member] DONE: iters=%d allowed=%d avg=%s total=%s",
+	log.Printf("[mongodb] [check_view_via_group_member] DONE: iters=%d allowed=%d avg=%s total=%s",
 		iters, allowed, avg, total)
 }
 
@@ -437,7 +437,7 @@ func runLookupResourcesManageSuper(parent context.Context, db *mongo.Database, d
 	userID := data.heavyManageUser
 	iters := envInt("BENCH_LOOKUPRES_MANAGE_ITER", 10)
 
-	log.Printf("[mongodb_1] [lookup_resources_manage_super] iterations=%d user=%s", iters, userID)
+	log.Printf("[mongodb] [lookup_resources_manage_super] iterations=%d user=%s", iters, userID)
 
 	totalDur := time.Duration(0)
 	lastCount := 0
@@ -447,7 +447,7 @@ func runLookupResourcesManageSuper(parent context.Context, db *mongo.Database, d
 		resIDs, err := mongoLookupManageResourcesForUser(ctx, db, userID)
 		cancel()
 		if err != nil {
-			log.Fatalf("[mongodb_1] [lookup_resources_manage_super] lookup error: %v", err)
+			log.Fatalf("[mongodb] [lookup_resources_manage_super] lookup error: %v", err)
 		}
 		lastCount = len(resIDs)
 		dur := time.Duration(0)
@@ -462,19 +462,19 @@ func runLookupResourcesManageSuper(parent context.Context, db *mongo.Database, d
 		_, err = mongoLookupManageResourcesForUser(ctx2, db, userID)
 		cancel2()
 		if err != nil {
-			log.Fatalf("[mongodb_1] [lookup_resources_manage_super] timing lookup error: %v", err)
+			log.Fatalf("[mongodb] [lookup_resources_manage_super] timing lookup error: %v", err)
 		}
 		dur = time.Since(start)
 
 		totalDur += dur
-		log.Printf("[mongodb_1] [lookup_resources_manage_super] iter=%d resources=%d duration=%s", i, lastCount, dur)
+		log.Printf("[mongodb] [lookup_resources_manage_super] iter=%d resources=%d duration=%s", i, lastCount, dur)
 	}
 
 	avg := time.Duration(0)
 	if iters > 0 {
 		avg = totalDur / time.Duration(iters)
 	}
-	log.Printf("[mongodb_1] [lookup_resources_manage_super] DONE: iters=%d lastCount=%d avg=%s total=%s",
+	log.Printf("[mongodb] [lookup_resources_manage_super] DONE: iters=%d lastCount=%d avg=%s total=%s",
 		iters, lastCount, avg, totalDur)
 }
 
@@ -529,7 +529,7 @@ func runLookupResourcesViewRegular(parent context.Context, db *mongo.Database, d
 		userID = data.regularViewUser
 	}
 
-	log.Printf("[mongodb_1] [lookup_resources_view_regular] iterations=%d user=%s", iters, userID)
+	log.Printf("[mongodb] [lookup_resources_view_regular] iterations=%d user=%s", iters, userID)
 
 	ctx, cancel := context.WithTimeout(parent, 15*time.Second)
 	defer cancel()
@@ -543,7 +543,7 @@ func runLookupResourcesViewRegular(parent context.Context, db *mongo.Database, d
 		"user_id": userID,
 	})
 	if err != nil {
-		log.Fatalf("[mongodb_1] [lookup_resources_view_regular] load orgIDs: %v", err)
+		log.Fatalf("[mongodb] [lookup_resources_view_regular] load orgIDs: %v", err)
 	}
 
 	// 2) Find all groups where this user is a member/admin.
@@ -551,7 +551,7 @@ func runLookupResourcesViewRegular(parent context.Context, db *mongo.Database, d
 		"user_id": userID,
 	})
 	if err != nil {
-		log.Fatalf("[mongodb_1] [lookup_resources_view_regular] load groupIDs: %v", err)
+		log.Fatalf("[mongodb] [lookup_resources_view_regular] load groupIDs: %v", err)
 	}
 
 	// 3) Build a resources filter that matches the Postgres semantics.
@@ -591,7 +591,7 @@ func runLookupResourcesViewRegular(parent context.Context, db *mongo.Database, d
 		)
 		if err != nil {
 			iterCancel()
-			log.Fatalf("[mongodb_1] [lookup_resources_view_regular] Find error: %v", err)
+			log.Fatalf("[mongodb] [lookup_resources_view_regular] Find error: %v", err)
 		}
 
 		count := 0
@@ -600,7 +600,7 @@ func runLookupResourcesViewRegular(parent context.Context, db *mongo.Database, d
 		}
 		if err := cur.Err(); err != nil {
 			iterCancel()
-			log.Fatalf("[mongodb_1] [lookup_resources_view_regular] cursor error: %v", err)
+			log.Fatalf("[mongodb] [lookup_resources_view_regular] cursor error: %v", err)
 		}
 		cur.Close(iterCtx)
 		iterCancel()
@@ -609,12 +609,12 @@ func runLookupResourcesViewRegular(parent context.Context, db *mongo.Database, d
 		total += dur
 		lastCount = count
 
-		log.Printf("[mongodb_1] [lookup_resources_view_regular] iter=%d resources=%d duration=%s",
+		log.Printf("[mongodb] [lookup_resources_view_regular] iter=%d resources=%d duration=%s",
 			i, count, dur.Truncate(time.Microsecond))
 	}
 
 	avg := time.Duration(int64(total) / int64(iters))
-	log.Printf("[mongodb_1] [lookup_resources_view_regular] DONE: iters=%d lastCount=%d avg=%s total=%s",
+	log.Printf("[mongodb] [lookup_resources_view_regular] DONE: iters=%d lastCount=%d avg=%s total=%s",
 		iters, lastCount, avg, total)
 }
 
@@ -637,7 +637,7 @@ func envInt(key string, def int) int {
 	}
 	n, err := strconv.Atoi(v)
 	if err != nil {
-		log.Printf("[mongodb_1] invalid %s=%q, using default %d", key, v, def)
+		log.Printf("[mongodb] invalid %s=%q, using default %d", key, v, def)
 		return def
 	}
 	return n

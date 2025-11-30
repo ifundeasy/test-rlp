@@ -1,4 +1,4 @@
-package elasticsearch_1
+package elasticsearch
 
 import (
 	"context"
@@ -58,11 +58,11 @@ func ElasticsearchCreateSchemas() {
 
 	es, cleanup, err := infrastructure.NewElasticsearchFromEnv(ctx)
 	if err != nil {
-		log.Fatalf("[elasticsearch_1] NewElasticsearchFromEnv failed: %v", err)
+		log.Fatalf("[elasticsearch] NewElasticsearchFromEnv failed: %v", err)
 	}
 	defer cleanup()
 
-	log.Printf("[elasticsearch_1] == Creating Elasticsearch index and mappings ==")
+	log.Printf("[elasticsearch] == Creating Elasticsearch index and mappings ==")
 
 	// 1) Drop existing index if present.
 	{
@@ -74,13 +74,13 @@ func ElasticsearchCreateSchemas() {
 			es.Indices.Delete.WithContext(ctxDrop),
 		)
 		if err != nil {
-			log.Fatalf("[elasticsearch_1] indices.delete %q failed: %v", IndexName, err)
+			log.Fatalf("[elasticsearch] indices.delete %q failed: %v", IndexName, err)
 		}
 		defer res.Body.Close()
 
 		// 404 is fine (index does not exist yet).
 		if res.IsError() && !strings.Contains(res.Status(), "404") {
-			log.Fatalf("[elasticsearch_1] indices.delete %q returned error: %s", IndexName, res.Status())
+			log.Fatalf("[elasticsearch] indices.delete %q returned error: %s", IndexName, res.Status())
 		}
 	}
 
@@ -136,13 +136,13 @@ func ElasticsearchCreateSchemas() {
 		es.Indices.Create.WithContext(ctxCreate),
 	)
 	if err != nil {
-		log.Fatalf("[elasticsearch_1] indices.create %q failed: %v", IndexName, err)
+		log.Fatalf("[elasticsearch] indices.create %q failed: %v", IndexName, err)
 	}
 	defer res.Body.Close()
 
 	if res.IsError() {
-		log.Fatalf("[elasticsearch_1] indices.create %q returned error: %s", IndexName, res.Status())
+		log.Fatalf("[elasticsearch] indices.create %q returned error: %s", IndexName, res.Status())
 	}
 
-	log.Printf("[elasticsearch_1] Index %q created successfully.", IndexName)
+	log.Printf("[elasticsearch] Index %q created successfully.", IndexName)
 }

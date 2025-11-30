@@ -1,4 +1,4 @@
-package elasticsearch_1
+package elasticsearch
 
 func ElasticsearchDropSchemas() {
 

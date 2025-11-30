@@ -1,4 +1,4 @@
-package mongodb_1
+package mongodb
 
 import (
 	"context"
@@ -11,18 +11,18 @@ import (
 	"test-tls/infrastructure"
 )
 
-// MongodbDropSchemas drops all collections used by the mongodb_1 benchmarks.
+// MongodbDropSchemas drops all collections used by the mongodb benchmarks.
 // It does NOT drop the database itself, only the collections we created.
 func MongodbDropSchemas() {
 	ctx := context.Background()
 
 	_, db, cleanup, err := infrastructure.NewMongoFromEnv(ctx)
 	if err != nil {
-		log.Fatalf("[mongodb_1] failed to create mongo client: %v", err)
+		log.Fatalf("[mongodb] failed to create mongo client: %v", err)
 	}
 	defer cleanup()
 
-	log.Printf("[mongodb_1] == Dropping MongoDB collections for benchmarks ==")
+	log.Printf("[mongodb] == Dropping MongoDB collections for benchmarks ==")
 
 	opTimeout := 30 * time.Second
 
@@ -53,15 +53,15 @@ func MongodbDropSchemas() {
 			// so the command is idempotent, like "DROP TABLE IF EXISTS".
 			var cmdErr mongo.CommandError
 			if errors.As(err, &cmdErr) && cmdErr.Code == 26 {
-				log.Printf("[mongodb_1] DropCollection %s: namespace not found (already dropped)", name)
+				log.Printf("[mongodb] DropCollection %s: namespace not found (already dropped)", name)
 				continue
 			}
 
-			log.Fatalf("[mongodb_1] DropCollection %s failed: %v", name, err)
+			log.Fatalf("[mongodb] DropCollection %s failed: %v", name, err)
 		}
 
-		log.Printf("[mongodb_1] Dropped collection: %s", name)
+		log.Printf("[mongodb] Dropped collection: %s", name)
 	}
 
-	log.Printf("[mongodb_1] MongoDB collections drop DONE")
+	log.Printf("[mongodb] MongoDB collections drop DONE")
 }

@@ -1,4 +1,4 @@
-package mongodb_1
+package mongodb
 
 import (
 	"context"
@@ -44,9 +44,9 @@ func CreateIndexesWithLog(
 
 	names, err := coll.Indexes().CreateMany(ctx, models)
 	if err != nil {
-		log.Fatalf("[mongodb_1] create indexes on %s failed: %v", collName, err)
+		log.Fatalf("[mongodb] create indexes on %s failed: %v", collName, err)
 	}
 	for _, name := range names {
-		log.Printf("[mongodb_1] Index created on %s: %s", collName, name)
+		log.Printf("[mongodb] Index created on %s: %s", collName, name)
 	}
 }

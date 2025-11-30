@@ -1,4 +1,4 @@
-package elasticsearch_1
+package elasticsearch
 
 import (
 	"bytes"
@@ -56,29 +56,29 @@ type esSearchResponse struct {
 
 // ElasticsearchBenchmarkReads is the entry point, invoked via:
 //
-//	go run cmd/main.go elasticsearch_1 benchmark
+//	go run cmd/main.go elasticsearch benchmark
 func ElasticsearchBenchmarkReads() {
 	ctx := context.Background()
 
 	es, cleanup, err := infrastructure.NewElasticsearchFromEnv(ctx)
 	if err != nil {
-		log.Fatalf("[elasticsearch_1] NewElasticsearchFromEnv failed: %v", err)
+		log.Fatalf("[elasticsearch] NewElasticsearchFromEnv failed: %v", err)
 	}
 	defer cleanup()
 
-	log.Printf("[elasticsearch_1] == Building benchmark dataset from Elasticsearch ==")
+	log.Printf("[elasticsearch] == Building benchmark dataset from Elasticsearch ==")
 	data, err := buildBenchDatasetFromElasticsearch(ctx, es)
 	if err != nil {
-		log.Fatalf("[elasticsearch_1] build benchmark dataset: %v", err)
+		log.Fatalf("[elasticsearch] build benchmark dataset: %v", err)
 	}
 
-	log.Printf("[elasticsearch_1] == Running Elasticsearch read benchmarks on index-backed dataset ==")
+	log.Printf("[elasticsearch] == Running Elasticsearch read benchmarks on index-backed dataset ==")
 
 	runCheckManageDirectUser(ctx, es, data)
 	runListViewHeavyUser(ctx, es, data)
 	runListViewRegularUser(ctx, es, data)
 
-	log.Println("[elasticsearch_1] == Elasticsearch read benchmarks DONE ==")
+	log.Println("[elasticsearch] == Elasticsearch read benchmarks DONE ==")
 }
 
 // buildBenchDatasetFromElasticsearch scans the rlp_resources index and builds
@@ -188,7 +188,7 @@ func buildBenchDatasetFromElasticsearch(ctx context.Context, es *elasticsearch.C
 	}
 
 	if len(managePairs) == 0 {
-		return nil, fmt.Errorf("no manage pairs found in index %q; did you run elasticsearch_1 load_data?", IndexName)
+		return nil, fmt.Errorf("no manage pairs found in index %q; did you run elasticsearch load_data?", IndexName)
 	}
 
 	// Compute heavy/regular users.
@@ -227,7 +227,7 @@ func buildBenchDatasetFromElasticsearch(ctx context.Context, es *elasticsearch.C
 	}
 
 	elapsed := time.Since(start).Truncate(time.Millisecond)
-	log.Printf("[elasticsearch_1] Benchmark dataset loaded in %s: directManagerPairs=%d orgAdminPairs=%d groupViewPairs=%d heavyManageUser=%q regularViewUser=%q",
+	log.Printf("[elasticsearch] Benchmark dataset loaded in %s: directManagerPairs=%d orgAdminPairs=%d groupViewPairs=%d heavyManageUser=%q regularViewUser=%q",
 		elapsed, len(managePairs), 0, 0, heavy, regular)
 
 	return &benchDataset{
@@ -247,12 +247,12 @@ func runCheckManageDirectUser(parent context.Context, es *elasticsearch.Client, 
 	iters := envInt("BENCH_CHECK_DIRECT_SUPER_ITER", 1000)
 	pairs := data.directManagerPairs
 	if len(pairs) == 0 {
-		log.Printf("[elasticsearch_1] [check_manage_direct_user] skipped: no manage pairs in dataset")
+		log.Printf("[elasticsearch] [check_manage_direct_user] skipped: no manage pairs in dataset")
 		return
 	}
 
 	name := "check_manage_direct_user"
-	log.Printf("[elasticsearch_1] [%s] iterations=%d samplePairs=%d", name, iters, len(pairs))
+	log.Printf("[elasticsearch] [%s] iterations=%d samplePairs=%d", name, iters, len(pairs))
 
 	start := time.Now()
 	allowed := 0
@@ -264,7 +264,7 @@ func runCheckManageDirectUser(parent context.Context, es *elasticsearch.Client, 
 		ok, err := checkManage(ctx, es, p.UserID, p.ResourceID)
 		cancel()
 		if err != nil {
-			log.Fatalf("[elasticsearch_1] [%s] query failed: %v", name, err)
+			log.Fatalf("[elasticsearch] [%s] query failed: %v", name, err)
 		}
 		if ok {
 			allowed++
@@ -273,7 +273,7 @@ func runCheckManageDirectUser(parent context.Context, es *elasticsearch.Client, 
 
 	total := time.Since(start)
 	avg := time.Duration(int64(total) / int64(iters))
-	log.Printf("[elasticsearch_1] [%s] DONE: iters=%d allowed=%d avg=%s total=%s", name, iters, allowed, avg, total)
+	log.Printf("[elasticsearch] [%s] DONE: iters=%d allowed=%d avg=%s total=%s", name, iters, allowed, avg, total)
 }
 
 func checkManage(ctx context.Context, es *elasticsearch.Client, userID, resourceID int) (bool, error) {
@@ -329,14 +329,14 @@ func runListViewHeavyUser(ctx context.Context, es *elasticsearch.Client, data *b
 	iters := envInt("BENCH_LOOKUPRES_MANAGE_ITER", 10)
 
 	if data.heavyManageUser == "" {
-		log.Printf("[elasticsearch_1] [lookup_resources_manage_super] skipped: heavyManageUser is empty")
+		log.Printf("[elasticsearch] [lookup_resources_manage_super] skipped: heavyManageUser is empty")
 		return
 	}
 
 	userStr := data.heavyManageUser
 	userID, err := strconv.Atoi(userStr)
 	if err != nil {
-		log.Fatalf("[elasticsearch_1] [lookup_resources_manage_super] invalid heavyManageUser=%q: %v", userStr, err)
+		log.Fatalf("[elasticsearch] [lookup_resources_manage_super] invalid heavyManageUser=%q: %v", userStr, err)
 	}
 
 	// Warm-up to populate ES request cache and FS cache
@@ -349,14 +349,14 @@ func runListViewRegularUser(ctx context.Context, es *elasticsearch.Client, data 
 	iters := envInt("BENCH_LOOKUPRES_VIEW_ITER", 10)
 
 	if data.regularViewUser == "" {
-		log.Printf("[elasticsearch_1] [lookup_resources_view_regular] skipped: regularViewUser is empty")
+		log.Printf("[elasticsearch] [lookup_resources_view_regular] skipped: regularViewUser is empty")
 		return
 	}
 
 	userStr := data.regularViewUser
 	userID, err := strconv.Atoi(userStr)
 	if err != nil {
-		log.Fatalf("[elasticsearch_1] [lookup_resources_view_regular] invalid regularViewUser=%q: %v", userStr, err)
+		log.Fatalf("[elasticsearch] [lookup_resources_view_regular] invalid regularViewUser=%q: %v", userStr, err)
 	}
 
 	// Warm-up
@@ -366,7 +366,7 @@ func runListViewRegularUser(ctx context.Context, es *elasticsearch.Client, data 
 }
 
 func runListViewUser(parent context.Context, es *elasticsearch.Client, name string, iters int, userStr string, userID int) {
-	log.Printf("[elasticsearch_1] [%s] iterations=%d user=%s", name, iters, userStr)
+	log.Printf("[elasticsearch] [%s] iterations=%d user=%s", name, iters, userStr)
 
 	var total time.Duration
 	lastCount := 0
@@ -378,18 +378,18 @@ func runListViewUser(parent context.Context, es *elasticsearch.Client, name stri
 		n, err := listViewResources(ctx, es, userID)
 		cancel()
 		if err != nil {
-			log.Fatalf("[elasticsearch_1] [%s] query failed: %v", name, err)
+			log.Fatalf("[elasticsearch] [%s] query failed: %v", name, err)
 		}
 
 		dur := time.Since(start)
 		total += dur
 		lastCount = n
 
-		log.Printf("[elasticsearch_1] [%s] iter=%d resources=%d duration=%s", name, i, n, dur.Truncate(time.Millisecond))
+		log.Printf("[elasticsearch] [%s] iter=%d resources=%d duration=%s", name, i, n, dur.Truncate(time.Millisecond))
 	}
 
 	avg := time.Duration(int64(total) / int64(iters))
-	log.Printf("[elasticsearch_1] [%s] DONE: iters=%d lastCount=%d avg=%s total=%s", name, iters, lastCount, avg, total)
+	log.Printf("[elasticsearch] [%s] DONE: iters=%d lastCount=%d avg=%s total=%s", name, iters, lastCount, avg, total)
 }
 
 func listViewResources(ctx context.Context, es *elasticsearch.Client, userID int) (int, error) {
@@ -440,7 +440,7 @@ func envInt(key string, def int) int {
 	}
 	n, err := strconv.Atoi(v)
 	if err != nil {
-		log.Printf("[elasticsearch_1] invalid %s=%q, using default %d", key, v, def)
+		log.Printf("[elasticsearch] invalid %s=%q, using default %d", key, v, def)
 		return def
 	}
 	return n
