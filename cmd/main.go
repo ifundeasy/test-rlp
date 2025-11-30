@@ -23,14 +23,14 @@ type handler func(args []string) error
 // modules maps module names to their handlers.
 var modules = map[string]handler{
 	"csv":           runCsv,
-	"authzed_crdb":  runAuthzedCrdb1,
-	"authzed_pgdb":  runAuthzedPgdb1,
-	"clickhouse":    runClickhouse1,
-	"cockroachdb":   runCockroachdb1,
-	"postgres":      runPostgres1,
-	"mongodb":       runMongodb1,
-	"scylladb":      runScylladb1,
-	"elasticsearch": runElasticsearch1,
+	"authzed_crdb":  runAuthzedCrdb,
+	"authzed_pgdb":  runAuthzedPgdb,
+	"clickhouse":    runClickhouse,
+	"cockroachdb":   runCockroachdb,
+	"postgres":      runPostgres,
+	"mongodb":       runMongodb,
+	"scylladb":      runScylladb,
+	"elasticsearch": runElasticsearch,
 }
 
 func main() {
@@ -77,7 +77,7 @@ func runCsv(args []string) error {
 	}
 }
 
-func runAuthzedCrdb1(args []string) error {
+func runAuthzedCrdb(args []string) error {
 	if len(args) == 0 {
 		return errors.New(`missing action for authzed_crdb (expected: "drop|create-schema|load-data|benchmark")`)
 	}
@@ -100,7 +100,7 @@ func runAuthzedCrdb1(args []string) error {
 	return nil
 }
 
-func runAuthzedPgdb1(args []string) error {
+func runAuthzedPgdb(args []string) error {
 	if len(args) == 0 {
 		return errors.New(`missing action for authzed_pgdb (expected: "drop|create-schema|load-data|benchmark")`)
 	}
@@ -123,7 +123,7 @@ func runAuthzedPgdb1(args []string) error {
 	return nil
 }
 
-func runClickhouse1(args []string) error {
+func runClickhouse(args []string) error {
 	if len(args) == 0 {
 		return errors.New(`missing action for clickhouse (expected: "drop|create-schema|load-data|benchmark")`)
 	}
@@ -146,7 +146,7 @@ func runClickhouse1(args []string) error {
 	return nil
 }
 
-func runCockroachdb1(args []string) error {
+func runCockroachdb(args []string) error {
 	if len(args) == 0 {
 		return errors.New(`missing action for cockroachdb (expected: "drop|create-schema|load-data|benchmark")`)
 	}
@@ -170,7 +170,7 @@ func runCockroachdb1(args []string) error {
 	return nil
 }
 
-func runPostgres1(args []string) error {
+func runPostgres(args []string) error {
 	if len(args) == 0 {
 		return errors.New(`missing action for postgres (expected: "drop|create-schema|load-data|benchmark")`)
 	}
@@ -193,7 +193,7 @@ func runPostgres1(args []string) error {
 	return nil
 }
 
-func runMongodb1(args []string) error {
+func runMongodb(args []string) error {
 	if len(args) == 0 {
 		return errors.New(`missing action for mongodb (expected: "drop|create-schema|load-data|benchmark")`)
 	}
@@ -216,7 +216,7 @@ func runMongodb1(args []string) error {
 	return nil
 }
 
-func runScylladb1(args []string) error {
+func runScylladb(args []string) error {
 	if len(args) == 0 {
 		return errors.New(`missing action for scylladb (expected: "drop|create-schema|load-data|benchmark")`)
 	}
@@ -239,7 +239,7 @@ func runScylladb1(args []string) error {
 	return nil
 }
 
-func runElasticsearch1(args []string) error {
+func runElasticsearch(args []string) error {
 	if len(args) == 0 {
 		return errors.New(`missing action for elasticsearch (expected: "drop|create-schema|load-data|benchmark")`)
 	}

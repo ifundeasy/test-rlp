@@ -51,7 +51,7 @@ func ScylladbBenchmarkReads() {
 // streamQuery streams rows from a CQL query and invokes handle for each row.
 // This helper avoids collecting results into memory, making it suitable for
 // processing large datasets without memory overhead.
-func streamQuery(ctx context.Context, session *gocql.Session, query string, args []interface{}, handle func(iter *gocql.Iter) error) error {
+func streamQuery(ctx context.Context, session *gocql.Session, query string, args []any, handle func(iter *gocql.Iter) error) error {
 	q := session.Query(query, args...)
 	iter := q.WithContext(ctx).Iter()
 	defer iter.Close()
@@ -94,7 +94,7 @@ func runLookupBench(session *gocql.Session, name, permission, userID string, ite
 			WHERE subject_type = 'user' AND subject_id = ? AND relation = ?`
 
 		count := 0
-		err := streamQuery(ctx, session, query, []interface{}{userID, permission}, func(iter *gocql.Iter) error {
+		err := streamQuery(ctx, session, query, []any{userID, permission}, func(iter *gocql.Iter) error {
 			for {
 				var resID int
 				if !iter.Scan(&resID) {
@@ -142,7 +142,7 @@ func runCheckManageDirectUser(session *gocql.Session) {
 				WHERE subject_type = 'user' AND subject_id = ? AND relation = 'manager_user'`
 
 			streamed := 0
-			err := streamQuery(ctx, session, query, []interface{}{lookupUser}, func(iter *gocql.Iter) error {
+			err := streamQuery(ctx, session, query, []any{lookupUser}, func(iter *gocql.Iter) error {
 				for {
 					if done >= iters || streamed >= sampleLimit {
 						break
@@ -245,7 +245,7 @@ func runCheckManageOrgAdmin(session *gocql.Session) {
 				WHERE subject_type = 'user' AND subject_id = ? AND relation = 'manager_user'`
 
 			streamed := 0
-			err := streamQuery(ctx, session, query, []interface{}{lookupUser}, func(iter *gocql.Iter) error {
+			err := streamQuery(ctx, session, query, []any{lookupUser}, func(iter *gocql.Iter) error {
 				for {
 					if done >= iters || streamed >= sampleLimit {
 						break
@@ -347,7 +347,7 @@ func runCheckViewViaGroupMember(session *gocql.Session) {
 				WHERE subject_type = 'user' AND subject_id = ? AND relation = 'viewer_user'`
 
 			streamed := 0
-			err := streamQuery(ctx, session, query, []interface{}{lookupUser}, func(iter *gocql.Iter) error {
+			err := streamQuery(ctx, session, query, []any{lookupUser}, func(iter *gocql.Iter) error {
 				for {
 					if done >= iters || streamed >= sampleLimit {
 						break
