@@ -122,6 +122,9 @@ func ClickhouseCreateData() {
 			}
 			rows = append(rows, []interface{}{rec[0]})
 			count++
+			if count%10000 == 0 {
+				log.Printf("[clickhouse] Loaded organizations progress: %d rows elapsed=%s", count, time.Since(start).Truncate(time.Millisecond))
+			}
 			if len(rows) >= batchSize {
 				if err := insertRows("organizations", []string{"org_id"}, rows); err != nil {
 					log.Fatalf("[clickhouse] %v", err)
@@ -159,6 +162,9 @@ func ClickhouseCreateData() {
 			}
 			rows = append(rows, []interface{}{rec[0], rec[1]})
 			count++
+			if count%10000 == 0 {
+				log.Printf("[clickhouse] Loaded users progress: %d rows elapsed=%s", count, time.Since(start).Truncate(time.Millisecond))
+			}
 			if len(rows) >= batchSize {
 				if err := insertRows("users", []string{"user_id", "primary_org_id"}, rows); err != nil {
 					log.Fatalf("[clickhouse] %v", err)
@@ -196,6 +202,9 @@ func ClickhouseCreateData() {
 			}
 			rows = append(rows, []interface{}{rec[0], rec[1]})
 			count++
+			if count%10000 == 0 {
+				log.Printf("[clickhouse] Loaded groups progress: %d rows elapsed=%s", count, time.Since(start).Truncate(time.Millisecond))
+			}
 			if len(rows) >= batchSize {
 				if err := insertRows("groups", []string{"group_id", "org_id"}, rows); err != nil {
 					log.Fatalf("[clickhouse] %v", err)
@@ -237,6 +246,9 @@ func ClickhouseCreateData() {
 			}
 			rows = append(rows, []interface{}{rec[0], rec[1], role})
 			count++
+			if count%10000 == 0 {
+				log.Printf("[clickhouse] Loaded org_memberships progress: %d rows elapsed=%s", count, time.Since(start).Truncate(time.Millisecond))
+			}
 			if len(rows) >= batchSize {
 				if err := insertRows("org_memberships", []string{"org_id", "user_id", "role"}, rows); err != nil {
 					log.Fatalf("[clickhouse] %v", err)
@@ -289,6 +301,9 @@ func ClickhouseCreateData() {
 			}
 			gm[rec[1]] = role
 			count++
+			if count%10000 == 0 {
+				log.Printf("[clickhouse] Loaded group_memberships progress: %d rows elapsed=%s", count, time.Since(start).Truncate(time.Millisecond))
+			}
 			if len(rows) >= batchSize {
 				if err := insertRows("group_memberships", []string{"group_id", "user_id", "role"}, rows); err != nil {
 					log.Fatalf("[clickhouse] %v", err)
@@ -343,6 +358,9 @@ func ClickhouseCreateData() {
 			}
 			m[rec[1]] = rel
 			count++
+			if count%10000 == 0 {
+				log.Printf("[clickhouse] Loaded group_hierarchy progress: %d rows elapsed=%s", count, time.Since(start).Truncate(time.Millisecond))
+			}
 			if len(rows) >= batchSize {
 				if err := insertRows("group_hierarchy", []string{"parent_group_id", "child_group_id", "relation"}, rows); err != nil {
 					log.Fatalf("[clickhouse] %v", err)
@@ -382,6 +400,9 @@ func ClickhouseCreateData() {
 			resourcesMap[rec[0]] = toUint32StringVal(rec[1])
 			rows = append(rows, []interface{}{rec[0], rec[1]})
 			count++
+			if count%10000 == 0 {
+				log.Printf("[clickhouse] Loaded resources progress: %d rows elapsed=%s", count, time.Since(start).Truncate(time.Millisecond))
+			}
 			if len(rows) >= batchSize {
 				if err := insertRows("resources", []string{"resource_id", "org_id"}, rows); err != nil {
 					log.Fatalf("[clickhouse] %v", err)
@@ -445,6 +466,9 @@ func ClickhouseCreateData() {
 
 			rows = append(rows, []interface{}{resID, fmt.Sprintf("%d", orgIDVal), subjType, subjID, rel})
 			count++
+			if count%10000 == 0 {
+				log.Printf("[clickhouse] Loaded resource_acl progress: %d rows elapsed=%s", count, time.Since(start).Truncate(time.Millisecond))
+			}
 			if len(rows) >= batchSize {
 				if err := insertRows("resource_acl", []string{"resource_id", "org_id", "subject_type", "subject_id", "relation"}, rows); err != nil {
 					log.Fatalf("[clickhouse] %v", err)
