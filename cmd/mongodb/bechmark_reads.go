@@ -40,19 +40,6 @@ func MongodbBenchmarkReads() {
 	_ = client
 }
 
-// === Helpers ===
-func findOneString(ctx context.Context, coll *mongo.Collection, filter interface{}, field string) (string, error) {
-	// Project single field to avoid large docs
-	opts := options.FindOne().SetProjection(bson.D{{Key: field, Value: 1}})
-	var doc bson.M
-	err := coll.FindOne(ctx, filter, opts).Decode(&doc)
-	if err != nil {
-		return "", err
-	}
-	v, _ := doc[field].(string)
-	return v, nil
-}
-
 func streamCursor(ctx context.Context, cur *mongo.Cursor, handle func(bson.M)) error {
 	for cur.Next(ctx) {
 		var m bson.M
@@ -285,7 +272,7 @@ func runLookupBench(db *mongo.Database, name, permission, userID string, iters i
 	var total time.Duration
 	var lastCount int
 
-	for i := 0; i < iters; i++ {
+	for i := range iters {
 		ctx, cancel := context.WithTimeout(context.Background(), timeout)
 		start := time.Now()
 

@@ -75,6 +75,11 @@ func MongodbCreateSchemas() {
 	CreateIndexesWithLog(parent, resources, []MongoIndexSpec{
 		{Name: "resource_id_unique", Keys: bson.D{{Key: "resource_id", Value: 1}}, Unique: true},
 		{Name: "org_id_idx", Keys: bson.D{{Key: "org_id", Value: 1}}},
+		// Single-field multikey indexes to accelerate direct lookups without org filter
+		{Name: "manager_user_ids_idx", Keys: bson.D{{Key: "manager_user_ids", Value: 1}}},
+		{Name: "viewer_user_ids_idx", Keys: bson.D{{Key: "viewer_user_ids", Value: 1}}},
+		{Name: "manager_group_ids_idx", Keys: bson.D{{Key: "manager_group_ids", Value: 1}}},
+		{Name: "viewer_group_ids_idx", Keys: bson.D{{Key: "viewer_group_ids", Value: 1}}},
 		// Fast lookups: by user or group membership within an org
 		{Name: "org_manage_user_idx", Keys: bson.D{{Key: "org_id", Value: 1}, {Key: "manager_user_ids", Value: 1}}},
 		{Name: "org_view_user_idx", Keys: bson.D{{Key: "org_id", Value: 1}, {Key: "viewer_user_ids", Value: 1}}},
