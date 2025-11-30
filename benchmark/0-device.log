@@ -1,0 +1,18 @@
+== Device ==
+[device] timestamp: 2025-12-01 05:34:51+0700
+[device] uname: Darwin Afas-MacBook-Pro.local 25.1.0 Darwin Kernel Version 25.1.0: Mon Oct 20 19:26:51 PDT 2025; root:xnu-12377.41.6~2/RELEASE_X86_64 x86_64
+[device] os: ProductName=macOS;ProductVersion=26.1;BuildVersion=25B78
+[device] model: MacBookPro16,1
+[device] cpu: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz
+[device] cores_physical: 8
+[device] cores_logical: 16
+[device] memory: 16GB (17179869184B)
+[device] disk_total: 1000G
+[device] disk_free: 878G
+== Docker ==
+[docker] version_client: 28.5.1
+[docker] version_server: 28.5.1
+[docker] compose_version: 2.40.3-desktop.1
+[docker] cpus: 8
+[docker] memory: 7.8GB
+[docker] swap_host: vm.swapusage: total = 2048.00M used = 528.25M free = 1519.75M (encrypted)

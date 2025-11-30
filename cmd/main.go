@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"test-tls/cmd/authzed_crdb"
 	"test-tls/cmd/authzed_pgdb"
@@ -37,6 +39,11 @@ func main() {
 	// Configure global logger to include date, time and sub-second precision.
 	// Use microsecond precision (includes milliseconds) for readable timing.
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+
+	// Load root .env first, then benchmark env overrides if present.
+	if err := loadEnvFile(".env"); err != nil {
+		log.Printf("WARN: could not load env file .env: %v", err)
+	}
 
 	if err := dispatch(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, "error:", err)
@@ -270,4 +277,48 @@ func usage() {
 	fmt.Printf("  %s authzed_crdb create-schema\n", prog)
 	fmt.Printf("  %s authzed_crdb load-data\n", prog)
 	fmt.Printf("  %s authzed_crdb benchmark\n", prog)
+}
+
+// loadEnvFile reads a simple KEY=VALUE env file and sets variables.
+// Lines starting with '#' are treated as comments; blank lines are skipped.
+// Values can be quoted with single or double quotes; surrounding quotes are trimmed.
+func loadEnvFile(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		// If the file doesn't exist, return a descriptive error so caller can warn.
+		if os.IsNotExist(err) {
+			return fmt.Errorf("env file not found: %s", path)
+		}
+		return err
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		// Support export KEY=VALUE lines
+		if strings.HasPrefix(line, "export ") {
+			line = strings.TrimSpace(strings.TrimPrefix(line, "export "))
+		}
+		// Split on first '=' only
+		eq := strings.IndexRune(line, '=')
+		if eq <= 0 {
+			continue
+		}
+		key := strings.TrimSpace(line[:eq])
+		val := strings.TrimSpace(line[eq+1:])
+		// Trim surrounding quotes
+		if len(val) >= 2 {
+			if (val[0] == '\'' && val[len(val)-1] == '\'') || (val[0] == '"' && val[len(val)-1] == '"') {
+				val = val[1 : len(val)-1]
+			}
+		}
+		// Expand existing env references like ${VAR}
+		val = os.ExpandEnv(val)
+		_ = os.Setenv(key, val)
+	}
+	return scanner.Err()
 }

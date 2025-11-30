@@ -1,93 +1,120 @@
-❯ go run ./cmd/main.go csv load-data
-2025/11/25 14:24:46.419210 [csv] == Generating CSV data into ./data with config: {NumOrgs:16 UsersPerOrg:200 GroupsPerOrg:20 ResourcesPerOrg:2000 GroupsPerUser:3 AdminsPerOrg:10 ManagerUsersPerResource:2 ManagerGroupsPerRes:1 ViewerUsersPerResource:10 ViewerGroupsPerRes:3 AvgOrgsPerUser:2} ==
-2025/11/25 14:24:46.419304 [csv] using random seed=1764055486419196927
-2025/11/25 14:24:46.422209 [csv] derived: total_memberships=3581, max_org_users=520
-2025/11/25 14:24:46.422961 [csv] derived total_users=1791 (avg_orgs_per_user≈2)
-2025/11/25 14:24:46.773155 [csv] CSV data generation DONE: elapsed=353ms
-2025/11/25 14:24:46.773210 [csv] organizations:        16
-2025/11/25 14:24:46.773239 [csv] users (global):       1791
-2025/11/25 14:24:46.773241 [csv] org_memberships:      3794
-2025/11/25 14:24:46.773242 [csv] groups:               181
-2025/11/25 14:24:46.773243 [csv] group_memberships:    12866
-2025/11/25 14:24:46.773244 [csv] resources:            21473
-2025/11/25 14:24:46.773245 [csv] resource_acl entries: 370994
-2025/11/25 14:24:46.773255 [csv] relation org->users (org_id -> users): 16 org_id; avg 237.12 users per org_id
-2025/11/25 14:24:46.773262 [csv]   fewest org_id:
-2025/11/25 14:24:46.773263 [csv]     org_id=3 => 51 users
-2025/11/25 14:24:46.773265 [csv]     org_id=16 => 51 users
-2025/11/25 14:24:46.773266 [csv]     org_id=11 => 62 users
-2025/11/25 14:24:46.773268 [csv]   typical org_id:
-2025/11/25 14:24:46.773269 [csv]     org_id=9 => 180 users
-2025/11/25 14:24:46.773270 [csv]     org_id=4 => 213 users
-2025/11/25 14:24:46.773270 [csv]     org_id=15 => 263 users
-2025/11/25 14:24:46.773271 [csv]   most org_id:
-2025/11/25 14:24:46.773272 [csv]     org_id=2 => 452 users
-2025/11/25 14:24:46.773272 [csv]     org_id=5 => 458 users
-2025/11/25 14:24:46.773273 [csv]     org_id=7 => 533 users
-2025/11/25 14:24:46.773604 [csv] relation user->orgs (user_id -> orgs): 1791 user_id; avg 2.12 orgs per user_id
-2025/11/25 14:24:46.773637 [csv]   fewest user_id:
-2025/11/25 14:24:46.773642 [csv]     user_id=1 => 1 orgs
-2025/11/25 14:24:46.773644 [csv]     user_id=4 => 1 orgs
-2025/11/25 14:24:46.773645 [csv]     user_id=7 => 1 orgs
-2025/11/25 14:24:46.773646 [csv]   typical user_id:
-2025/11/25 14:24:46.773647 [csv]     user_id=736 => 2 orgs
-2025/11/25 14:24:46.773648 [csv]     user_id=739 => 2 orgs
-2025/11/25 14:24:46.773649 [csv]     user_id=743 => 2 orgs
-2025/11/25 14:24:46.773650 [csv]   most user_id:
-2025/11/25 14:24:46.773650 [csv]     user_id=1487 => 6 orgs
-2025/11/25 14:24:46.773651 [csv]     user_id=1520 => 6 orgs
-2025/11/25 14:24:46.773654 [csv]     user_id=1774 => 7 orgs
-2025/11/25 14:24:46.773686 [csv] relation group->users (group_id -> users): 181 group_id; avg 71.08 users per group_id
-2025/11/25 14:24:46.773689 [csv]   fewest group_id:
-2025/11/25 14:24:46.773690 [csv]     group_id=59 => 13 users
-2025/11/25 14:24:46.773691 [csv]     group_id=71 => 16 users
-2025/11/25 14:24:46.773691 [csv]     group_id=57 => 17 users
-2025/11/25 14:24:46.773693 [csv]   typical group_id:
-2025/11/25 14:24:46.773693 [csv]     group_id=14 => 58 users
-2025/11/25 14:24:46.773694 [csv]     group_id=9 => 60 users
-2025/11/25 14:24:46.773695 [csv]     group_id=15 => 60 users
-2025/11/25 14:24:46.773695 [csv]   most group_id:
-2025/11/25 14:24:46.773696 [csv]     group_id=52 => 325 users
-2025/11/25 14:24:46.773697 [csv]     group_id=54 => 325 users
-2025/11/25 14:24:46.773697 [csv]     group_id=113 => 435 users
-2025/11/25 14:24:46.774027 [csv] relation user->groups (user_id -> groups): 1791 user_id; avg 7.18 groups per user_id
-2025/11/25 14:24:46.774060 [csv]   fewest user_id:
-2025/11/25 14:24:46.774064 [csv]     user_id=1 => 1 groups
-2025/11/25 14:24:46.774066 [csv]     user_id=4 => 1 groups
-2025/11/25 14:24:46.774066 [csv]     user_id=9 => 1 groups
-2025/11/25 14:24:46.774068 [csv]   typical user_id:
-2025/11/25 14:24:46.774069 [csv]     user_id=1603 => 6 groups
-2025/11/25 14:24:46.774070 [csv]     user_id=1605 => 6 groups
-2025/11/25 14:24:46.774071 [csv]     user_id=1640 => 6 groups
-2025/11/25 14:24:46.774071 [csv]   most user_id:
-2025/11/25 14:24:46.774072 [csv]     user_id=1693 => 26 groups
-2025/11/25 14:24:46.774073 [csv]     user_id=1774 => 26 groups
-2025/11/25 14:24:46.774074 [csv]     user_id=827 => 29 groups
-2025/11/25 14:24:46.774415 [csv] relation user->resources (user_id -> resources): 1755 user_id; avg 159.08 resources per user_id
-2025/11/25 14:24:46.774450 [csv]   fewest user_id:
-2025/11/25 14:24:46.774455 [csv]     user_id=25 => 1 resources
-2025/11/25 14:24:46.774456 [csv]     user_id=40 => 1 resources
-2025/11/25 14:24:46.774457 [csv]     user_id=42 => 1 resources
-2025/11/25 14:24:46.774459 [csv]   typical user_id:
-2025/11/25 14:24:46.774460 [csv]     user_id=905 => 118 resources
-2025/11/25 14:24:46.774461 [csv]     user_id=938 => 118 resources
-2025/11/25 14:24:46.774462 [csv]     user_id=1248 => 118 resources
-2025/11/25 14:24:46.774462 [csv]   most user_id:
-2025/11/25 14:24:46.774463 [csv]     user_id=43 => 767 resources
-2025/11/25 14:24:46.774464 [csv]     user_id=906 => 855 resources
-2025/11/25 14:24:46.774465 [csv]     user_id=1398 => 915 resources
-2025/11/25 14:24:46.779577 [csv] relation resource->users (resource_id -> users): 21473 resource_id; avg 13.00 users per resource_id
-2025/11/25 14:24:46.779616 [csv]   fewest resource_id:
-2025/11/25 14:24:46.779621 [csv]     resource_id=194 => 2 users
-2025/11/25 14:24:46.779623 [csv]     resource_id=240 => 2 users
-2025/11/25 14:24:46.779624 [csv]     resource_id=272 => 2 users
-2025/11/25 14:24:46.779626 [csv]   typical resource_id:
-2025/11/25 14:24:46.779627 [csv]     resource_id=12109 => 13 users
-2025/11/25 14:24:46.779628 [csv]     resource_id=12116 => 13 users
-2025/11/25 14:24:46.779628 [csv]     resource_id=12177 => 13 users
-2025/11/25 14:24:46.779629 [csv]   most resource_id:
-2025/11/25 14:24:46.779630 [csv]     resource_id=19717 => 25 users
-2025/11/25 14:24:46.779630 [csv]     resource_id=19718 => 25 users
-2025/11/25 14:24:46.779631 [csv]     resource_id=21248 => 25 users
-2025/11/25 14:24:46.779951 [csv] BENCH_LOOKUPRES_MANAGE_USER=1398
-2025/11/25 14:24:46.779984 [csv] BENCH_LOOKUPRES_VIEW_USER=938
+❯ go run ./cmd/main.go csv generate
+2025/12/01 05:34:59.322416 [csv] == Generating CSV data into ./data with config: {NumOrgs:16 UsersPerOrg:200 GroupsPerOrg:20 ResourcesPerOrg:2000 GroupsPerUser:3 AdminsPerOrg:10 ManagerUsersPerResource:2 ManagerGroupsPerRes:1 ViewerUsersPerResource:10 ViewerGroupsPerRes:3 AvgOrgsPerUser:2} ==
+2025/12/01 05:34:59.322606 [csv] using random seed=1764542099322404000
+2025/12/01 05:34:59.323633 [csv] derived: total_memberships=3900, max_org_users=521
+2025/12/01 05:34:59.323639 [csv] derived total_users=1950 (avg_orgs_per_user≈2)
+2025/12/01 05:34:59.576431 [csv] CSV data generation DONE: elapsed=254ms
+2025/12/01 05:34:59.576448 [csv] organizations:        16
+2025/12/01 05:34:59.576450 [csv] users (global):       1950
+2025/12/01 05:34:59.576451 [csv] org_memberships:      4117
+2025/12/01 05:34:59.576453 [csv] groups:               170
+2025/12/01 05:34:59.576454 [csv] group_memberships:    13441
+2025/12/01 05:34:59.576455 [csv] group_hierarchy:      14
+2025/12/01 05:34:59.576456 [csv] resources:            22084
+2025/12/01 05:34:59.576457 [csv] resource_acl entries: 364983
+2025/12/01 05:34:59.576463 [csv] relation org->users (org_id -> users): 16 org_id; avg 257.31 users per org_id
+2025/12/01 05:34:59.576471 [csv]   fewest org_id:
+2025/12/01 05:34:59.576473 [csv]     org_id=1 => 31 users
+2025/12/01 05:34:59.576474 [csv]     org_id=8 => 141 users
+2025/12/01 05:34:59.576475 [csv]     org_id=9 => 150 users
+2025/12/01 05:34:59.576478 [csv]   typical org_id:
+2025/12/01 05:34:59.576479 [csv]     org_id=3 => 249 users
+2025/12/01 05:34:59.576480 [csv]     org_id=4 => 256 users
+2025/12/01 05:34:59.576482 [csv]     org_id=12 => 258 users
+2025/12/01 05:34:59.576483 [csv]   most org_id:
+2025/12/01 05:34:59.576498 [csv]     org_id=10 => 394 users
+2025/12/01 05:34:59.576500 [csv]     org_id=14 => 475 users
+2025/12/01 05:34:59.576502 [csv]     org_id=7 => 535 users
+2025/12/01 05:34:59.576932 [csv] relation user->orgs (user_id -> orgs): 1950 user_id; avg 2.11 orgs per user_id
+2025/12/01 05:34:59.576935 [csv]   fewest user_id:
+2025/12/01 05:34:59.576937 [csv]     user_id=9 => 1 orgs
+2025/12/01 05:34:59.576952 [csv]     user_id=11 => 1 orgs
+2025/12/01 05:34:59.576954 [csv]     user_id=12 => 1 orgs
+2025/12/01 05:34:59.576955 [csv]   typical user_id:
+2025/12/01 05:34:59.576956 [csv]     user_id=756 => 2 orgs
+2025/12/01 05:34:59.576958 [csv]     user_id=762 => 2 orgs
+2025/12/01 05:34:59.576959 [csv]     user_id=768 => 2 orgs
+2025/12/01 05:34:59.576960 [csv]   most user_id:
+2025/12/01 05:34:59.576962 [csv]     user_id=95 => 7 orgs
+2025/12/01 05:34:59.576963 [csv]     user_id=1445 => 7 orgs
+2025/12/01 05:34:59.576964 [csv]     user_id=529 => 8 orgs
+2025/12/01 05:34:59.577007 [csv] relation group->direct_members (group_id -> direct_member users): 170 group_id; avg 78.89 direct_member users per group_id
+2025/12/01 05:34:59.577009 [csv]   fewest group_id:
+2025/12/01 05:34:59.577011 [csv]     group_id=1 => 18 direct_member users
+2025/12/01 05:34:59.577012 [csv]     group_id=3 => 19 direct_member users
+2025/12/01 05:34:59.577014 [csv]     group_id=2 => 22 direct_member users
+2025/12/01 05:34:59.577015 [csv]   typical group_id:
+2025/12/01 05:34:59.577017 [csv]     group_id=29 => 60 direct_member users
+2025/12/01 05:34:59.577018 [csv]     group_id=107 => 60 direct_member users
+2025/12/01 05:34:59.577020 [csv]     group_id=33 => 61 direct_member users
+2025/12/01 05:34:59.577021 [csv]   most group_id:
+2025/12/01 05:34:59.577023 [csv]     group_id=83 => 302 direct_member users
+2025/12/01 05:34:59.577024 [csv]     group_id=84 => 303 direct_member users
+2025/12/01 05:34:59.577026 [csv]     group_id=39 => 306 direct_member users
+2025/12/01 05:34:59.577030 [csv] relation group->direct_managers (group_id -> direct_manager users): 21 group_id; avg 1.43 direct_manager users per group_id
+2025/12/01 05:34:59.577053 [csv]   fewest group_id:
+2025/12/01 05:34:59.577054 [csv]     group_id=24 => 1 direct_manager users
+2025/12/01 05:34:59.577056 [csv]     group_id=41 => 1 direct_manager users
+2025/12/01 05:34:59.577057 [csv]     group_id=47 => 1 direct_manager users
+2025/12/01 05:34:59.577059 [csv]   typical group_id:
+2025/12/01 05:34:59.577061 [csv]     group_id=86 => 1 direct_manager users
+2025/12/01 05:34:59.577062 [csv]     group_id=114 => 1 direct_manager users
+2025/12/01 05:34:59.577064 [csv]     group_id=126 => 1 direct_manager users
+2025/12/01 05:34:59.577065 [csv]   most group_id:
+2025/12/01 05:34:59.577067 [csv]     group_id=138 => 2 direct_manager users
+2025/12/01 05:34:59.577068 [csv]     group_id=1 => 3 direct_manager users
+2025/12/01 05:34:59.577070 [csv]     group_id=141 => 3 direct_manager users
+2025/12/01 05:34:59.577409 [csv] relation user->groups (user_id -> groups): 1950 user_id; avg 6.89 groups per user_id
+2025/12/01 05:34:59.577412 [csv]   fewest user_id:
+2025/12/01 05:34:59.577413 [csv]     user_id=15 => 1 groups
+2025/12/01 05:34:59.577414 [csv]     user_id=23 => 1 groups
+2025/12/01 05:34:59.577416 [csv]     user_id=29 => 1 groups
+2025/12/01 05:34:59.577417 [csv]   typical user_id:
+2025/12/01 05:34:59.577418 [csv]     user_id=1251 => 6 groups
+2025/12/01 05:34:59.577420 [csv]     user_id=1252 => 6 groups
+2025/12/01 05:34:59.577421 [csv]     user_id=1278 => 6 groups
+2025/12/01 05:34:59.577422 [csv]   most user_id:
+2025/12/01 05:34:59.577423 [csv]     user_id=1782 => 26 groups
+2025/12/01 05:34:59.577425 [csv]     user_id=97 => 27 groups
+2025/12/01 05:34:59.577426 [csv]     user_id=529 => 31 groups
+2025/12/01 05:34:59.577429 [csv] relation group->child_groups (parent_group_id -> child groups): 12 parent_group_id; avg 1.17 child groups per parent_group_id
+2025/12/01 05:34:59.577430 [csv]   fewest parent_group_id:
+2025/12/01 05:34:59.577432 [csv]     parent_group_id=8 => 1 child groups
+2025/12/01 05:34:59.577433 [csv]     parent_group_id=40 => 1 child groups
+2025/12/01 05:34:59.577434 [csv]     parent_group_id=84 => 1 child groups
+2025/12/01 05:34:59.577436 [csv]   typical parent_group_id:
+2025/12/01 05:34:59.577437 [csv]     parent_group_id=102 => 1 child groups
+2025/12/01 05:34:59.577438 [csv]     parent_group_id=113 => 1 child groups
+2025/12/01 05:34:59.577439 [csv]     parent_group_id=145 => 1 child groups
+2025/12/01 05:34:59.577441 [csv]   most parent_group_id:
+2025/12/01 05:34:59.577442 [csv]     parent_group_id=162 => 1 child groups
+2025/12/01 05:34:59.577443 [csv]     parent_group_id=96 => 2 child groups
+2025/12/01 05:34:59.577444 [csv]     parent_group_id=141 => 2 child groups
+2025/12/01 05:34:59.577777 [csv] relation user->resources (user_id -> resources): 1837 user_id; avg 156.22 resources per user_id
+2025/12/01 05:34:59.577780 [csv]   fewest user_id:
+2025/12/01 05:34:59.577781 [csv]     user_id=81 => 1 resources
+2025/12/01 05:34:59.577782 [csv]     user_id=136 => 1 resources
+2025/12/01 05:34:59.577784 [csv]     user_id=150 => 1 resources
+2025/12/01 05:34:59.577785 [csv]   typical user_id:
+2025/12/01 05:34:59.577787 [csv]     user_id=1258 => 121 resources
+2025/12/01 05:34:59.577788 [csv]     user_id=1539 => 121 resources
+2025/12/01 05:34:59.577789 [csv]     user_id=1737 => 121 resources
+2025/12/01 05:34:59.577790 [csv]   most user_id:
+2025/12/01 05:34:59.577792 [csv]     user_id=1591 => 809 resources
+2025/12/01 05:34:59.577793 [csv]     user_id=451 => 816 resources
+2025/12/01 05:34:59.577794 [csv]     user_id=1388 => 875 resources
+2025/12/01 05:34:59.581980 [csv] relation resource->users (resource_id -> users): 22084 resource_id; avg 12.99 users per resource_id
+2025/12/01 05:34:59.581983 [csv]   fewest resource_id:
+2025/12/01 05:34:59.581985 [csv]     resource_id=70 => 2 users
+2025/12/01 05:34:59.581986 [csv]     resource_id=88 => 2 users
+2025/12/01 05:34:59.581987 [csv]     resource_id=207 => 2 users
+2025/12/01 05:34:59.581989 [csv]   typical resource_id:
+2025/12/01 05:34:59.581990 [csv]     resource_id=10956 => 13 users
+2025/12/01 05:34:59.581992 [csv]     resource_id=10986 => 13 users
+2025/12/01 05:34:59.581993 [csv]     resource_id=10995 => 13 users
+2025/12/01 05:34:59.581994 [csv]   most resource_id:
+2025/12/01 05:34:59.581995 [csv]     resource_id=21412 => 25 users
+2025/12/01 05:34:59.581997 [csv]     resource_id=21440 => 25 users
+2025/12/01 05:34:59.581998 [csv]     resource_id=21974 => 25 users
+2025/12/01 05:34:59.582250 [csv] BENCH_LOOKUPRES_MANAGE_USER=1388
+2025/12/01 05:34:59.582253 [csv] BENCH_LOOKUPRES_VIEW_USER=1539
