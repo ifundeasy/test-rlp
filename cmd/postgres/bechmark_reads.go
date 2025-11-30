@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"log"
-	"math/rand"
 	"os"
 	"time"
 
@@ -12,559 +11,390 @@ import (
 	"test-tls/utils"
 )
 
-// benchPair couples a resource with a user that should have a given permission.
-type benchPair struct {
-	ResourceID string
-	UserID     string
-}
-
-// benchDataset holds precomputed samples and heavy users for the benchmarks.
-type benchDataset struct {
-	directManagerPairs []benchPair // from resource_acl: subject_type=user, relation=manager
-	orgAdminPairs      []benchPair // resource + org admin user
-	groupViewPairs     []benchPair // resource + user via viewer_group + group_membership
-
-	heavyManageUser string // user used for "manage" lookup benchmarks
-	regularViewUser string // user used for "view" lookup benchmarks
-}
-
-// PostgresBenchmarkReads runs several read benchmarks against the current dataset.
+// PostgresBenchmarkReads runs read benchmarks against the Postgres dataset.
+// It mirrors the behavior and logging of the Authzed streaming-only benchmarks
+// and performs all work in a streaming fashion (no in-memory collection).
 func PostgresBenchmarkReads() {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
-	defer cancel()
-
+	ctx := context.Background()
 	db, cleanup, err := infrastructure.NewPostgresFromEnv(ctx)
 	if err != nil {
-		log.Fatalf("[postgres] benchmark: connect failed: %v", err)
+		log.Fatalf("[postgres] failed to create postgres client: %v", err)
 	}
 	defer cleanup()
 
-	log.Println("[postgres] == Building benchmark dataset from Postgres ==")
-	data := loadBenchDataset(db)
-	log.Println("[postgres] == Running Postgres read benchmarks on DB-backed dataset ==")
+	start := time.Now()
+	heavyManageUser := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER")
+	regularViewUser := os.Getenv("BENCH_LOOKUPRES_VIEW_USER")
+	elapsed := time.Since(start).Truncate(time.Millisecond)
+	log.Printf("[postgres] Running in streaming-only mode (no precollection). elapsed=%s heavyManageUser=%q regularViewUser=%q",
+		elapsed, heavyManageUser, regularViewUser)
 
-	runCheckManageDirectUser(db, data)   // direct manager ACL
-	runCheckManageOrgAdmin(db, data)     // org admin path
-	runCheckViewViaGroupMember(db, data) // via viewer_group + group membership
-	runLookupResourcesManageHeavyUser(db, data)
-	runLookupResourcesViewRegularUser(db, data)
+	runCheckManageDirectUser(db)
+	runCheckManageOrgAdmin(db)
+	runCheckViewViaGroupMember(db)
+	runLookupResourcesManageHeavyUser(db)
+	runLookupResourcesViewRegularUser(db)
 
 	log.Println("[postgres] == Postgres read benchmarks DONE ==")
 }
 
-///////////////////////////////
-// Dataset loading from DB   //
-///////////////////////////////
-
-// loadBenchDataset builds the benchmark dataset for Postgres.
-// It mirrors the Authzed benchmark behavior:
-//   - build sample pairs for direct manager, org admin, and group-based view
-//   - choose heavy/regular users from environment variables, or fall back
-//     to random users drawn from the sampled pairs
-//
-// It avoids global "weight" maps (manageCount/viewCount) and does not
-// attempt to reconstruct the full permission graph in memory.
-func loadBenchDataset(db *sql.DB) *benchDataset {
-	start := time.Now()
-	ctx := context.Background()
-
-	var directManagerPairs []benchPair
-	var orgAdminPairs []benchPair
-	var groupViewPairs []benchPair
-
-	// For org admin sampling we need a mapping from resource -> org
-	// and from org -> admin users.
-	resourceOrg := make(map[string]string)    // resource_id -> org_id
-	var resourceIDs []string                  // the list of all resources
-	orgAdmins := make(map[string][]string)    // org_id -> []user_id (role=admin)
-	groupMembers := make(map[string][]string) // group_id -> []user_id (group membership)
-	groupSampleIndex := make(map[string]int)  // group_id -> round-robin index for sampling
-
-	// 1) Load resource -> org mapping.
-	{
-		rows, err := db.QueryContext(ctx, `
-			SELECT resource_id, org_id
-			FROM resources
-		`)
-		if err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: query resources: %v", err)
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			var resID, orgID string
-			if err := rows.Scan(&resID, &orgID); err != nil {
-				log.Fatalf("[postgres] loadBenchDataset: scan resources: %v", err)
-			}
-			resourceOrg[resID] = orgID
-			resourceIDs = append(resourceIDs, resID)
-		}
-		if err := rows.Err(); err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: rows resources: %v", err)
-		}
-	}
-
-	// 2) Load org admin users (role='admin').
-	{
-		rows, err := db.QueryContext(ctx, `
-			SELECT org_id, user_id
-			FROM org_memberships
-			WHERE role = 'admin'
-		`)
-		if err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: query org_memberships: %v", err)
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			var orgID, userID string
-			if err := rows.Scan(&orgID, &userID); err != nil {
-				log.Fatalf("[postgres] loadBenchDataset: scan org_memberships: %v", err)
-			}
-			orgAdmins[orgID] = append(orgAdmins[orgID], userID)
-		}
-		if err := rows.Err(); err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: rows org_memberships: %v", err)
-		}
-	}
-
-	// 3) Load group memberships.
-	{
-		rows, err := db.QueryContext(ctx, `
-			SELECT group_id, user_id
-			FROM group_memberships
-		`)
-		if err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: query group_memberships: %v", err)
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			var groupID, userID string
-			if err := rows.Scan(&groupID, &userID); err != nil {
-				log.Fatalf("[postgres] loadBenchDataset: scan group_memberships: %v", err)
-			}
-			groupMembers[groupID] = append(groupMembers[groupID], userID)
-		}
-		if err := rows.Err(); err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: rows group_memberships: %v", err)
-		}
-	}
-
-	// 4) Build direct manager and group view pairs from resource_acl.
-	{
-		rows, err := db.QueryContext(ctx, `
-			SELECT resource_id, subject_type, subject_id, relation
-			FROM resource_acl
-		`)
-		if err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: query resource_acl: %v", err)
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			var resID, subjectType, subjectID, relation string
-			if err := rows.Scan(&resID, &subjectType, &subjectID, &relation); err != nil {
-				log.Fatalf("[postgres] loadBenchDataset: scan resource_acl: %v", err)
-			}
-
-			switch subjectType {
-			case "user":
-				// Direct manager edges become directManagerPairs.
-				if relation == "manager" {
-					directManagerPairs = append(directManagerPairs, benchPair{
-						ResourceID: resID,
-						UserID:     subjectID,
-					})
-				}
-				// viewer_user edges are not needed for sampling; they are
-				// still covered by the lookup queries themselves.
-			case "group":
-				// For viewer_group, we sample one effective member from the group.
-				if relation == "viewer" {
-					members := groupMembers[subjectID]
-					if len(members) == 0 {
-						continue
-					}
-					idx := groupSampleIndex[subjectID] % len(members)
-					groupSampleIndex[subjectID]++
-					userID := members[idx]
-
-					groupViewPairs = append(groupViewPairs, benchPair{
-						ResourceID: resID,
-						UserID:     userID,
-					})
-				}
-				// manager_group edges are processed in the DB query for lookups,
-				// not needed for sampling here.
-			default:
-				// ignore unknown subject_type
-			}
-		}
-		if err := rows.Err(); err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: rows resource_acl: %v", err)
-		}
-	}
-
-	// 5) Build orgAdminPairs: one admin per resource (round-robin per org).
-	adminRoundRobin := make(map[string]int)
-	for _, resID := range resourceIDs {
-		orgID := resourceOrg[resID]
-		admins := orgAdmins[orgID]
-		if len(admins) == 0 {
-			continue
-		}
-		idx := adminRoundRobin[orgID] % len(admins)
-		adminRoundRobin[orgID]++
-		userID := admins[idx]
-
-		orgAdminPairs = append(orgAdminPairs, benchPair{
-			ResourceID: resID,
-			UserID:     userID,
-		})
-	}
-
-	// 6) Select heavyManageUser & regularViewUser.
-	//    Behavior:
-	//      - If env vars are set, they win.
-	//      - Else choose random users from the sampled pairs.
-	rand.Seed(time.Now().UnixNano())
-
-	heavyManageUser := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER")
-	if heavyManageUser == "" && len(directManagerPairs) > 0 {
-		idx := rand.Intn(len(directManagerPairs))
-		heavyManageUser = directManagerPairs[idx].UserID
-	}
-
-	regularViewUser := os.Getenv("BENCH_LOOKUPRES_VIEW_USER")
-	if regularViewUser == "" && len(groupViewPairs) > 0 {
-		// Try to pick a different user from heavyManageUser if possible.
-		candidates := make([]string, 0, len(groupViewPairs))
-		for _, p := range groupViewPairs {
-			if p.UserID == heavyManageUser {
-				continue
-			}
-			candidates = append(candidates, p.UserID)
-		}
-		if len(candidates) == 0 {
-			// Fall back to any user from groupViewPairs.
-			idx := rand.Intn(len(groupViewPairs))
-			regularViewUser = groupViewPairs[idx].UserID
-		} else {
-			idx := rand.Intn(len(candidates))
-			regularViewUser = candidates[idx]
-		}
-	}
-
-	// Safety: if one of them is still empty but the other is set, reuse it.
-	if heavyManageUser == "" && regularViewUser != "" {
-		heavyManageUser = regularViewUser
-	}
-	if regularViewUser == "" && heavyManageUser != "" {
-		regularViewUser = heavyManageUser
-	}
-
-	elapsed := time.Since(start).Truncate(time.Millisecond)
-	log.Printf("[postgres] Benchmark dataset loaded in %s: directManagerPairs=%d orgAdminPairs=%d groupViewPairs=%d heavyManageUser=%q regularViewUser=%q",
-		elapsed, len(directManagerPairs), len(orgAdminPairs), len(groupViewPairs),
-		heavyManageUser, regularViewUser)
-
-	return &benchDataset{
-		directManagerPairs: directManagerPairs,
-		orgAdminPairs:      orgAdminPairs,
-		groupViewPairs:     groupViewPairs,
-		heavyManageUser:    heavyManageUser,
-		regularViewUser:    regularViewUser,
-	}
-}
-
-///////////////////////////////
-// Bench 1: direct manage   //
-///////////////////////////////
-
-func runCheckManageDirectUser(db *sql.DB, data *benchDataset) {
-	pairs := data.directManagerPairs
-	iters := utils.GetEnvInt("BENCH_CHECK_DIRECT_SUPER_ITER", 1000)
-	// Use materialized view for fast permission checks (canonical relation 'manager')
-	query := `
-			SELECT 1
-			FROM user_resource_permissions
-			WHERE resource_id = $1
-			  AND user_id = $2
-			  AND relation = 'manager'
-			LIMIT 1
-		`
-	runCheckBenchSQL(db, "check_manage_direct_user", query, pairs, iters, 2*time.Second)
-}
-
-// runCheckBenchSQL executes a prepared statement that checks a permission
-// for many (resource,user) pairs and reports timing and allowed counts.
-func runCheckBenchSQL(db *sql.DB, name, query string, pairs []benchPair, iters int, timeout time.Duration) {
-	if len(pairs) == 0 {
-		log.Printf("[postgres] [%s] skipped: no sample pairs", name)
+// runLookupBenchPG enumerates resources from the materialized view for a user
+// and counts them. It streams rows from the DB and does not retain results.
+func runLookupBenchPG(db *sql.DB, name, permission, userID string, iters int, timeout time.Duration) {
+	if userID == "" {
+		log.Printf("[postgres] [%s] skipped: no user specified", name)
 		return
 	}
 
-	log.Printf("[postgres] [%s] iterations=%d samplePairs=%d", name, iters, len(pairs))
-
-	prepCtx := context.Background()
-	stmt, err := db.PrepareContext(prepCtx, query)
-	if err != nil {
-		log.Fatalf("[postgres] [%s] prepare failed: %v", name, err)
-	}
-	defer stmt.Close()
-
-	var total time.Duration
-	allowedCount := 0
-
-	for i := 0; i < iters; i++ {
-		pair := pairs[i%len(pairs)]
-
-		ctx, cancel := context.WithTimeout(context.Background(), timeout)
-		start := time.Now()
-
-		var dummy int
-		err := stmt.QueryRowContext(ctx, pair.ResourceID, pair.UserID).Scan(&dummy)
-		cancel()
-
-		if err != nil && err != sql.ErrNoRows {
-			log.Fatalf("[postgres] [%s] query failed: %v", name, err)
-		}
-		dur := time.Since(start)
-		total += dur
-
-		if err == nil {
-			allowedCount++
-		}
-	}
-
-	avg := time.Duration(int64(total) / int64(iters))
-	log.Printf("[postgres] [%s] DONE: iters=%d allowed=%d avg=%s total=%s",
-		name, iters, allowedCount, avg, total)
-}
-
-/////////////////////////////////////////
-// Bench 2: manage via org admin      //
-/////////////////////////////////////////
-
-func runCheckManageOrgAdmin(db *sql.DB, data *benchDataset) {
-	pairs := data.orgAdminPairs
-	iters := utils.GetEnvInt("BENCH_CHECK_ORGADMIN_ITER", 1000)
-	query := `
-			SELECT 1
-			FROM resources r
-			JOIN org_memberships om
-			  ON r.org_id = om.org_id
-			WHERE r.resource_id = $1
-			  AND om.user_id = $2
-			  AND om.role = 'admin'
-			LIMIT 1
-		`
-	runCheckBenchSQL(db, "check_manage_org_admin", query, pairs, iters, 2*time.Second)
-}
-
-/////////////////////////////////////////
-// Bench 3: view via group membership //
-/////////////////////////////////////////
-
-func runCheckViewViaGroupMember(db *sql.DB, data *benchDataset) {
-	pairs := data.groupViewPairs
-	iters := utils.GetEnvInt("BENCH_CHECK_VIEW_GROUP_ITER", 1000)
-	// Use materialized view for canonical viewer relation (includes group expansion)
-	query := `
-			SELECT 1
-			FROM user_resource_permissions
-			WHERE resource_id = $1
-			  AND user_id = $2
-			  AND relation = 'viewer'
-			LIMIT 1
-		`
-	runCheckBenchSQL(db, "check_view_via_group_member", query, pairs, iters, 2*time.Second)
-}
-
-//////////////////////////////////////////////
-// Bench 4: Lookup manage for heavy user    //
-//////////////////////////////////////////////
-
-func runLookupResourcesManageHeavyUser(db *sql.DB, data *benchDataset) {
-	iters := utils.GetEnvInt("BENCH_LOOKUPRES_MANAGE_ITER", 10)
-
-	userID := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER")
-	if userID == "" {
-		userID = data.heavyManageUser
-	}
-	if userID == "" {
-		log.Printf("[postgres] [lookup_resources_manage_super] skipped: no heavyManageUser found")
-		return
-	}
-
-	name := "lookup_resources_manage_super"
-	// Use COUNT(DISTINCT ...) so DB does the aggregation and we avoid
-	// transferring potentially large result sets back to the client.
-	query := `
-				SELECT COUNT(DISTINCT resource_id) FROM (
-						-- org->admin (org admins manage all org resources)
-						SELECT r.resource_id
-						FROM resources r
-						JOIN org_memberships om
-							ON r.org_id = om.org_id
-						WHERE om.user_id = $1
-							AND om.role = 'admin'
-
-						UNION
-
-						-- manager_user
-						SELECT ra.resource_id
-						FROM resource_acl ra
-						WHERE ra.subject_type = 'user'
-							AND ra.subject_id = $1
-							AND ra.relation = 'manager'
-
-						UNION
-
-						-- manager_group via group_memberships
-						SELECT ra.resource_id
-						FROM resource_acl ra
-						JOIN group_memberships gm
-							ON ra.subject_type = 'group'
-						 AND ra.subject_id = gm.group_id
-						WHERE gm.user_id = $1
-							AND ra.relation = 'manager'
-				) AS t;
-		`
-
-	runLookupBenchSQL(db, name, query, userID, iters)
-}
-
-//////////////////////////////////////////////
-// Bench 5: Lookup view for regular user    //
-//////////////////////////////////////////////
-
-func runLookupResourcesViewRegularUser(db *sql.DB, data *benchDataset) {
-	iters := utils.GetEnvInt("BENCH_LOOKUPRES_VIEW_ITER", 10)
-
-	userID := os.Getenv("BENCH_LOOKUPRES_VIEW_USER")
-	if userID == "" {
-		userID = data.regularViewUser
-	}
-	if userID == "" {
-		log.Printf("[postgres] [lookup_resources_view_regular] skipped: no regularViewUser found")
-		return
-	}
-
-	name := "lookup_resources_view_regular"
-	// Use COUNT(DISTINCT ...) to avoid transferring large result sets.
-	query := `
-				SELECT COUNT(DISTINCT resource_id) FROM (
-						-- org->member (member_user + member_group + admin)
-						--  a) direct org_memberships
-						SELECT r.resource_id
-						FROM resources r
-						JOIN org_memberships om
-							ON r.org_id = om.org_id
-						WHERE om.user_id = $1
-
-						UNION
-
-						--  b) member_group: group memberships + groups(org_id)
-						SELECT r.resource_id
-						FROM resources r
-						JOIN groups g
-							ON g.org_id = r.org_id
-						JOIN group_memberships gm
-							ON gm.group_id = g.group_id
-						WHERE gm.user_id = $1
-
-						UNION
-
-						-- viewer_user
-						SELECT ra.resource_id
-						FROM resource_acl ra
-						WHERE ra.subject_type = 'user'
-							AND ra.subject_id = $1
-							AND ra.relation = 'viewer'
-
-						UNION
-
-						-- viewer_group via group_memberships
-						SELECT ra.resource_id
-						FROM resource_acl ra
-						JOIN group_memberships gm
-							ON ra.subject_type = 'group'
-						 AND ra.subject_id = gm.group_id
-						WHERE gm.user_id = $1
-							AND ra.relation = 'viewer'
-
-						UNION
-
-						-- manage path: org->admin
-						SELECT r.resource_id
-						FROM resources r
-						JOIN org_memberships om
-							ON r.org_id = om.org_id
-						WHERE om.user_id = $1
-							AND om.role = 'admin'
-
-						UNION
-
-						-- manage path: manager_user
-						SELECT ra.resource_id
-						FROM resource_acl ra
-						WHERE ra.subject_type = 'user'
-							AND ra.subject_id = $1
-							AND ra.relation = 'manager'
-
-						UNION
-
-						-- manage path: manager_group via group_memberships
-						SELECT ra.resource_id
-						FROM resource_acl ra
-						JOIN group_memberships gm
-							ON ra.subject_type = 'group'
-						 AND ra.subject_id = gm.group_id
-						WHERE gm.user_id = $1
-							AND ra.relation = 'manager'
-				) AS t;
-		`
-
-	runLookupBenchSQL(db, name, query, userID, iters)
-}
-
-// runLookupBenchSQL prepares and runs a COUNT(*) style lookup query for a user
-// across multiple iterations, logging per-iteration durations and overall stats.
-func runLookupBenchSQL(db *sql.DB, name, query, userID string, iters int) {
 	log.Printf("[postgres] [%s] iterations=%d user=%s", name, iters, userID)
-
-	prepCtx := context.Background()
-	stmt, err := db.PrepareContext(prepCtx, query)
-	if err != nil {
-		log.Fatalf("[postgres] [%s] prepare count query failed: %v", name, err)
-	}
-	defer stmt.Close()
-
 	var total time.Duration
 	var lastCount int
 
-	for i := 0; i < iters; i++ {
-		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	for i := range iters {
+		ctx, cancel := context.WithTimeout(context.Background(), timeout)
 		start := time.Now()
 
-		var count int
-		if err := stmt.QueryRowContext(ctx, userID).Scan(&count); err != nil {
+		rows, err := db.QueryContext(ctx, `SELECT resource_id FROM user_resource_permissions WHERE user_id = $1 AND relation = $2`, userID, permission)
+		if err != nil {
 			cancel()
-			log.Fatalf("[postgres] [%s] count query failed: %v", name, err)
+			log.Fatalf("[postgres] [%s] LookupResources query failed: %v", name, err)
 		}
+
+		count := 0
+		for rows.Next() {
+			var resID int
+			if err := rows.Scan(&resID); err != nil {
+				rows.Close()
+				cancel()
+				log.Fatalf("[postgres] [%s] rows.Scan failed: %v", name, err)
+			}
+			count++
+		}
+		rows.Close()
 		cancel()
 
 		dur := time.Since(start)
 		total += dur
 		lastCount = count
-
-		log.Printf("[postgres] [%s] iter=%d resources=%d duration=%s",
-			name, i, count, dur.Truncate(time.Millisecond))
+		log.Printf("[postgres] [%s] iter=%d resources=%d duration=%s", name, i, count, dur.Truncate(time.Millisecond))
 	}
 
-	avg := time.Duration(int64(total) / int64(iters))
-	log.Printf("[postgres] [%s] DONE: iters=%d lastCount=%d avg=%s total=%s",
-		name, iters, lastCount, avg, total)
+	avg := time.Duration(0)
+	if iters > 0 {
+		avg = time.Duration(int64(total) / int64(iters))
+	}
+	log.Printf("[postgres] [%s] DONE: iters=%d lastCount=%d avg=%s total=%s", name, iters, lastCount, avg, total)
+}
+
+// runCheckManageDirectUser streams direct user->resource ACL rows and runs
+// existence checks against the materialized view to emulate CheckPermission.
+func runCheckManageDirectUser(db *sql.DB) {
+	iters := utils.GetEnvInt("BENCH_CHECK_DIRECT_SUPER_ITER", 1000)
+	log.Printf("[postgres] [check_manage_direct_user] streaming mode. iterations=%d", iters)
+
+	lookupUser := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER")
+	sampleLimit := utils.GetEnvInt("BENCH_LOOKUP_SAMPLE_LIMIT", 1000)
+	done := 0
+
+	for done < iters {
+		if lookupUser != "" {
+			// Stream resources for this user from the materialized view
+			ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+			rows, err := db.QueryContext(ctx, `SELECT resource_id FROM user_resource_permissions WHERE user_id = $1 AND relation = 'manager'`, lookupUser)
+			if err != nil {
+				cancel()
+				log.Fatalf("[postgres] [check_manage_direct_user] lookup query failed: %v", err)
+			}
+
+			streamed := 0
+			for rows.Next() {
+				if done >= iters || streamed >= sampleLimit {
+					break
+				}
+				var resID int
+				if err := rows.Scan(&resID); err != nil {
+					rows.Close()
+					cancel()
+					log.Fatalf("[postgres] [check_manage_direct_user] scan failed: %v", err)
+				}
+				streamed++
+
+				// Existence check (emulates CheckPermission)
+				cstart := time.Now()
+				var exists bool
+				qctx, qcancel := context.WithTimeout(context.Background(), 2*time.Second)
+				err = db.QueryRowContext(qctx, `SELECT EXISTS(SELECT 1 FROM user_resource_permissions WHERE resource_id = $1 AND user_id = $2 AND relation = 'manager')`, resID, lookupUser).Scan(&exists)
+				qcancel()
+				if err != nil {
+					rows.Close()
+					cancel()
+					log.Fatalf("[postgres] [check_manage_direct_user] check query failed: %v", err)
+				}
+				dur := time.Since(cstart)
+				if done%100 == 0 {
+					log.Printf("[postgres] [check_manage_direct_user] lookup iter=%d resource=%d user=%s dur=%s", done, resID, lookupUser, dur)
+				}
+				done++
+			}
+			rows.Close()
+			cancel()
+			if streamed == 0 {
+				log.Printf("[postgres] [check_manage_direct_user] lookup-mode: no resources returned for user=%s", lookupUser)
+				lookupUser = ""
+			}
+			continue
+		}
+
+		// Relationship-driven: stream resource_acl rows for user subjects with manager relation
+		rows, err := db.QueryContext(context.Background(), `SELECT resource_id, subject_id FROM resource_acl WHERE subject_type = 'user' AND (relation = 'manager_user' OR relation = 'manager')`)
+		if err != nil {
+			log.Fatalf("[postgres] [check_manage_direct_user] resource_acl query failed: %v", err)
+		}
+		for rows.Next() {
+			if done >= iters {
+				break
+			}
+			var resID, userID int
+			if err := rows.Scan(&resID, &userID); err != nil {
+				rows.Close()
+				log.Fatalf("[postgres] [check_manage_direct_user] scan failed: %v", err)
+			}
+
+			cstart := time.Now()
+			var exists bool
+			qctx, qcancel := context.WithTimeout(context.Background(), 2*time.Second)
+			err = db.QueryRowContext(qctx, `SELECT EXISTS(SELECT 1 FROM user_resource_permissions WHERE resource_id = $1 AND user_id = $2 AND relation = 'manager')`, resID, userID).Scan(&exists)
+			qcancel()
+			if err != nil {
+				rows.Close()
+				log.Fatalf("[postgres] [check_manage_direct_user] check query failed: %v", err)
+			}
+			dur := time.Since(cstart)
+			if done%100 == 0 {
+				log.Printf("[postgres] [check_manage_direct_user] iter=%d resource=%d user=%d dur=%s", done, resID, userID, dur)
+			}
+			done++
+		}
+		rows.Close()
+	}
+	log.Printf("[postgres] [check_manage_direct_user] DONE: iters=%d", iters)
+}
+
+// runCheckManageOrgAdmin streams resources and for each resource finds an org admin
+// and performs an existence check against the materialized view.
+func runCheckManageOrgAdmin(db *sql.DB) {
+	iters := utils.GetEnvInt("BENCH_CHECK_ORGADMIN_ITER", 1000)
+	log.Printf("[postgres] [check_manage_org_admin] streaming mode. iterations=%d", iters)
+	lookupUser := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER")
+	sampleLimit := utils.GetEnvInt("BENCH_LOOKUP_SAMPLE_LIMIT", 1000)
+	done := 0
+
+	for done < iters {
+		if lookupUser != "" {
+			ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+			rows, err := db.QueryContext(ctx, `SELECT resource_id FROM user_resource_permissions WHERE user_id = $1 AND relation = 'manager'`, lookupUser)
+			if err != nil {
+				cancel()
+				log.Fatalf("[postgres] [check_manage_org_admin] lookup query failed: %v", err)
+			}
+			streamed := 0
+			for rows.Next() {
+				if done >= iters || streamed >= sampleLimit {
+					break
+				}
+				var resID int
+				if err := rows.Scan(&resID); err != nil {
+					rows.Close()
+					cancel()
+					log.Fatalf("[postgres] [check_manage_org_admin] scan failed: %v", err)
+				}
+				streamed++
+
+				cstart := time.Now()
+				var exists bool
+				qctx, qcancel := context.WithTimeout(context.Background(), 2*time.Second)
+				err = db.QueryRowContext(qctx, `SELECT EXISTS(SELECT 1 FROM user_resource_permissions WHERE resource_id = $1 AND user_id = $2 AND relation = 'manager')`, resID, lookupUser).Scan(&exists)
+				qcancel()
+				if err != nil {
+					rows.Close()
+					cancel()
+					log.Fatalf("[postgres] [check_manage_org_admin] check query failed: %v", err)
+				}
+				dur := time.Since(cstart)
+				if done%100 == 0 {
+					log.Printf("[postgres] [check_manage_org_admin] lookup iter=%d resource=%d user=%s dur=%s", done, resID, lookupUser, dur)
+				}
+				done++
+			}
+			rows.Close()
+			cancel()
+			if streamed == 0 {
+				log.Printf("[postgres] [check_manage_org_admin] lookup-mode: no resources returned for user=%s", lookupUser)
+				lookupUser = ""
+			}
+			continue
+		}
+
+		// Stream resources table and find an admin for each org
+		rows, err := db.QueryContext(context.Background(), `SELECT resource_id, org_id FROM resources`)
+		if err != nil {
+			log.Fatalf("[postgres] [check_manage_org_admin] resources query failed: %v", err)
+		}
+		for rows.Next() {
+			if done >= iters {
+				break
+			}
+			var resID, orgID int
+			if err := rows.Scan(&resID, &orgID); err != nil {
+				rows.Close()
+				log.Fatalf("[postgres] [check_manage_org_admin] scan failed: %v", err)
+			}
+
+			// Find any admin for this org (on-demand)
+			var adminUser int
+			err = db.QueryRowContext(context.Background(), `SELECT user_id FROM org_memberships WHERE org_id = $1 AND role = 'admin' LIMIT 1`, orgID).Scan(&adminUser)
+			if err == sql.ErrNoRows {
+				// skip
+				continue
+			}
+			if err != nil {
+				rows.Close()
+				log.Fatalf("[postgres] [check_manage_org_admin] find admin failed: %v", err)
+			}
+
+			cstart := time.Now()
+			var exists bool
+			qctx, qcancel := context.WithTimeout(context.Background(), 2*time.Second)
+			err = db.QueryRowContext(qctx, `SELECT EXISTS(SELECT 1 FROM user_resource_permissions WHERE resource_id = $1 AND user_id = $2 AND relation = 'manager')`, resID, adminUser).Scan(&exists)
+			qcancel()
+			if err != nil {
+				rows.Close()
+				log.Fatalf("[postgres] [check_manage_org_admin] check query failed: %v", err)
+			}
+			dur := time.Since(cstart)
+			if done%100 == 0 {
+				log.Printf("[postgres] [check_manage_org_admin] iter=%d resource=%d org=%d admin=%d dur=%s", done, resID, orgID, adminUser, dur)
+			}
+			done++
+		}
+		rows.Close()
+	}
+	log.Printf("[postgres] [check_manage_org_admin] DONE: iters=%d", iters)
+}
+
+// runCheckViewViaGroupMember streams viewer_group ACLs and checks permission for a
+// picked group member (direct_member_user or fallback manager) without collecting.
+func runCheckViewViaGroupMember(db *sql.DB) {
+	iters := utils.GetEnvInt("BENCH_CHECK_VIEW_GROUP_ITER", 1000)
+	log.Printf("[postgres] [check_view_via_group_member] streaming mode. iterations=%d", iters)
+	lookupUser := os.Getenv("BENCH_LOOKUPRES_VIEW_USER")
+	sampleLimit := utils.GetEnvInt("BENCH_LOOKUP_SAMPLE_LIMIT", 1000)
+	done := 0
+
+	for done < iters {
+		if lookupUser != "" {
+			ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+			rows, err := db.QueryContext(ctx, `SELECT resource_id FROM user_resource_permissions WHERE user_id = $1 AND relation = 'viewer'`, lookupUser)
+			if err != nil {
+				cancel()
+				log.Fatalf("[postgres] [check_view_via_group_member] lookup query failed: %v", err)
+			}
+			streamed := 0
+			for rows.Next() {
+				if done >= iters || streamed >= sampleLimit {
+					break
+				}
+				var resID int
+				if err := rows.Scan(&resID); err != nil {
+					rows.Close()
+					cancel()
+					log.Fatalf("[postgres] [check_view_via_group_member] scan failed: %v", err)
+				}
+				streamed++
+
+				cstart := time.Now()
+				var exists bool
+				qctx, qcancel := context.WithTimeout(context.Background(), 2*time.Second)
+				err = db.QueryRowContext(qctx, `SELECT EXISTS(SELECT 1 FROM user_resource_permissions WHERE resource_id = $1 AND user_id = $2 AND relation = 'viewer')`, resID, lookupUser).Scan(&exists)
+				qcancel()
+				if err != nil {
+					rows.Close()
+					cancel()
+					log.Fatalf("[postgres] [check_view_via_group_member] check query failed: %v", err)
+				}
+				dur := time.Since(cstart)
+				if done%100 == 0 {
+					log.Printf("[postgres] [check_view_via_group_member] lookup iter=%d resource=%d user=%s dur=%s", done, resID, lookupUser, dur)
+				}
+				done++
+			}
+			rows.Close()
+			cancel()
+			if streamed == 0 {
+				log.Printf("[postgres] [check_view_via_group_member] lookup-mode: no resources returned for user=%s", lookupUser)
+				lookupUser = ""
+			}
+			continue
+		}
+
+		// Relationship-driven: stream resource_acl for viewer groups
+		rows, err := db.QueryContext(context.Background(), `SELECT resource_id, subject_id FROM resource_acl WHERE subject_type = 'group' AND (relation = 'viewer_group' OR relation = 'viewer')`)
+		if err != nil {
+			log.Fatalf("[postgres] [check_view_via_group_member] resource_acl query failed: %v", err)
+		}
+		for rows.Next() {
+			if done >= iters {
+				break
+			}
+			var resID, groupID int
+			if err := rows.Scan(&resID, &groupID); err != nil {
+				rows.Close()
+				log.Fatalf("[postgres] [check_view_via_group_member] scan failed: %v", err)
+			}
+
+			// Find a direct member
+			var pickedUser int
+			err = db.QueryRowContext(context.Background(), `SELECT user_id FROM group_memberships WHERE group_id = $1 AND role = 'direct_member' LIMIT 1`, groupID).Scan(&pickedUser)
+			if err == sql.ErrNoRows {
+				// fallback to manager
+				err = db.QueryRowContext(context.Background(), `SELECT user_id FROM group_memberships WHERE group_id = $1 AND role = 'direct_manager' LIMIT 1`, groupID).Scan(&pickedUser)
+				if err == sql.ErrNoRows {
+					continue
+				}
+			}
+			if err != nil {
+				rows.Close()
+				log.Fatalf("[postgres] [check_view_via_group_member] find member failed: %v", err)
+			}
+
+			cstart := time.Now()
+			var exists bool
+			qctx, qcancel := context.WithTimeout(context.Background(), 2*time.Second)
+			err = db.QueryRowContext(qctx, `SELECT EXISTS(SELECT 1 FROM user_resource_permissions WHERE resource_id = $1 AND user_id = $2 AND relation = 'viewer')`, resID, pickedUser).Scan(&exists)
+			qcancel()
+			if err != nil {
+				rows.Close()
+				log.Fatalf("[postgres] [check_view_via_group_member] check query failed: %v", err)
+			}
+			dur := time.Since(cstart)
+			if done%100 == 0 {
+				log.Printf("[postgres] [check_view_via_group_member] iter=%d resource=%d group=%d user=%d dur=%s", done, resID, groupID, pickedUser, dur)
+			}
+			done++
+		}
+		rows.Close()
+	}
+	log.Printf("[postgres] [check_view_via_group_member] DONE: iters=%d", iters)
+}
+
+func runLookupResourcesManageHeavyUser(db *sql.DB) {
+	iters := utils.GetEnvInt("BENCH_LOOKUPRES_MANAGE_ITER", 10)
+	userID := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER")
+	runLookupBenchPG(db, "lookup_resources_manage_super", "manager", userID, iters, 60*time.Second)
+}
+
+func runLookupResourcesViewRegularUser(db *sql.DB) {
+	iters := utils.GetEnvInt("BENCH_LOOKUPRES_VIEW_ITER", 10)
+	userID := os.Getenv("BENCH_LOOKUPRES_VIEW_USER")
+	runLookupBenchPG(db, "lookup_resources_view_regular", "viewer", userID, iters, 60*time.Second)
 }

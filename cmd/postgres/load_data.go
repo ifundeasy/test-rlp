@@ -91,6 +91,8 @@ func loadOrganizations(db *sql.DB, total *int) {
 	}
 	defer f.Close()
 
+	start := time.Now()
+
 	// organizations.csv: org_id
 	if _, err := r.Read(); err != nil {
 		log.Fatalf("[postgres] organizations: read header failed: %v", err)
@@ -129,6 +131,9 @@ func loadOrganizations(db *sql.DB, total *int) {
 			log.Fatalf("[postgres] organizations: CopyIn exec failed: %v", err)
 		}
 		count++
+		if count%10000 == 0 {
+			log.Printf("[postgres] Loaded organizations progress: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	if _, err := stmt.Exec(); err != nil {
@@ -148,7 +153,7 @@ func loadOrganizations(db *sql.DB, total *int) {
 	}
 
 	*total += count
-	log.Printf("[postgres] Loaded organizations: %d rows (cumulative=%d)", count, *total)
+	log.Printf("[postgres] Loaded organizations: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
 }
 
 func loadUsers(db *sql.DB, total *int) {
@@ -158,7 +163,7 @@ func loadUsers(db *sql.DB, total *int) {
 		return
 	}
 	defer f.Close()
-
+	start := time.Now()
 	// users.csv: user_id,org_id
 	if _, err := r.Read(); err != nil {
 		log.Fatalf("[postgres] users: read header failed: %v", err)
@@ -196,6 +201,9 @@ func loadUsers(db *sql.DB, total *int) {
 			log.Fatalf("[postgres] users: CopyIn exec failed: %v", err)
 		}
 		count++
+		if count%10000 == 0 {
+			log.Printf("[postgres] Loaded users progress: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	if _, err := stmt.Exec(); err != nil {
@@ -215,7 +223,7 @@ func loadUsers(db *sql.DB, total *int) {
 	}
 
 	*total += count
-	log.Printf("[postgres] Loaded users: %d rows (cumulative=%d)", count, *total)
+	log.Printf("[postgres] Loaded users: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
 }
 
 func loadGroups(db *sql.DB, total *int) {
@@ -225,7 +233,7 @@ func loadGroups(db *sql.DB, total *int) {
 		return
 	}
 	defer f.Close()
-
+	start := time.Now()
 	// groups.csv: group_id,org_id
 	if _, err := r.Read(); err != nil {
 		log.Fatalf("[postgres] groups: read header failed: %v", err)
@@ -263,6 +271,9 @@ func loadGroups(db *sql.DB, total *int) {
 			log.Fatalf("[postgres] groups: CopyIn exec failed: %v", err)
 		}
 		count++
+		if count%10000 == 0 {
+			log.Printf("[postgres] Loaded groups progress: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	if _, err := stmt.Exec(); err != nil {
@@ -282,7 +293,7 @@ func loadGroups(db *sql.DB, total *int) {
 	}
 
 	*total += count
-	log.Printf("[postgres] Loaded groups -> org.member_group: %d rows (cumulative=%d)", count, *total)
+	log.Printf("[postgres] Loaded groups -> org.member_group: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
 }
 
 func loadOrgMemberships(db *sql.DB, total *int) {
@@ -292,7 +303,7 @@ func loadOrgMemberships(db *sql.DB, total *int) {
 		return
 	}
 	defer f.Close()
-
+	start := time.Now()
 	// org_memberships.csv: org_id,user_id,role
 	if _, err := r.Read(); err != nil {
 		log.Fatalf("[postgres] org_memberships: read header failed: %v", err)
@@ -330,6 +341,9 @@ func loadOrgMemberships(db *sql.DB, total *int) {
 			log.Fatalf("[postgres] org_memberships: CopyIn exec failed: %v", err)
 		}
 		count++
+		if count%10000 == 0 {
+			log.Printf("[postgres] Loaded org_memberships progress: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	if _, err := stmt.Exec(); err != nil {
@@ -349,7 +363,7 @@ func loadOrgMemberships(db *sql.DB, total *int) {
 	}
 
 	*total += count
-	log.Printf("[postgres] Loaded org_memberships: %d rows (cumulative=%d)", count, *total)
+	log.Printf("[postgres] Loaded org_memberships: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
 }
 
 func loadGroupMemberships(db *sql.DB, total *int) {
@@ -359,7 +373,7 @@ func loadGroupMemberships(db *sql.DB, total *int) {
 		return
 	}
 	defer f.Close()
-
+	start := time.Now()
 	// group_memberships.csv: group_id,user_id,role
 	if _, err := r.Read(); err != nil {
 		log.Fatalf("[postgres] group_memberships: read header failed: %v", err)
@@ -397,6 +411,9 @@ func loadGroupMemberships(db *sql.DB, total *int) {
 			log.Fatalf("[postgres] group_memberships: CopyIn exec failed: %v", err)
 		}
 		count++
+		if count%10000 == 0 {
+			log.Printf("[postgres] Loaded group_memberships progress: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	if _, err := stmt.Exec(); err != nil {
@@ -416,7 +433,7 @@ func loadGroupMemberships(db *sql.DB, total *int) {
 	}
 
 	*total += count
-	log.Printf("[postgres] Loaded group_memberships: %d rows (cumulative=%d)", count, *total)
+	log.Printf("[postgres] Loaded group_memberships: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
 }
 
 // loadGroupHierarchy loads parent-child group edges from CSV
@@ -427,7 +444,7 @@ func loadGroupHierarchy(db *sql.DB, total *int) {
 		return
 	}
 	defer f.Close()
-
+	start := time.Now()
 	// header: parent_group_id,child_group_id,relation
 	if _, err := r.Read(); err != nil {
 		log.Fatalf("[postgres] group_hierarchy: read header failed: %v", err)
@@ -465,6 +482,9 @@ func loadGroupHierarchy(db *sql.DB, total *int) {
 			log.Fatalf("[postgres] group_hierarchy: CopyIn exec failed: %v", err)
 		}
 		count++
+		if count%10000 == 0 {
+			log.Printf("[postgres] Loaded group_hierarchy progress: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	if _, err := stmt.Exec(); err != nil {
@@ -484,7 +504,7 @@ func loadGroupHierarchy(db *sql.DB, total *int) {
 	}
 
 	*total += count
-	log.Printf("[postgres] Loaded group_hierarchy: %d rows (cumulative=%d)", count, *total)
+	log.Printf("[postgres] Loaded group_hierarchy: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
 }
 
 func loadResources(db *sql.DB, total *int) {
@@ -494,7 +514,7 @@ func loadResources(db *sql.DB, total *int) {
 		return
 	}
 	defer f.Close()
-
+	start := time.Now()
 	// resources.csv: resource_id,org_id
 	if _, err := r.Read(); err != nil {
 		log.Fatalf("[postgres] resources: read header failed: %v", err)
@@ -532,6 +552,9 @@ func loadResources(db *sql.DB, total *int) {
 			log.Fatalf("[postgres] resources: CopyIn exec failed: %v", err)
 		}
 		count++
+		if count%10000 == 0 {
+			log.Printf("[postgres] Loaded resources -> resource.org: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	if _, err := stmt.Exec(); err != nil {
@@ -551,7 +574,7 @@ func loadResources(db *sql.DB, total *int) {
 	}
 
 	*total += count
-	log.Printf("[postgres] Loaded resources -> resource.org: %d rows (cumulative=%d)", count, *total)
+	log.Printf("[postgres] Loaded resources -> resource.org: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
 }
 
 func loadResourceACL(db *sql.DB, total *int) {
@@ -561,7 +584,7 @@ func loadResourceACL(db *sql.DB, total *int) {
 		return
 	}
 	defer f.Close()
-
+	start := time.Now()
 	// resource_acl.csv: resource_id,subject_type,subject_id,relation
 	if _, err := r.Read(); err != nil {
 		log.Fatalf("[postgres] resource_acl: read header failed: %v", err)
@@ -599,6 +622,9 @@ func loadResourceACL(db *sql.DB, total *int) {
 			log.Fatalf("[postgres] resource_acl: CopyIn exec failed: %v", err)
 		}
 		count++
+		if count%10000 == 0 {
+			log.Printf("[postgres] Loaded resource_acl progress: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	if _, err := stmt.Exec(); err != nil {
@@ -618,7 +644,7 @@ func loadResourceACL(db *sql.DB, total *int) {
 	}
 
 	*total += count
-	log.Printf("[postgres] Loaded resource_acl: %d rows (cumulative=%d)", count, *total)
+	log.Printf("[postgres] Loaded resource_acl: %d rows (cumulative=%d) elapsed=%s", count, *total, time.Since(start).Truncate(time.Millisecond))
 }
 
 // refreshUserResourcePermissions calls the convenience function in the DB

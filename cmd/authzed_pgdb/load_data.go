@@ -134,6 +134,9 @@ func loadOrgMemberships(client *authzed.Client, batch *[]*v1.RelationshipUpdate,
 		*relCount++
 		count++
 		flushIfNeeded(client, batch, relCount, start)
+		if count%10000 == 0 {
+			log.Printf("[authzed_pgdb] Loaded org_memberships progress: %d rows (cumulative=%d) elapsed=%s", count, *relCount, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	log.Printf("[authzed_pgdb] Loaded org_memberships: %d relationships (cumulative=%d)", count, *relCount)
@@ -190,6 +193,9 @@ func loadGroups(client *authzed.Client, batch *[]*v1.RelationshipUpdate, relCoun
 		*relCount++
 		count++
 		flushIfNeeded(client, batch, relCount, start)
+		if count%10000 == 0 {
+			log.Printf("[authzed_pgdb] Loaded groups progress: %d rows (cumulative=%d) elapsed=%s", count, *relCount, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	log.Printf("[authzed_pgdb] Loaded groups -> org.member_group: %d relationships (cumulative=%d)", count, *relCount)
@@ -265,6 +271,9 @@ func loadGroupMemberships(client *authzed.Client, batch *[]*v1.RelationshipUpdat
 		*relCount++
 		count++
 		flushIfNeeded(client, batch, relCount, start)
+		if count%10000 == 0 {
+			log.Printf("[authzed_pgdb] Loaded group_memberships progress: %d rows (cumulative=%d) elapsed=%s", count, *relCount, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	log.Printf("[authzed_pgdb] Loaded group_memberships: %d relationships (cumulative=%d)", count, *relCount)
@@ -339,6 +348,9 @@ func loadGroupHierarchy(client *authzed.Client, batch *[]*v1.RelationshipUpdate,
 		*relCount++
 		count++
 		flushIfNeeded(client, batch, relCount, start)
+		if count%10000 == 0 {
+			log.Printf("[authzed_pgdb] Loaded group_hierarchy progress: %d rows (cumulative=%d) elapsed=%s", count, *relCount, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	log.Printf("[authzed_pgdb] Loaded group_hierarchy: %d relationships (cumulative=%d)", count, *relCount)
@@ -388,6 +400,9 @@ func loadResources(client *authzed.Client, batch *[]*v1.RelationshipUpdate, relC
 		*relCount++
 		count++
 		flushIfNeeded(client, batch, relCount, start)
+		if count%10000 == 0 {
+			log.Printf("[authzed_pgdb] Loaded resources -> resource.org: %d relationships (cumulative=%d) elapsed=%s", count, *relCount, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	log.Printf("[authzed_pgdb] Loaded resources -> resource.org: %d relationships (cumulative=%d)", count, *relCount)
@@ -529,6 +544,9 @@ func loadResourceACL(client *authzed.Client, batch *[]*v1.RelationshipUpdate, re
 		*relCount++
 		count++
 		flushIfNeeded(client, batch, relCount, start)
+		if count%10000 == 0 {
+			log.Printf("[authzed_pgdb] Loaded resource_acl progress: %d rows (cumulative=%d) elapsed=%s", count, *relCount, time.Since(start).Truncate(time.Millisecond))
+		}
 	}
 
 	log.Printf("[authzed_pgdb] Loaded resource_acl: %d relationships (cumulative=%d)", count, *relCount)

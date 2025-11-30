@@ -3,11 +3,13 @@ package cockroachdb
 import (
 	"context"
 	"encoding/csv"
+	"fmt"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"test-tls/infrastructure"
@@ -16,6 +18,7 @@ import (
 const (
 	dataDir          = "data"
 	resourceACLBatch = 5000 // commit every N ACL rows
+	insertBatchSize  = 5000 // multi-row insert batch size
 )
 
 // CockroachdbLoadData loads CSV data into CockroachDB using UPSERT (idempotent).
@@ -59,14 +62,28 @@ func CockroachdbCreateData() {
 		if err != nil {
 			log.Fatalf("[cockroachdb] begin tx %s: %v", filename, err)
 		}
-		stmt, err := tx.PrepareContext(ctx,
-			"UPSERT INTO organizations (org_id) VALUES ($1)",
-		)
-		if err != nil {
-			log.Fatalf("[cockroachdb] prepare UPSERT organizations: %v", err)
-		}
+		defer tx.Rollback()
 
 		count := 0
+		// batching slices
+		args := make([]interface{}, 0, insertBatchSize)
+		placeholders := make([]string, 0, insertBatchSize)
+		batchCount := 0
+
+		flush := func() {
+			if batchCount == 0 {
+				return
+			}
+			query := fmt.Sprintf("INSERT INTO organizations (org_id) VALUES %s ON CONFLICT (org_id) DO NOTHING", strings.Join(placeholders, ","))
+			if _, err := tx.ExecContext(ctx, query, args...); err != nil {
+				log.Fatalf("[cockroachdb] upsert organizations batch failed: %v", err)
+			}
+			// reset
+			args = args[:0]
+			placeholders = placeholders[:0]
+			batchCount = 0
+		}
+
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -84,13 +101,19 @@ func CockroachdbCreateData() {
 				log.Fatalf("[cockroachdb] parse org_id: %v", err)
 			}
 
-			if _, err := stmt.ExecContext(ctx, orgID); err != nil {
-				log.Fatalf("[cockroachdb] upsert organizations: %v", err)
-			}
+			args = append(args, orgID)
+			// single-column placeholder (use current args length)
+			placeholders = append(placeholders, fmt.Sprintf("($%d)", len(args)))
+			batchCount++
 			count++
+
+			if batchCount >= insertBatchSize {
+				flush()
+			}
 		}
 
-		stmt.Close()
+		flush()
+
 		if err := tx.Commit(); err != nil {
 			log.Fatalf("[cockroachdb] commit organizations: %v", err)
 		}
@@ -119,14 +142,26 @@ func CockroachdbCreateData() {
 		if err != nil {
 			log.Fatalf("[cockroachdb] begin tx %s: %v", filename, err)
 		}
-		stmt, err := tx.PrepareContext(ctx,
-			"UPSERT INTO users (user_id, org_id) VALUES ($1, $2)",
-		)
-		if err != nil {
-			log.Fatalf("[cockroachdb] prepare UPSERT users: %v", err)
-		}
+		defer tx.Rollback()
 
 		count := 0
+		args := make([]interface{}, 0, insertBatchSize*2)
+		placeholders := make([]string, 0, insertBatchSize)
+		batchCount := 0
+
+		flush := func() {
+			if batchCount == 0 {
+				return
+			}
+			query := fmt.Sprintf("INSERT INTO users (user_id, org_id) VALUES %s ON CONFLICT (user_id) DO UPDATE SET org_id = EXCLUDED.org_id", strings.Join(placeholders, ","))
+			if _, err := tx.ExecContext(ctx, query, args...); err != nil {
+				log.Fatalf("[cockroachdb] upsert users batch failed: %v", err)
+			}
+			args = args[:0]
+			placeholders = placeholders[:0]
+			batchCount = 0
+		}
+
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -148,13 +183,20 @@ func CockroachdbCreateData() {
 				log.Fatalf("[cockroachdb] parse org_id (user): %v", err)
 			}
 
-			if _, err := stmt.ExecContext(ctx, userID, orgID); err != nil {
-				log.Fatalf("[cockroachdb] upsert users: %v", err)
-			}
+			args = append(args, userID, orgID)
+			// create placeholders like ($1,$2),($3,$4)... using current args length
+			cur := len(args)
+			placeholders = append(placeholders, fmt.Sprintf("($%d,$%d)", cur-1, cur))
+			batchCount++
 			count++
+
+			if batchCount >= insertBatchSize {
+				flush()
+			}
 		}
 
-		stmt.Close()
+		flush()
+
 		if err := tx.Commit(); err != nil {
 			log.Fatalf("[cockroachdb] commit users: %v", err)
 		}
@@ -183,14 +225,26 @@ func CockroachdbCreateData() {
 		if err != nil {
 			log.Fatalf("[cockroachdb] begin tx %s: %v", filename, err)
 		}
-		stmt, err := tx.PrepareContext(ctx,
-			"UPSERT INTO groups (group_id, org_id) VALUES ($1, $2)",
-		)
-		if err != nil {
-			log.Fatalf("[cockroachdb] prepare UPSERT groups: %v", err)
-		}
+		defer tx.Rollback()
 
 		count := 0
+		args := make([]interface{}, 0, insertBatchSize*2)
+		placeholders := make([]string, 0, insertBatchSize)
+		batchCount := 0
+
+		flush := func() {
+			if batchCount == 0 {
+				return
+			}
+			query := fmt.Sprintf("INSERT INTO groups (group_id, org_id) VALUES %s ON CONFLICT (group_id) DO UPDATE SET org_id = EXCLUDED.org_id", strings.Join(placeholders, ","))
+			if _, err := tx.ExecContext(ctx, query, args...); err != nil {
+				log.Fatalf("[cockroachdb] upsert groups batch failed: %v", err)
+			}
+			args = args[:0]
+			placeholders = placeholders[:0]
+			batchCount = 0
+		}
+
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -212,13 +266,19 @@ func CockroachdbCreateData() {
 				log.Fatalf("[cockroachdb] parse org_id (group): %v", err)
 			}
 
-			if _, err := stmt.ExecContext(ctx, groupID, orgID); err != nil {
-				log.Fatalf("[cockroachdb] upsert groups: %v", err)
-			}
+			args = append(args, groupID, orgID)
+			cur := len(args)
+			placeholders = append(placeholders, fmt.Sprintf("($%d,$%d)", cur-1, cur))
+			batchCount++
 			count++
+
+			if batchCount >= insertBatchSize {
+				flush()
+			}
 		}
 
-		stmt.Close()
+		flush()
+
 		if err := tx.Commit(); err != nil {
 			log.Fatalf("[cockroachdb] commit groups: %v", err)
 		}
@@ -247,14 +307,26 @@ func CockroachdbCreateData() {
 		if err != nil {
 			log.Fatalf("[cockroachdb] begin tx %s: %v", filename, err)
 		}
-		stmt, err := tx.PrepareContext(ctx,
-			"UPSERT INTO org_memberships (org_id, user_id, role) VALUES ($1, $2, $3)",
-		)
-		if err != nil {
-			log.Fatalf("[cockroachdb] prepare UPSERT org_memberships: %v", err)
-		}
+		defer tx.Rollback()
 
 		count := 0
+		args := make([]interface{}, 0, insertBatchSize*3)
+		placeholders := make([]string, 0, insertBatchSize)
+		batchCount := 0
+
+		flush := func() {
+			if batchCount == 0 {
+				return
+			}
+			query := fmt.Sprintf("INSERT INTO org_memberships (org_id, user_id, role) VALUES %s ON CONFLICT (org_id, user_id) DO UPDATE SET role = EXCLUDED.role", strings.Join(placeholders, ","))
+			if _, err := tx.ExecContext(ctx, query, args...); err != nil {
+				log.Fatalf("[cockroachdb] upsert org_memberships batch failed: %v", err)
+			}
+			args = args[:0]
+			placeholders = placeholders[:0]
+			batchCount = 0
+		}
+
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -277,13 +349,19 @@ func CockroachdbCreateData() {
 			}
 			role := rec[2]
 
-			if _, err := stmt.ExecContext(ctx, orgID, userID, role); err != nil {
-				log.Fatalf("[cockroachdb] upsert org_memberships: %v", err)
-			}
+			args = append(args, orgID, userID, role)
+			cur := len(args)
+			placeholders = append(placeholders, fmt.Sprintf("($%d,$%d,$%d)", cur-2, cur-1, cur))
+			batchCount++
 			count++
+
+			if batchCount >= insertBatchSize {
+				flush()
+			}
 		}
 
-		stmt.Close()
+		flush()
+
 		if err := tx.Commit(); err != nil {
 			log.Fatalf("[cockroachdb] commit org_memberships: %v", err)
 		}
@@ -312,14 +390,26 @@ func CockroachdbCreateData() {
 		if err != nil {
 			log.Fatalf("[cockroachdb] begin tx %s: %v", filename, err)
 		}
-		stmt, err := tx.PrepareContext(ctx,
-			"UPSERT INTO group_memberships (group_id, user_id, role) VALUES ($1, $2, $3)",
-		)
-		if err != nil {
-			log.Fatalf("[cockroachdb] prepare UPSERT group_memberships: %v", err)
-		}
+		defer tx.Rollback()
 
 		count := 0
+		args := make([]interface{}, 0, insertBatchSize*3)
+		placeholders := make([]string, 0, insertBatchSize)
+		batchCount := 0
+
+		flush := func() {
+			if batchCount == 0 {
+				return
+			}
+			query := fmt.Sprintf("INSERT INTO group_memberships (group_id, user_id, role) VALUES %s ON CONFLICT (group_id, user_id) DO UPDATE SET role = EXCLUDED.role", strings.Join(placeholders, ","))
+			if _, err := tx.ExecContext(ctx, query, args...); err != nil {
+				log.Fatalf("[cockroachdb] upsert group_memberships batch failed: %v", err)
+			}
+			args = args[:0]
+			placeholders = placeholders[:0]
+			batchCount = 0
+		}
+
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -342,13 +432,19 @@ func CockroachdbCreateData() {
 			}
 			role := rec[2]
 
-			if _, err := stmt.ExecContext(ctx, groupID, userID, role); err != nil {
-				log.Fatalf("[cockroachdb] upsert group_memberships: %v", err)
-			}
+			args = append(args, groupID, userID, role)
+			cur := len(args)
+			placeholders = append(placeholders, fmt.Sprintf("($%d,$%d,$%d)", cur-2, cur-1, cur))
+			batchCount++
 			count++
+
+			if batchCount >= insertBatchSize {
+				flush()
+			}
 		}
 
-		stmt.Close()
+		flush()
+
 		if err := tx.Commit(); err != nil {
 			log.Fatalf("[cockroachdb] commit group_memberships: %v", err)
 		}
@@ -381,14 +477,26 @@ func CockroachdbCreateData() {
 		if err != nil {
 			log.Fatalf("[cockroachdb] begin tx %s: %v", filename, err)
 		}
-		stmt, err := tx.PrepareContext(ctx,
-			"UPSERT INTO group_hierarchy (parent_group_id, child_group_id, relation) VALUES ($1, $2, $3)",
-		)
-		if err != nil {
-			log.Fatalf("[cockroachdb] prepare UPSERT group_hierarchy: %v", err)
-		}
+		defer tx.Rollback()
 
 		count := 0
+		args := make([]interface{}, 0, insertBatchSize*3)
+		placeholders := make([]string, 0, insertBatchSize)
+		batchCount := 0
+
+		flush := func() {
+			if batchCount == 0 {
+				return
+			}
+			query := fmt.Sprintf("INSERT INTO group_hierarchy (parent_group_id, child_group_id, relation) VALUES %s ON CONFLICT (parent_group_id, child_group_id, relation) DO NOTHING", strings.Join(placeholders, ","))
+			if _, err := tx.ExecContext(ctx, query, args...); err != nil {
+				log.Fatalf("[cockroachdb] upsert group_hierarchy batch failed: %v", err)
+			}
+			args = args[:0]
+			placeholders = placeholders[:0]
+			batchCount = 0
+		}
+
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -411,13 +519,19 @@ func CockroachdbCreateData() {
 			}
 			relation := rec[2]
 
-			if _, err := stmt.ExecContext(ctx, parentID, childID, relation); err != nil {
-				log.Fatalf("[cockroachdb] upsert group_hierarchy: %v", err)
-			}
+			args = append(args, parentID, childID, relation)
+			cur := len(args)
+			placeholders = append(placeholders, fmt.Sprintf("($%d,$%d,$%d)", cur-2, cur-1, cur))
+			batchCount++
 			count++
+
+			if batchCount >= insertBatchSize {
+				flush()
+			}
 		}
 
-		stmt.Close()
+		flush()
+
 		if err := tx.Commit(); err != nil {
 			log.Fatalf("[cockroachdb] commit group_hierarchy: %v", err)
 		}
@@ -446,14 +560,26 @@ func CockroachdbCreateData() {
 		if err != nil {
 			log.Fatalf("[cockroachdb] begin tx %s: %v", filename, err)
 		}
-		stmt, err := tx.PrepareContext(ctx,
-			"UPSERT INTO resources (resource_id, org_id) VALUES ($1, $2)",
-		)
-		if err != nil {
-			log.Fatalf("[cockroachdb] prepare UPSERT resources: %v", err)
-		}
+		defer tx.Rollback()
 
 		count := 0
+		args := make([]interface{}, 0, insertBatchSize*2)
+		placeholders := make([]string, 0, insertBatchSize)
+		batchCount := 0
+
+		flush := func() {
+			if batchCount == 0 {
+				return
+			}
+			query := fmt.Sprintf("INSERT INTO resources (resource_id, org_id) VALUES %s ON CONFLICT (resource_id) DO UPDATE SET org_id = EXCLUDED.org_id", strings.Join(placeholders, ","))
+			if _, err := tx.ExecContext(ctx, query, args...); err != nil {
+				log.Fatalf("[cockroachdb] upsert resources batch failed: %v", err)
+			}
+			args = args[:0]
+			placeholders = placeholders[:0]
+			batchCount = 0
+		}
+
 		for {
 			rec, err := r.Read()
 			if err == io.EOF {
@@ -475,13 +601,19 @@ func CockroachdbCreateData() {
 				log.Fatalf("[cockroachdb] parse org_id (resource): %v", err)
 			}
 
-			if _, err := stmt.ExecContext(ctx, resourceID, orgID); err != nil {
-				log.Fatalf("[cockroachdb] upsert resources: %v", err)
-			}
+			args = append(args, resourceID, orgID)
+			cur := len(args)
+			placeholders = append(placeholders, fmt.Sprintf("($%d,$%d)", cur-1, cur))
+			batchCount++
 			count++
+
+			if batchCount >= insertBatchSize {
+				flush()
+			}
 		}
 
-		stmt.Close()
+		flush()
+
 		if err := tx.Commit(); err != nil {
 			log.Fatalf("[cockroachdb] commit resources: %v", err)
 		}
@@ -506,35 +638,37 @@ func CockroachdbCreateData() {
 			log.Fatalf("[cockroachdb] read %s header: %v", filename, err)
 		}
 
-		sqlStmt := "UPSERT INTO resource_acl (resource_id, subject_type, subject_id, relation) VALUES ($1, $2, $3, $4)"
-
+		// We'll batch INSERT resource_acl rows in multi-row statements per transaction
 		tx, err := db.BeginTx(ctx, nil)
 		if err != nil {
 			log.Fatalf("[cockroachdb] begin tx %s: %v", filename, err)
-		}
-		stmt, err := tx.PrepareContext(ctx, sqlStmt)
-		if err != nil {
-			log.Fatalf("[cockroachdb] prepare UPSERT resource_acl: %v", err)
 		}
 
 		count := 0
 		rowsInTxn := 0
 
+		// batching buffers for current txn
+		args := make([]interface{}, 0, resourceACLBatch*4)
+		placeholders := make([]string, 0, resourceACLBatch)
+
 		commitAndReset := func() {
-			stmt.Close()
+			if rowsInTxn > 0 {
+				query := fmt.Sprintf("INSERT INTO resource_acl (resource_id, subject_type, subject_id, relation) VALUES %s ON CONFLICT (resource_id, subject_type, subject_id, relation) DO NOTHING", strings.Join(placeholders, ","))
+				if _, err := tx.ExecContext(ctx, query, args...); err != nil {
+					log.Fatalf("[cockroachdb] commit resource_acl batch failed: %v", err)
+				}
+			}
 			if err := tx.Commit(); err != nil {
 				log.Fatalf("[cockroachdb] commit resource_acl batch: %v", err)
 			}
 
-			var err error
+			// reset txn and buffers
 			tx, err = db.BeginTx(ctx, nil)
 			if err != nil {
 				log.Fatalf("[cockroachdb] begin tx resource_acl (next batch): %v", err)
 			}
-			stmt, err = tx.PrepareContext(ctx, sqlStmt)
-			if err != nil {
-				log.Fatalf("[cockroachdb] prepare UPSERT resource_acl (next batch): %v", err)
-			}
+			args = args[:0]
+			placeholders = placeholders[:0]
 			rowsInTxn = 0
 		}
 
@@ -561,14 +695,15 @@ func CockroachdbCreateData() {
 			}
 			relation := rec[3]
 
-			if _, err := stmt.ExecContext(ctx, resourceID, subjectType, subjectID, relation); err != nil {
-				log.Fatalf("[cockroachdb] upsert resource_acl: %v", err)
-			}
+			args = append(args, resourceID, subjectType, subjectID, relation)
+			cur := len(args)
+			// placeholders use 1-based parameter indexing
+			placeholders = append(placeholders, fmt.Sprintf("($%d,$%d,$%d,$%d)", cur-3, cur-2, cur-1, cur))
 			count++
 			rowsInTxn++
 
 			if count%resourceACLBatch == 0 {
-				log.Printf("[cockroachdb] ... resource_acl progress: %d rows", count)
+				log.Printf("[cockroachdb] Loaded resource_acl progress: %d rows (cumulative=%d) elapsed=%s", count, totalRows+count, time.Since(start).Truncate(time.Millisecond))
 			}
 
 			if rowsInTxn >= resourceACLBatch {
@@ -577,13 +712,10 @@ func CockroachdbCreateData() {
 		}
 
 		// Commit any remaining rows in the last batch.
-		stmt.Close()
-		if err := tx.Commit(); err != nil {
-			log.Fatalf("[cockroachdb] commit resource_acl final batch: %v", err)
-		}
+		commitAndReset()
 
 		totalRows += count
-		log.Printf("[cockroachdb] Loaded resource_acl: %d rows (cumulative=%d)", count, totalRows)
+		log.Printf("[cockroachdb] Loaded resource_acl: %d rows (cumulative=%d) elapsed=%s", count, totalRows, time.Since(start).Truncate(time.Millisecond))
 	}()
 
 	elapsed := time.Since(start).Truncate(time.Millisecond)
