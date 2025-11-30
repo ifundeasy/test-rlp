@@ -12,7 +12,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v9"
 )
 
-const IndexName = "rlp_resources"
+const IndexName = "rlp"
 
 // =========================
 // Build and index resource docs
@@ -141,7 +141,7 @@ func indexResourceDocs(
 			AllowedViewUserID:   viewSlice,
 		}
 
-		meta := map[string]map[string]interface{}{
+		meta := map[string]map[string]any{
 			"index": {
 				"_index": IndexName,
 				"_id":    strconv.Itoa(resID),

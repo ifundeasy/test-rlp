@@ -1,148 +1,124 @@
 package elasticsearch
 
 import (
+	"bytes"
 	"context"
+	"fmt"
+	"io"
 	"log"
-	"strings"
 	"time"
+
+	esv9 "github.com/elastic/go-elasticsearch/v9"
 
 	"test-tls/infrastructure"
 )
 
-// ElasticsearchCreateSchemas creates the Elasticsearch index and mappings
-// used for the RLS benchmarks.
-//
-// Design goals:
-//
-//   - Optimize for two main patterns:
-//     1) RLS check: can user U manage/view resource R?
-//     2) RLS list: which resources can user U manage/view?
-//   - Fully embrace Elasticsearch strengths: denormalized documents,
-//     inverted index on user IDs, nested ACL edges for authzed-style graph queries.
-//   - Avoid any "relational-style" normalization that would require joins.
-//
-// Index: rlp_resources
-//
-//   - One document per resource.
-//
-//     Fields:
-//
-//     resource_id: long            -> resource identifier
-//     org_id:      long            -> owning organization
-//
-//     acl: nested {
-//     relation:     keyword      -> "manager" | "viewer"
-//     subject_type: keyword      -> "user" | "group" | "org"
-//     subject_id:   long         -> ID of that subject
-//     }
-//
-//     allowed_user_ids_manage: long[]
-//
-//   - compiled closure: all users that can manage this resource
-//
-//     allowed_user_ids_view: long[]
-//
-//   - compiled closure: all users that can view this resource
-//
-//   - superset of allowed_user_ids_manage
-//
-// RLS check:
-//
-//   - Query by resource_id + user_id on allowed_user_ids_*.
-//
-// RLS list:
-//
-//   - Query by user_id on allowed_user_ids_view and page through results.
+// ElasticsearchCreateSchemas creates the index and mappings optimized for
+// fast permission lookups. We denormalize allowed user IDs directly on the
+// resource document to enable single-indexed term queries.
 func ElasticsearchCreateSchemas() {
 	ctx := context.Background()
-
 	es, cleanup, err := infrastructure.NewElasticsearchFromEnv(ctx)
 	if err != nil {
-		log.Fatalf("[elasticsearch] NewElasticsearchFromEnv failed: %v", err)
+		log.Fatalf("[elasticsearch] connect error: %v", err)
+		return
 	}
 	defer cleanup()
 
-	log.Printf("[elasticsearch] == Creating Elasticsearch index and mappings ==")
+	ensureResourceIndex(ctx, es)
+}
 
-	// 1) Drop existing index if present.
-	{
-		ctxDrop, cancel := context.WithTimeout(ctx, 30*time.Second)
-		defer cancel()
+func ensureResourceIndex(ctx context.Context, es *esv9.Client) {
+	// Mapping notes:
+	// - allowed_manage_user_id / allowed_view_user_id are arrays of integers
+	//   (multi-valued numeric fields) for fast term lookups.
+	// - acl is optional and modeled as nested for future auditing.
+	// - dynamic is false to keep mapping stable.
+	mapping := `{
+			"settings": {
+				"number_of_shards": 1,
+				"number_of_replicas": 0
+			},
+			"mappings": {
+				"dynamic": false,
+				"properties": {
+					"resource_id": {"type": "integer"},
+					"org_id": {"type": "integer"},
+					"allowed_manage_user_id": {"type": "integer"},
+					"allowed_view_user_id": {"type": "integer"},
+					"acl": {
+						"type": "nested",
+						"properties": {
+							"subject_type": {"type": "keyword"},
+							"subject_id": {"type": "integer"},
+							"relation": {"type": "keyword"}
+						}
+					}
+				}
+			}
+		}`
 
-		res, err := es.Indices.Delete(
-			[]string{IndexName},
-			es.Indices.Delete.WithContext(ctxDrop),
+	// Create index if missing; otherwise put mapping (idempotent).
+	existsCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	defer cancel()
+	res, err := es.Indices.Exists([]string{IndexName}, es.Indices.Exists.WithContext(existsCtx))
+	if err != nil {
+		log.Fatalf("[elasticsearch] index exists check failed: %v", err)
+	}
+	defer safeClose(res.Body)
+
+	if res.StatusCode == 404 {
+		// Create index with settings+mappings
+		createCtx, ccancel := context.WithTimeout(ctx, 60*time.Second)
+		defer ccancel()
+		cres, err := es.Indices.Create(IndexName,
+			es.Indices.Create.WithBody(bytes.NewReader([]byte(mapping))),
+			es.Indices.Create.WithContext(createCtx),
 		)
 		if err != nil {
-			log.Fatalf("[elasticsearch] indices.delete %q failed: %v", IndexName, err)
+			log.Fatalf("[elasticsearch] create index %q failed: %v", IndexName, err)
 		}
-		defer res.Body.Close()
-
-		// 404 is fine (index does not exist yet).
-		if res.IsError() && !strings.Contains(res.Status(), "404") {
-			log.Fatalf("[elasticsearch] indices.delete %q returned error: %s", IndexName, res.Status())
+		defer safeClose(cres.Body)
+		if cres.IsError() {
+			body := readBodyString(cres.Body)
+			log.Fatalf("[elasticsearch] create index %q error: %s body=%s", IndexName, cres.Status(), body)
 		}
+		log.Printf("[elasticsearch] created index %q with mappings", IndexName)
+		return
 	}
 
-	// 2) Create index with optimized settings + mappings.
-	mapping := `
-{
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 0
-  },
-  "mappings": {
-    "dynamic": "strict",
-    "properties": {
-      "resource_id": {
-        "type": "long"
-      },
-      "org_id": {
-        "type": "long"
-      },
-      "acl": {
-        "type": "nested",
-        "properties": {
-          "relation": {
-            "type": "keyword"
-          },
-          "subject_type": {
-            "type": "keyword"
-          },
-          "subject_id": {
-            "type": "long"
-          }
-        }
-      },
-      "allowed_user_ids_manage": {
-				"type": "long",
-				"doc_values": true
-      },
-      "allowed_user_ids_view": {
-				"type": "long",
-				"doc_values": true
-      }
-    }
-  }
-}
-`
-
-	ctxCreate, cancel := context.WithTimeout(ctx, 30*time.Second)
-	defer cancel()
-
-	res, err := es.Indices.Create(
-		IndexName,
-		es.Indices.Create.WithBody(strings.NewReader(mapping)),
-		es.Indices.Create.WithContext(ctxCreate),
-	)
+	// Exists: try to update mappings to ensure fields exist (no breaking changes).
+	putMapCtx, mcancel := context.WithTimeout(ctx, 60*time.Second)
+	defer mcancel()
+	mres, err := es.Indices.PutMapping([]string{IndexName}, bytes.NewReader([]byte(`{
+			"properties": {
+				"allowed_manage_user_id": {"type": "integer"},
+				"allowed_view_user_id": {"type": "integer"}
+			}
+		}`)), es.Indices.PutMapping.WithContext(putMapCtx))
 	if err != nil {
-		log.Fatalf("[elasticsearch] indices.create %q failed: %v", IndexName, err)
+		log.Fatalf("[elasticsearch] put mapping on %q failed: %v", IndexName, err)
 	}
-	defer res.Body.Close()
-
-	if res.IsError() {
-		log.Fatalf("[elasticsearch] indices.create %q returned error: %s", IndexName, res.Status())
+	defer safeClose(mres.Body)
+	if mres.IsError() {
+		body := readBodyString(mres.Body)
+		log.Printf("[elasticsearch] put mapping on %q returned: %s body=%s", IndexName, mres.Status(), body)
+	} else {
+		log.Printf("[elasticsearch] ensured mappings on %q", IndexName)
 	}
+}
 
-	log.Printf("[elasticsearch] Index %q created successfully.", IndexName)
+func safeClose(c io.Closer) {
+	_ = c.Close()
+}
+
+func readBodyString(r io.Reader) string {
+	if r == nil {
+		return ""
+	}
+	b := new(bytes.Buffer)
+	if _, err := b.ReadFrom(r); err != nil {
+		return fmt.Sprintf("<read error: %v>", err)
+	}
+	return b.String()
 }
