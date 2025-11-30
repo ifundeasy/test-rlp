@@ -1,4 +1,4 @@
-package clickhouse_1
+package clickhouse
 
 func ClickhouseDropSchemas() {
 

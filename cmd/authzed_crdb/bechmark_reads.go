@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"log"
+	"math/rand"
 	"os"
 	"strconv"
 	"time"
@@ -13,6 +14,10 @@ import (
 
 	"test-tls/infrastructure"
 )
+
+// package-local RNG (use NewSource to get a local generator; do not rely on
+// the global Seed behavior which is deprecated/no-op on recent Go versions).
+var rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 // benchPair couples a resource with a user that should have a given permission.
 type benchPair struct {
@@ -26,7 +31,7 @@ type benchDataset struct {
 	orgAdminPairs      []benchPair // resource + org admin user
 	groupViewPairs     []benchPair // resource + user via viewer_group + group membership
 
-	heavyManageUser string // user with many "manage" resources
+	heavyManageUser string // user with many "manage" resources (or an env / random pick)
 	regularViewUser string // user with many "view" resources (preferably not heavyManageUser)
 }
 
@@ -77,7 +82,7 @@ func loadBenchDataset(client *authzed.Client) *benchDataset {
 	manageCount := make(map[string]int) // approx number of manageable resources
 	viewCount := make(map[string]int)   // approx number of viewable resources
 
-	// 1) organization#admin_user@user  -> orgAdmins + orgMembers
+	// helper: streaming relationship reader
 	readRels := func(filter *v1.RelationshipFilter, handle func(rel *v1.Relationship)) {
 		stream, err := client.ReadRelationships(ctx, &v1.ReadRelationshipsRequest{
 			RelationshipFilter: filter,
@@ -97,7 +102,7 @@ func loadBenchDataset(client *authzed.Client) *benchDataset {
 		}
 	}
 
-	// org admin_user
+	// 1) organization#admin_user@user  -> orgAdmins + orgMembers
 	readRels(&v1.RelationshipFilter{
 		ResourceType:     "organization",
 		OptionalRelation: "admin_user",
@@ -108,7 +113,7 @@ func loadBenchDataset(client *authzed.Client) *benchDataset {
 		orgMembers[orgID] = append(orgMembers[orgID], userID)
 	})
 
-	// org member_user
+	// organization#member_user@user -> orgMembers
 	readRels(&v1.RelationshipFilter{
 		ResourceType:     "organization",
 		OptionalRelation: "member_user",
@@ -118,7 +123,7 @@ func loadBenchDataset(client *authzed.Client) *benchDataset {
 		orgMembers[orgID] = append(orgMembers[orgID], userID)
 	})
 
-	// 2) usergroup memberships: usergroup.{member_user,admin_user}@user  -> groupMembers
+	// 2) usergroup memberships: usergroup.{direct_member_user,direct_manager_user}@user -> groupMembers
 	readRels(&v1.RelationshipFilter{
 		ResourceType:     "usergroup",
 		OptionalRelation: "direct_member_user",
@@ -237,7 +242,7 @@ func loadBenchDataset(client *authzed.Client) *benchDataset {
 		resourceIDs = append(resourceIDs, resID)
 	})
 
-	// 5) org-level contributions:
+	// 5) organization-level contributions:
 	//    manage: org.admin
 	//    view: org.member (member_user + member_group + admin)
 	for orgID, admins := range orgAdmins {
@@ -309,8 +314,6 @@ func loadBenchDataset(client *authzed.Client) *benchDataset {
 		ResourceType:     "resource",
 		OptionalRelation: "manager_group",
 	}, func(rel *v1.Relationship) {
-		resID := rel.Resource.ObjectId
-		_ = resID // we only need per-user manageCount
 		groupID := rel.Subject.Object.ObjectId
 
 		// prefer effective managers (transitive), fall back to direct members
@@ -357,7 +360,7 @@ func loadBenchDataset(client *authzed.Client) *benchDataset {
 		viewCount[userID] += mc
 	}
 
-	// 8) Build orgAdminPairs: satu admin per resource (round-robin per org)
+	// 8) Build orgAdminPairs: one admin per resource (round-robin per org)
 	var orgAdminPairs []benchPair
 	adminRoundRobin := make(map[string]int)
 
@@ -377,37 +380,28 @@ func loadBenchDataset(client *authzed.Client) *benchDataset {
 		})
 	}
 
-	// 9) Pick heavyManageUser & regularViewUser
-	var heavyManageUser string
-	maxManage := 0
-	for userID, c := range manageCount {
-		if c > maxManage {
-			maxManage = c
-			heavyManageUser = userID
-		}
+	// 9) Select heavyManageUser & regularViewUser:
+	//    - Prefer explicit env overrides
+	//    - Otherwise, pick random users from manageCount / viewCount.
+	heavyManageUser := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER")
+	regularViewUser := os.Getenv("BENCH_LOOKUPRES_VIEW_USER")
+
+	// Use a package-local RNG instead of seeding the global generator
+	// (Seed is a no-op as of Go 1.24). Create a local RNG for deterministic
+	// sequences when desired via env overrides or explicit seeding.
+	// The package-level `rng` is used by pickRandomUserFromCounts helpers.
+	// (no-op here; rng was initialized at package init)
+
+	if heavyManageUser == "" {
+		heavyManageUser = pickRandomUserFromCounts(manageCount)
 	}
 
-	var regularViewUser string
-	maxView := 0
-	for userID, c := range viewCount {
-		if userID == heavyManageUser {
-			continue
-		}
-		if c > maxView {
-			maxView = c
-			regularViewUser = userID
-		}
-	}
 	if regularViewUser == "" {
-		regularViewUser = heavyManageUser
-	}
-
-	// 10) Allow override via env (shared with lookup_resources_* benchmarks)
-	if v := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER"); v != "" {
-		heavyManageUser = v
-	}
-	if v := os.Getenv("BENCH_LOOKUPRES_VIEW_USER"); v != "" {
-		regularViewUser = v
+		// Try to pick a different user that has view activity; fall back to heavyManageUser.
+		regularViewUser = pickRandomUserFromCountsExcluding(viewCount, heavyManageUser)
+		if regularViewUser == "" {
+			regularViewUser = heavyManageUser
+		}
 	}
 
 	elapsed := time.Since(start).Truncate(time.Millisecond)
@@ -422,6 +416,41 @@ func loadBenchDataset(client *authzed.Client) *benchDataset {
 		heavyManageUser:    heavyManageUser,
 		regularViewUser:    regularViewUser,
 	}
+}
+
+// pickRandomUserFromCounts returns a random user ID from the given counts map,
+// or an empty string if the map is empty.
+func pickRandomUserFromCounts(counts map[string]int) string {
+	if len(counts) == 0 {
+		return ""
+	}
+	users := make([]string, 0, len(counts))
+	for userID := range counts {
+		users = append(users, userID)
+	}
+	idx := rng.Intn(len(users))
+	return users[idx]
+}
+
+// pickRandomUserFromCountsExcluding returns a random user ID from the given counts
+// map, excluding the provided user ID. It returns an empty string if there is no
+// eligible user.
+func pickRandomUserFromCountsExcluding(counts map[string]int, exclude string) string {
+	if len(counts) == 0 {
+		return ""
+	}
+	users := make([]string, 0, len(counts))
+	for userID := range counts {
+		if userID == exclude {
+			continue
+		}
+		users = append(users, userID)
+	}
+	if len(users) == 0 {
+		return ""
+	}
+	idx := rng.Intn(len(users))
+	return users[idx]
 }
 
 // ===============================

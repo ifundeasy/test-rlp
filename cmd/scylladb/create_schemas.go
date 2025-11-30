@@ -1,8 +1,10 @@
-package scylladb_1
+package scylladb
 
 import (
 	"context"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	"test-tls/infrastructure"
@@ -54,92 +56,55 @@ func ScylladbCreateSchemas() {
 
 	session, cleanup, err := infrastructure.NewScyllaFromEnv(ctx)
 	if err != nil {
-		log.Fatalf("[scylladb_1] NewScyllaFromEnv failed: %v", err)
+		log.Fatalf("[scylladb] NewScyllaFromEnv failed: %v", err)
 	}
 	defer cleanup()
 
-	log.Printf("[scylladb_1] == Creating ScyllaDB schemas ==")
+	log.Printf("[scylladb] == Creating ScyllaDB schemas ==")
 
-	// We keep replication/KS setup outside this function; here we only manage tables.
-	queries := []string{
-		// Core entities
-		`CREATE TABLE IF NOT EXISTS organizations (
-			org_id int,
-			PRIMARY KEY (org_id)
-		)`,
-		`CREATE TABLE IF NOT EXISTS users (
-			user_id int,
-			org_id int,
-			PRIMARY KEY (user_id)
-		)`,
-		`CREATE TABLE IF NOT EXISTS groups (
-			group_id int,
-			org_id int,
-			PRIMARY KEY (group_id)
-		)`,
+	// Read schemas from schemas.cql file
+	schemaFile := "cmd/scylladb/schemas.cql"
+	content, err := os.ReadFile(schemaFile)
+	if err != nil {
+		log.Fatalf("[scylladb] read schemas.cql failed: %v", err)
+	}
 
-		// Memberships
-		`CREATE TABLE IF NOT EXISTS org_memberships (
-			org_id int,
-			user_id int,
-			role text,
-			PRIMARY KEY (org_id, user_id, role)
-		)`,
-		`CREATE TABLE IF NOT EXISTS group_memberships (
-			user_id int,
-			group_id int,
-			role text,
-			PRIMARY KEY (user_id, group_id)
-		)`,
+	// Parse CQL statements (split by semicolon and filter out comments)
+	lines := strings.Split(string(content), "\n")
+	var currentStatement strings.Builder
+	queries := []string{}
 
-		// Resources
-		`CREATE TABLE IF NOT EXISTS resources (
-			resource_id int,
-			org_id int,
-			PRIMARY KEY (resource_id)
-		)`,
+	for _, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		// Skip empty lines and comment lines
+		if trimmedLine == "" || strings.HasPrefix(trimmedLine, "--") {
+			continue
+		}
 
-		// Direct ACL graph (Zanzibar-style edges, denormalized for both directions)
-		`CREATE TABLE IF NOT EXISTS resource_acl_by_resource (
-			resource_id int,
-			relation text,
-			subject_type text,
-			subject_id int,
-			PRIMARY KEY ((resource_id), relation, subject_type, subject_id)
-		)`,
-		`CREATE TABLE IF NOT EXISTS resource_acl_by_subject (
-			subject_type text,
-			subject_id int,
-			relation text,
-			resource_id int,
-			PRIMARY KEY ((subject_type, subject_id), relation, resource_id)
-		)`,
+		// Append line to current statement
+		currentStatement.WriteString(line)
+		currentStatement.WriteString("\n")
 
-		// Fully compiled permissions closure
-		`CREATE TABLE IF NOT EXISTS user_resource_perms_by_user (
-			user_id int,
-			resource_id int,
-			can_manage boolean,
-			can_view boolean,
-			PRIMARY KEY ((user_id), resource_id)
-		)`,
-		`CREATE TABLE IF NOT EXISTS user_resource_perms_by_resource (
-			resource_id int,
-			user_id int,
-			can_manage boolean,
-			can_view boolean,
-			PRIMARY KEY ((resource_id), user_id)
-		)`,
+		// If line ends with semicolon, we have a complete statement
+		if strings.HasSuffix(trimmedLine, ";") {
+			stmt := strings.TrimSpace(currentStatement.String())
+			stmt = strings.TrimSuffix(stmt, ";")
+			stmt = strings.TrimSpace(stmt)
+			if stmt != "" {
+				queries = append(queries, stmt)
+			}
+			currentStatement.Reset()
+		}
 	}
 
 	for _, q := range queries {
 		ctxTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
 		if err := session.Query(q).WithContext(ctxTimeout).Exec(); err != nil {
 			cancel()
-			log.Fatalf("[scylladb_1] create_schemas: exec failed for %q: %v", q, err)
+			log.Fatalf("[scylladb] create_schemas: exec failed for query: %v\n%s", err, q)
 		}
 		cancel()
 	}
 
-	log.Printf("[scylladb_1] ScyllaDB schemas created successfully.")
+	log.Printf("[scylladb] ScyllaDB schemas created successfully.")
 }

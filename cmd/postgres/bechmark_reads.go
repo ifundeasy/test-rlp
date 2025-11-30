@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"math/rand"
 	"os"
 	"time"
 
@@ -23,8 +24,8 @@ type benchDataset struct {
 	orgAdminPairs      []benchPair // resource + org admin user
 	groupViewPairs     []benchPair // resource + user via viewer_group + group_membership
 
-	heavyManageUser string // user with many "manage" resources
-	regularViewUser string // user with many "view" resources (preferably not heavyManageUser)
+	heavyManageUser string // user used for "manage" lookup benchmarks
+	regularViewUser string // user used for "view" lookup benchmarks
 }
 
 // PostgresBenchmarkReads runs several read benchmarks against the current dataset.
@@ -55,139 +56,31 @@ func PostgresBenchmarkReads() {
 // Dataset loading from DB   //
 ///////////////////////////////
 
+// loadBenchDataset builds the benchmark dataset for Postgres.
+// It mirrors the Authzed benchmark behavior:
+//   - build sample pairs for direct manager, org admin, and group-based view
+//   - choose heavy/regular users from environment variables, or fall back
+//     to random users drawn from the sampled pairs
+//
+// It avoids global "weight" maps (manageCount/viewCount) and does not
+// attempt to reconstruct the full permission graph in memory.
 func loadBenchDataset(db *sql.DB) *benchDataset {
 	start := time.Now()
 	ctx := context.Background()
 
-	// org-level
-	orgAdmins := make(map[string][]string)  // org_id -> []user_id (role=admin)
-	orgMembers := make(map[string][]string) // org_id -> []user_id (all roles)
+	var directManagerPairs []benchPair
+	var orgAdminPairs []benchPair
+	var groupViewPairs []benchPair
 
-	// groups & memberships
-	groupMembers := make(map[string][]string) // group_id -> []user_id
-	groupOrg := make(map[string]string)       // group_id -> org_id
+	// For org admin sampling we need a mapping from resource -> org
+	// and from org -> admin users.
+	resourceOrg := make(map[string]string)    // resource_id -> org_id
+	var resourceIDs []string                  // the list of all resources
+	orgAdmins := make(map[string][]string)    // org_id -> []user_id (role=admin)
+	groupMembers := make(map[string][]string) // group_id -> []user_id (group membership)
+	groupSampleIndex := make(map[string]int)  // group_id -> round-robin index for sampling
 
-	// resources
-	resOrg := make(map[string]string) // resource_id -> org_id
-	orgResourceCount := make(map[string]int)
-	var resourceIDs []string
-
-	// user permission "weight"
-	manageCount := make(map[string]int) // how many resources user can manage
-	viewCount := make(map[string]int)   // how many resources user can view
-
-	// 1) org_memberships: org_id,user_id,role
-	{
-		rows, err := db.QueryContext(ctx, `
-			SELECT org_id, user_id, role
-			FROM org_memberships
-		`)
-		if err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: query org_memberships: %v", err)
-		}
-		for rows.Next() {
-			var orgID, userID, role string
-			if err := rows.Scan(&orgID, &userID, &role); err != nil {
-				rows.Close()
-				log.Fatalf("[postgres] loadBenchDataset: scan org_memberships: %v", err)
-			}
-			orgMembers[orgID] = append(orgMembers[orgID], userID)
-			if role == "admin" {
-				orgAdmins[orgID] = append(orgAdmins[orgID], userID)
-			}
-		}
-		if err := rows.Err(); err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: rows org_memberships: %v", err)
-		}
-		rows.Close()
-	}
-
-	// 2) group_memberships: group_id,user_id,role
-	{
-		rows, err := db.QueryContext(ctx, `
-			SELECT group_id, user_id, role
-			FROM group_memberships
-		`)
-		if err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: query group_memberships: %v", err)
-		}
-		for rows.Next() {
-			var groupID, userID, role string
-			if err := rows.Scan(&groupID, &userID, &role); err != nil {
-				rows.Close()
-				log.Fatalf("[postgres] loadBenchDataset: scan group_memberships: %v", err)
-			}
-			_ = role // member/admin -> both counted via group membership
-			groupMembers[groupID] = append(groupMembers[groupID], userID)
-		}
-		if err := rows.Err(); err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: rows group_memberships: %v", err)
-		}
-		rows.Close()
-	}
-
-	// 3) groups: group_id,org_id -> org.member_group (in schema) via usergroup#member
-	{
-		rows, err := db.QueryContext(ctx, `
-			SELECT group_id, org_id
-			FROM groups
-		`)
-		if err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: query groups: %v", err)
-		}
-		for rows.Next() {
-			// 2b) group_hierarchy: parent_group_id,child_group_id,relation
-			// build parent -> children maps for member_group and manager_group
-			memberChildren := make(map[string][]string)
-			managerChildren := make(map[string][]string)
-			{
-				rows, err := db.QueryContext(ctx, `
-			SELECT parent_group_id, child_group_id, relation
-			FROM group_hierarchy
-		`)
-				if err != nil {
-					// If table missing or empty, continue without nested groups
-					if err == sql.ErrNoRows {
-						// no-op
-					} else {
-						log.Fatalf("[postgres] loadBenchDataset: query group_hierarchy: %v", err)
-					}
-				} else {
-					for rows.Next() {
-						var parent, child, relation string
-						if err := rows.Scan(&parent, &child, &relation); err != nil {
-							rows.Close()
-							log.Fatalf("[postgres] loadBenchDataset: scan group_hierarchy: %v", err)
-						}
-						switch relation {
-						case "member_group":
-							memberChildren[parent] = append(memberChildren[parent], child)
-						case "manager_group":
-							managerChildren[parent] = append(managerChildren[parent], child)
-						default:
-							// ignore unknown relations
-						}
-					}
-					if err := rows.Err(); err != nil {
-						log.Fatalf("[postgres] loadBenchDataset: rows group_hierarchy: %v", err)
-					}
-					rows.Close()
-				}
-			}
-			var groupID, orgID string
-			if err := rows.Scan(&groupID, &orgID); err != nil {
-				rows.Close()
-				log.Fatalf("[postgres] loadBenchDataset: scan groups: %v", err)
-			}
-			groupOrg[groupID] = orgID
-		}
-		if err := rows.Err(); err != nil {
-			log.Fatalf("[postgres] loadBenchDataset: rows groups: %v", err)
-		}
-		rows.Close()
-	}
-
-	// 4) resources: resource_id,org_id
+	// 1) Load resource -> org mapping.
 	{
 		rows, err := db.QueryContext(ctx, `
 			SELECT resource_id, org_id
@@ -196,65 +89,69 @@ func loadBenchDataset(db *sql.DB) *benchDataset {
 		if err != nil {
 			log.Fatalf("[postgres] loadBenchDataset: query resources: %v", err)
 		}
+		defer rows.Close()
+
 		for rows.Next() {
 			var resID, orgID string
 			if err := rows.Scan(&resID, &orgID); err != nil {
-				rows.Close()
 				log.Fatalf("[postgres] loadBenchDataset: scan resources: %v", err)
 			}
-			resOrg[resID] = orgID
-			orgResourceCount[orgID]++
+			resourceOrg[resID] = orgID
 			resourceIDs = append(resourceIDs, resID)
 		}
 		if err := rows.Err(); err != nil {
 			log.Fatalf("[postgres] loadBenchDataset: rows resources: %v", err)
 		}
-		rows.Close()
 	}
 
-	// 5) org->admin contributes to manage (manage += all resources in org)
-	for orgID, admins := range orgAdmins {
-		cnt := orgResourceCount[orgID]
-		if cnt == 0 {
-			continue
+	// 2) Load org admin users (role='admin').
+	{
+		rows, err := db.QueryContext(ctx, `
+			SELECT org_id, user_id
+			FROM org_memberships
+			WHERE role = 'admin'
+		`)
+		if err != nil {
+			log.Fatalf("[postgres] loadBenchDataset: query org_memberships: %v", err)
 		}
-		for _, u := range admins {
-			manageCount[u] += cnt
-		}
-	}
+		defer rows.Close()
 
-	// 6) org->member contributes to view:
-	// org.member = member_user + member_group + admin
-	// - member_user/admin_user: org_members
-	// - member_group: groupOrg + groupMembers
-	for orgID, members := range orgMembers {
-		cnt := orgResourceCount[orgID]
-		if cnt == 0 {
-			continue
+		for rows.Next() {
+			var orgID, userID string
+			if err := rows.Scan(&orgID, &userID); err != nil {
+				log.Fatalf("[postgres] loadBenchDataset: scan org_memberships: %v", err)
+			}
+			orgAdmins[orgID] = append(orgAdmins[orgID], userID)
 		}
-		for _, u := range members {
-			viewCount[u] += cnt
-		}
-	}
-	for groupID, members := range groupMembers {
-		orgID, ok := groupOrg[groupID]
-		if !ok {
-			continue
-		}
-		cnt := orgResourceCount[orgID]
-		if cnt == 0 {
-			continue
-		}
-		for _, u := range members {
-			viewCount[u] += cnt
+		if err := rows.Err(); err != nil {
+			log.Fatalf("[postgres] loadBenchDataset: rows org_memberships: %v", err)
 		}
 	}
 
-	// 7) resource_acl -> manage & view & sample pairs
-	var directManagerPairs []benchPair
-	var groupViewPairs []benchPair
-	groupSampleIndex := make(map[string]int)
+	// 3) Load group memberships.
+	{
+		rows, err := db.QueryContext(ctx, `
+			SELECT group_id, user_id
+			FROM group_memberships
+		`)
+		if err != nil {
+			log.Fatalf("[postgres] loadBenchDataset: query group_memberships: %v", err)
+		}
+		defer rows.Close()
 
+		for rows.Next() {
+			var groupID, userID string
+			if err := rows.Scan(&groupID, &userID); err != nil {
+				log.Fatalf("[postgres] loadBenchDataset: scan group_memberships: %v", err)
+			}
+			groupMembers[groupID] = append(groupMembers[groupID], userID)
+		}
+		if err := rows.Err(); err != nil {
+			log.Fatalf("[postgres] loadBenchDataset: rows group_memberships: %v", err)
+		}
+	}
+
+	// 4) Build direct manager and group view pairs from resource_acl.
 	{
 		rows, err := db.QueryContext(ctx, `
 			SELECT resource_id, subject_type, subject_id, relation
@@ -263,76 +160,56 @@ func loadBenchDataset(db *sql.DB) *benchDataset {
 		if err != nil {
 			log.Fatalf("[postgres] loadBenchDataset: query resource_acl: %v", err)
 		}
+		defer rows.Close()
+
 		for rows.Next() {
 			var resID, subjectType, subjectID, relation string
 			if err := rows.Scan(&resID, &subjectType, &subjectID, &relation); err != nil {
-				rows.Close()
 				log.Fatalf("[postgres] loadBenchDataset: scan resource_acl: %v", err)
 			}
 
 			switch subjectType {
 			case "user":
-				switch relation {
-				case "manager":
-					// resource.manager_user
+				// Direct manager edges become directManagerPairs.
+				if relation == "manager" {
 					directManagerPairs = append(directManagerPairs, benchPair{
 						ResourceID: resID,
 						UserID:     subjectID,
 					})
-					manageCount[subjectID]++
-				case "viewer":
-					// resource.viewer_user
-					viewCount[subjectID]++
-				default:
-					// ignore
 				}
-
+				// viewer_user edges are not needed for sampling; they are
+				// still covered by the lookup queries themselves.
 			case "group":
-				members := groupMembers[subjectID]
-				if len(members) == 0 {
-					continue
-				}
-				switch relation {
-				case "manager":
-					for _, u := range members {
-						manageCount[u]++
+				// For viewer_group, we sample one effective member from the group.
+				if relation == "viewer" {
+					members := groupMembers[subjectID]
+					if len(members) == 0 {
+						continue
 					}
-				case "viewer":
-					for _, u := range members {
-						viewCount[u]++
-					}
-					// one sample per (group,resource) for bench view-via-group
 					idx := groupSampleIndex[subjectID] % len(members)
 					groupSampleIndex[subjectID]++
 					userID := members[idx]
+
 					groupViewPairs = append(groupViewPairs, benchPair{
 						ResourceID: resID,
 						UserID:     userID,
 					})
-				default:
-					// ignore
 				}
+				// manager_group edges are processed in the DB query for lookups,
+				// not needed for sampling here.
 			default:
-				// ignore
+				// ignore unknown subject_type
 			}
 		}
 		if err := rows.Err(); err != nil {
 			log.Fatalf("[postgres] loadBenchDataset: rows resource_acl: %v", err)
 		}
-		rows.Close()
 	}
 
-	// 8) propagate manage -> view (schema: view includes manage)
-	for userID, mc := range manageCount {
-		viewCount[userID] += mc
-	}
-
-	// 9) Build orgAdminPairs: one admin per resource
-	var orgAdminPairs []benchPair
+	// 5) Build orgAdminPairs: one admin per resource (round-robin per org).
 	adminRoundRobin := make(map[string]int)
-
 	for _, resID := range resourceIDs {
-		orgID := resOrg[resID]
+		orgID := resourceOrg[resID]
 		admins := orgAdmins[orgID]
 		if len(admins) == 0 {
 			continue
@@ -347,37 +224,44 @@ func loadBenchDataset(db *sql.DB) *benchDataset {
 		})
 	}
 
-	// 10) heavyManageUser & regularViewUser
-	var heavyManageUser string
-	maxManage := 0
-	for userID, c := range manageCount {
-		if c > maxManage {
-			maxManage = c
-			heavyManageUser = userID
+	// 6) Select heavyManageUser & regularViewUser.
+	//    Behavior:
+	//      - If env vars are set, they win.
+	//      - Else choose random users from the sampled pairs.
+	rand.Seed(time.Now().UnixNano())
+
+	heavyManageUser := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER")
+	if heavyManageUser == "" && len(directManagerPairs) > 0 {
+		idx := rand.Intn(len(directManagerPairs))
+		heavyManageUser = directManagerPairs[idx].UserID
+	}
+
+	regularViewUser := os.Getenv("BENCH_LOOKUPRES_VIEW_USER")
+	if regularViewUser == "" && len(groupViewPairs) > 0 {
+		// Try to pick a different user from heavyManageUser if possible.
+		candidates := make([]string, 0, len(groupViewPairs))
+		for _, p := range groupViewPairs {
+			if p.UserID == heavyManageUser {
+				continue
+			}
+			candidates = append(candidates, p.UserID)
+		}
+		if len(candidates) == 0 {
+			// Fall back to any user from groupViewPairs.
+			idx := rand.Intn(len(groupViewPairs))
+			regularViewUser = groupViewPairs[idx].UserID
+		} else {
+			idx := rand.Intn(len(candidates))
+			regularViewUser = candidates[idx]
 		}
 	}
 
-	var regularViewUser string
-	maxView := 0
-	for userID, c := range viewCount {
-		if userID == heavyManageUser {
-			continue
-		}
-		if c > maxView {
-			maxView = c
-			regularViewUser = userID
-		}
+	// Safety: if one of them is still empty but the other is set, reuse it.
+	if heavyManageUser == "" && regularViewUser != "" {
+		heavyManageUser = regularViewUser
 	}
-	if regularViewUser == "" {
+	if regularViewUser == "" && heavyManageUser != "" {
 		regularViewUser = heavyManageUser
-	}
-
-	// Allow override via env
-	if v := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER"); v != "" {
-		heavyManageUser = v
-	}
-	if v := os.Getenv("BENCH_LOOKUPRES_VIEW_USER"); v != "" {
-		regularViewUser = v
 	}
 
 	elapsed := time.Since(start).Truncate(time.Millisecond)

@@ -567,7 +567,7 @@ func CockroachdbCreateData() {
 			count++
 			rowsInTxn++
 
-			if count%50000 == 0 {
+			if count%resourceACLBatch == 0 {
 				log.Printf("[cockroachdb] ... resource_acl progress: %d rows", count)
 			}
 

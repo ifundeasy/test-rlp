@@ -1,4 +1,4 @@
-package scylladb_1
+package scylladb
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"test-tls/infrastructure"
 )
 
-// ScylladbDropSchemas drops all tables used by the scylladb_1 benchmarks.
+// ScylladbDropSchemas drops all tables used by the scylladb benchmarks.
 //
 // It does NOT drop the keyspace itself, only the benchmark tables created in
 // ScylladbCreateSchemas so the command is safe to re-run.
@@ -17,11 +17,11 @@ func ScylladbDropSchemas() {
 
 	session, cleanup, err := infrastructure.NewScyllaFromEnv(ctx)
 	if err != nil {
-		log.Fatalf("[scylladb_1] failed to create scylla session: %v", err)
+		log.Fatalf("[scylladb] failed to create scylla session: %v", err)
 	}
 	defer cleanup()
 
-	log.Printf("[scylladb_1] == Dropping ScyllaDB tables for benchmarks ==")
+	log.Printf("[scylladb] == Dropping ScyllaDB tables for benchmarks ==")
 
 	// Keep this list in sync with ScylladbCreateSchemas.
 	tables := []string{
@@ -43,12 +43,12 @@ func ScylladbDropSchemas() {
 		dropCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
 		if err := session.Query(cql).WithContext(dropCtx).Exec(); err != nil {
 			cancel()
-			log.Fatalf("[scylladb_1] DropTable %s failed: %v", tbl, err)
+			log.Fatalf("[scylladb] DropTable %s failed: %v", tbl, err)
 		}
 		cancel()
 
-		log.Printf("[scylladb_1] Dropped table: %s", tbl)
+		log.Printf("[scylladb] Dropped table: %s", tbl)
 	}
 
-	log.Printf("[scylladb_1] ScyllaDB benchmark tables drop DONE")
+	log.Printf("[scylladb] ScyllaDB benchmark tables drop DONE")
 }
