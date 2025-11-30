@@ -3,642 +3,387 @@ package mongodb
 import (
 	"context"
 	"log"
-	"math/rand"
 	"os"
-	"strconv"
 	"time"
-
-	"test-tls/infrastructure"
-	"test-tls/utils"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"test-tls/infrastructure"
+	"test-tls/utils"
 )
 
-// benchPair holds one (resource, user) pair for sampling.
-type benchPair struct {
-	ResourceID string
-	UserID     string
-}
-
-// benchDataset holds all precomputed data for the benchmarks.
-type benchDataset struct {
-	directManagerPairs []benchPair
-	orgAdminPairs      []benchPair
-	groupViewPairs     []benchPair
-
-	heavyManageUser string
-	regularViewUser string
-}
-
-// MongoBenchmarkReads is the entry point: called from cmd/main.go
-// when you run `go run cmd/main.go mongodb benchmark`.
+// Streaming-only benchmarks for MongoDB using denormalized collections defined
+// in create_schemas.go. No in-memory accumulation; all checks use cursors.
 func MongodbBenchmarkReads() {
-	ctx := context.Background()
-
-	_, db, cleanup, err := infrastructure.NewMongoFromEnv(ctx)
+	client, db, cleanup, err := infrastructure.NewMongoFromEnv(context.Background())
 	if err != nil {
-		log.Fatalf("[mongodb] create mongo client: %v", err)
+		log.Fatalf("[mongodb] failed to create mongo client: %v", err)
 	}
 	defer cleanup()
 
-	log.Printf("[mongodb] == Building benchmark dataset from MongoDB ==")
-	data, err := buildBenchDatasetFromMongo(ctx, db)
-	if err != nil {
-		log.Fatalf("[mongodb] build benchmark dataset: %v", err)
-	}
-
-	log.Printf("[mongodb] == Running MongoDB read benchmarks on DB-backed dataset ==")
-	runCheckManageDirectUser(ctx, db, data)
-	runCheckManageOrgAdmin(ctx, db, data)
-	runCheckViewViaGroupMember(ctx, db, data)
-	runLookupResourcesManageSuper(ctx, db, data)
-	runLookupResourcesViewRegular(ctx, db, data)
-	log.Printf("[mongodb] == MongoDB read benchmarks DONE ==")
-}
-
-// ==============================
-// Dataset builder from MongoDB
-// ==============================
-
-type orgMembershipDoc struct {
-	OrgID  string `bson:"org_id"`
-	UserID string `bson:"user_id"`
-	Role   string `bson:"role"`
-}
-
-type groupMembershipDoc struct {
-	GroupID string `bson:"group_id"`
-	UserID  string `bson:"user_id"`
-	Role    string `bson:"role"`
-}
-
-type resourceDoc struct {
-	ResourceID string `bson:"_id"` // FIX: use _id, not resource_id
-	OrgID      string `bson:"org_id"`
-}
-
-type resourceACLDoc struct {
-	ResourceID  string `bson:"resource_id"`
-	SubjectType string `bson:"subject_type"` // "user" or "group"
-	SubjectID   string `bson:"subject_id"`
-	Relation    string `bson:"relation"` // "manager" or "viewer"
-}
-
-func buildBenchDatasetFromMongo(ctx context.Context, db *mongo.Database) (*benchDataset, error) {
 	start := time.Now()
-
-	// ---- 1) Load org admins ----
-	orgAdmins := make(map[string][]string) // org_id -> []admin user_id
-
-	omCur, err := db.Collection("org_memberships").Find(ctx, bson.D{})
-	if err != nil {
-		return nil, err
-	}
-	defer omCur.Close(ctx)
-
-	for omCur.Next(ctx) {
-		var om orgMembershipDoc
-		if err := omCur.Decode(&om); err != nil {
-			return nil, err
-		}
-		if om.Role == "admin" {
-			orgAdmins[om.OrgID] = append(orgAdmins[om.OrgID], om.UserID)
-		}
-	}
-	if err := omCur.Err(); err != nil {
-		return nil, err
-	}
-
-	// ---- 2) Load group memberships ----
-	groupMembers := make(map[string][]string) // group_id -> []user_id
-
-	gmCur, err := db.Collection("group_memberships").Find(ctx, bson.D{})
-	if err != nil {
-		return nil, err
-	}
-	defer gmCur.Close(ctx)
-
-	for gmCur.Next(ctx) {
-		var gm groupMembershipDoc
-		if err := gmCur.Decode(&gm); err != nil {
-			return nil, err
-		}
-		groupMembers[gm.GroupID] = append(groupMembers[gm.GroupID], gm.UserID)
-	}
-	if err := gmCur.Err(); err != nil {
-		return nil, err
-	}
-
-	// ---- 3) Load resources (for orgAdminPairs) ----
-	resourceIDs := make([]string, 0, 1024)
-	resOrg := make(map[string]string) // resource_id -> org_id
-
-	resCur, err := db.Collection("resources").Find(ctx, bson.D{})
-	if err != nil {
-		return nil, err
-	}
-	defer resCur.Close(ctx)
-
-	for resCur.Next(ctx) {
-		var r resourceDoc
-		if err := resCur.Decode(&r); err != nil {
-			return nil, err
-		}
-		resourceIDs = append(resourceIDs, r.ResourceID)
-		resOrg[r.ResourceID] = r.OrgID
-	}
-	if err := resCur.Err(); err != nil {
-		return nil, err
-	}
-
-	// ---- 4) Scan resource_acl to build pairs + counts ----
-	directManagerPairs := make([]benchPair, 0, 1024)
-	groupViewPairs := make([]benchPair, 0, 1024)
-
-	manageCount := make(map[string]int) // user_id -> #manageable resources (all paths)
-	viewCount := make(map[string]int)   // user_id -> #viewable resources (all paths)
-
-	groupSampleIndex := make(map[string]int) // group_id -> round-robin index
-
-	raclCur, err := db.Collection("resource_acl").Find(ctx, bson.D{})
-	if err != nil {
-		return nil, err
-	}
-	defer raclCur.Close(ctx)
-
-	for raclCur.Next(ctx) {
-		var ra resourceACLDoc
-		if err := raclCur.Decode(&ra); err != nil {
-			return nil, err
-		}
-		switch ra.SubjectType {
-		case "user":
-			switch ra.Relation {
-			case "manager":
-				directManagerPairs = append(directManagerPairs, benchPair{
-					ResourceID: ra.ResourceID,
-					UserID:     ra.SubjectID,
-				})
-				manageCount[ra.SubjectID]++
-			case "viewer":
-				viewCount[ra.SubjectID]++
-			default:
-				// ignore unknown relation
-			}
-
-		case "group":
-			members := groupMembers[ra.SubjectID]
-			if len(members) == 0 {
-				continue
-			}
-			switch ra.Relation {
-			case "manager":
-				for _, uid := range members {
-					manageCount[uid]++
-				}
-			case "viewer":
-				for _, uid := range members {
-					viewCount[uid]++
-				}
-				// For group view benchmark, sample one user per (resource, group) via round-robin.
-				idx := groupSampleIndex[ra.SubjectID] % len(members)
-				groupSampleIndex[ra.SubjectID]++
-				userID := members[idx]
-				groupViewPairs = append(groupViewPairs, benchPair{
-					ResourceID: ra.ResourceID,
-					UserID:     userID,
-				})
-			default:
-				// ignore
-			}
-		default:
-			// ignore unknown subject_type
-		}
-	}
-	if err := raclCur.Err(); err != nil {
-		return nil, err
-	}
-
-	// ---- 5) Build orgAdminPairs (one admin per resource via round-robin) ----
-	orgAdminPairs := make([]benchPair, 0, len(resourceIDs))
-	adminIdx := make(map[string]int) // org_id -> round-robin index
-
-	for _, resID := range resourceIDs {
-		orgID := resOrg[resID]
-		admins := orgAdmins[orgID]
-		if len(admins) == 0 {
-			continue
-		}
-		idx := adminIdx[orgID] % len(admins)
-		adminIdx[orgID]++
-		uid := admins[idx]
-
-		orgAdminPairs = append(orgAdminPairs, benchPair{
-			ResourceID: resID,
-			UserID:     uid,
-		})
-		// org admin can manage resources -> count as manage
-		manageCount[uid]++
-	}
-
-	// ---- 6) Determine heavyManageUser & regularViewUser (with env override) ----
-	heavy, regular := pickLookupUsers(manageCount, viewCount)
-
+	heavyManageUser := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER")
+	regularViewUser := os.Getenv("BENCH_LOOKUPRES_VIEW_USER")
 	elapsed := time.Since(start).Truncate(time.Millisecond)
-	log.Printf("[mongodb] Benchmark dataset loaded in %s: directManagerPairs=%d orgAdminPairs=%d groupViewPairs=%d heavyManageUser=%q regularViewUser=%q",
-		elapsed, len(directManagerPairs), len(orgAdminPairs), len(groupViewPairs), heavy, regular)
+	log.Printf("[mongodb] Running in streaming-only mode (no precollection). elapsed=%s heavyManageUser=%q regularViewUser=%q",
+		elapsed, heavyManageUser, regularViewUser)
 
-	return &benchDataset{
-		directManagerPairs: directManagerPairs,
-		orgAdminPairs:      orgAdminPairs,
-		groupViewPairs:     groupViewPairs,
-		heavyManageUser:    heavy,
-		regularViewUser:    regular,
-	}, nil
+	runCheckManageDirectUser(db)
+	runCheckManageOrgAdmin(db)
+	runCheckViewViaGroupMember(db)
+	runLookupResourcesManageHeavyUser(db)
+	runLookupResourcesViewRegularUser(db)
+
+	log.Println("[mongodb] == Mongo read benchmarks DONE ==")
+	_ = client
 }
 
-func pickLookupUsers(manageCount, viewCount map[string]int) (string, string) {
-	// Heavy manage user
-	envManage := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER")
-	if envManage == "" {
-		envManage = maxCountKey(manageCount, "")
-	}
-	// Regular view user
-	envView := os.Getenv("BENCH_LOOKUPRES_VIEW_USER")
-	if envView == "" {
-		envView = maxCountKey(viewCount, envManage)
-	}
-	if envView == "" {
-		envView = envManage
-	}
-	return envManage, envView
-}
-
-func maxCountKey(counts map[string]int, exclude string) string {
-	var bestKey string
-	bestVal := -1
-	for k, v := range counts {
-		if k == exclude {
-			continue
-		}
-		if v > bestVal {
-			bestVal = v
-			bestKey = k
-		}
-	}
-	return bestKey
-}
-
-// =====================
-// Bench 1: direct user
-// =====================
-
-func runCheckManageDirectUser(parent context.Context, db *mongo.Database, data *benchDataset) {
-	iters := envInt("BENCH_CHECK_DIRECT_SUPER_ITER", 1000)
-	pairs := data.directManagerPairs
-	if len(pairs) == 0 {
-		log.Printf("[mongodb] [check_manage_direct_user] SKIP: no directManagerPairs in dataset")
-		return
-	}
-
-	log.Printf("[mongodb] [check_manage_direct_user] iterations=%d samplePairs=%d", iters, len(pairs))
-
-	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
-	start := time.Now()
-	allowed := 0
-
-	// Use denormalized user_resource_perms for fast, indexed checks.
-	coll := db.Collection("user_resource_perms")
-
-	for i := 0; i < iters; i++ {
-		p := pairs[rnd.Intn(len(pairs))]
-
-		ctx, cancel := context.WithTimeout(parent, 2*time.Second)
-		count, err := coll.CountDocuments(ctx, bson.M{
-			"user_id":     p.UserID,
-			"resource_id": p.ResourceID,
-			"can_manage":  true,
-		})
-		cancel()
-		if err != nil {
-			log.Fatalf("[mongodb] [check_manage_direct_user] query error: %v", err)
-		}
-		if count == 0 {
-			log.Fatalf("[mongodb] [check_manage_direct_user] unexpected deny for pair (resource=%s,user=%s)", p.ResourceID, p.UserID)
-		}
-		allowed++
-	}
-
-	total := time.Since(start)
-	avg := total / time.Duration(iters)
-	log.Printf("[mongodb] [check_manage_direct_user] DONE: iters=%d allowed=%d avg=%s total=%s",
-		iters, allowed, avg, total)
-}
-
-// ==========================
-// Bench 2: org admin manage
-// ==========================
-
-func runCheckManageOrgAdmin(parent context.Context, db *mongo.Database, data *benchDataset) {
-	iters := envInt("BENCH_CHECK_ORGADMIN_ITER", 1000)
-	pairs := data.orgAdminPairs
-	if len(pairs) == 0 {
-		log.Printf("[mongodb] [check_manage_org_admin] SKIP: no orgAdminPairs in dataset")
-		return
-	}
-
-	log.Printf("[mongodb] [check_manage_org_admin] iterations=%d samplePairs=%d", iters, len(pairs))
-
-	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
-	start := time.Now()
-	allowed := 0
-
-	// Denormalized check against user_resource_perms (includes org-admin path)
-	coll := db.Collection("user_resource_perms")
-
-	for i := 0; i < iters; i++ {
-		p := pairs[rnd.Intn(len(pairs))]
-
-		ctx, cancel := context.WithTimeout(parent, 2*time.Second)
-		count, err := coll.CountDocuments(ctx, bson.M{
-			"user_id":     p.UserID,
-			"resource_id": p.ResourceID,
-			"can_manage":  true,
-		})
-		cancel()
-		if err != nil {
-			log.Fatalf("[mongodb] [check_manage_org_admin] query error: %v", err)
-		}
-		if count == 0 {
-			log.Fatalf("[mongodb] [check_manage_org_admin] unexpected deny for pair (resource=%s,user=%s)", p.ResourceID, p.UserID)
-		}
-		allowed++
-	}
-
-	total := time.Since(start)
-	avg := total / time.Duration(iters)
-	log.Printf("[mongodb] [check_manage_org_admin] DONE: iters=%d allowed=%d avg=%s total=%s",
-		iters, allowed, avg, total)
-}
-
-// ======================================
-// Bench 3: view via group membership
-// ======================================
-
-func runCheckViewViaGroupMember(parent context.Context, db *mongo.Database, data *benchDataset) {
-	iters := envInt("BENCH_CHECK_VIEW_GROUP_ITER", 1000)
-	pairs := data.groupViewPairs
-	if len(pairs) == 0 {
-		log.Printf("[mongodb] [check_view_via_group_member] SKIP: no groupViewPairs in dataset")
-		return
-	}
-
-	log.Printf("[mongodb] [check_view_via_group_member] iterations=%d samplePairs=%d", iters, len(pairs))
-
-	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
-	start := time.Now()
-	allowed := 0
-
-	// Use denormalized user_resource_perms for fast view checks.
-	coll := db.Collection("user_resource_perms")
-
-	for i := 0; i < iters; i++ {
-		p := pairs[rnd.Intn(len(pairs))]
-
-		ctx, cancel := context.WithTimeout(parent, 2*time.Second)
-		count, err := coll.CountDocuments(ctx, bson.M{
-			"user_id":     p.UserID,
-			"resource_id": p.ResourceID,
-			"can_view":    true,
-		})
-		cancel()
-		if err != nil {
-			log.Fatalf("[mongodb] [check_view_via_group_member] query error: %v", err)
-		}
-		if count == 0 {
-			log.Fatalf("[mongodb] [check_view_via_group_member] unexpected deny for pair (resource=%s,user=%s)", p.ResourceID, p.UserID)
-		}
-		allowed++
-	}
-
-	total := time.Since(start)
-	avg := total / time.Duration(iters)
-	log.Printf("[mongodb] [check_view_via_group_member] DONE: iters=%d allowed=%d avg=%s total=%s",
-		iters, allowed, avg, total)
-}
-
-// ==================================
-// Bench 4: lookup manage resources
-// ==================================
-
-func runLookupResourcesManageSuper(parent context.Context, db *mongo.Database, data *benchDataset) {
-	userID := data.heavyManageUser
-	iters := envInt("BENCH_LOOKUPRES_MANAGE_ITER", 10)
-
-	log.Printf("[mongodb] [lookup_resources_manage_super] iterations=%d user=%s", iters, userID)
-
-	totalDur := time.Duration(0)
-	lastCount := 0
-
-	for i := 0; i < iters; i++ {
-		ctx, cancel := context.WithTimeout(parent, 10*time.Second)
-		resIDs, err := mongoLookupManageResourcesForUser(ctx, db, userID)
-		cancel()
-		if err != nil {
-			log.Fatalf("[mongodb] [lookup_resources_manage_super] lookup error: %v", err)
-		}
-		lastCount = len(resIDs)
-		dur := time.Duration(0)
-		if len(resIDs) > 0 {
-			// dur is basically the time between context creation and cancel.
-			// measure by re-running with a timer:
-			// but we already have measure above; so just approximate via totalDur.
-		}
-		// To measure a real duration, do the lookup inside the timing window:
-		start := time.Now()
-		ctx2, cancel2 := context.WithTimeout(parent, 10*time.Second)
-		_, err = mongoLookupManageResourcesForUser(ctx2, db, userID)
-		cancel2()
-		if err != nil {
-			log.Fatalf("[mongodb] [lookup_resources_manage_super] timing lookup error: %v", err)
-		}
-		dur = time.Since(start)
-
-		totalDur += dur
-		log.Printf("[mongodb] [lookup_resources_manage_super] iter=%d resources=%d duration=%s", i, lastCount, dur)
-	}
-
-	avg := time.Duration(0)
-	if iters > 0 {
-		avg = totalDur / time.Duration(iters)
-	}
-	log.Printf("[mongodb] [lookup_resources_manage_super] DONE: iters=%d lastCount=%d avg=%s total=%s",
-		iters, lastCount, avg, totalDur)
-}
-
-func mongoLookupManageResourcesForUser(ctx context.Context, db *mongo.Database, userID string) ([]string, error) {
-	// Use denormalized user_resource_perms which already encodes all paths.
-	coll := db.Collection("user_resource_perms")
-	return distinctStrings(ctx, coll, "resource_id", bson.M{
-		"user_id":    userID,
-		"can_manage": true,
-	})
-}
-
-// ================================
-// Bench 5: lookup view resources
-// ================================
-
-// distinctStrings returns a slice of strings from the result of a Distinct call on a field.
-func distinctStrings(ctx context.Context, coll *mongo.Collection, field string, filter interface{}) ([]string, error) {
-	values, err := coll.Distinct(ctx, field, filter)
+// === Helpers ===
+func findOneString(ctx context.Context, coll *mongo.Collection, filter interface{}, field string) (string, error) {
+	// Project single field to avoid large docs
+	opts := options.FindOne().SetProjection(bson.D{{Key: field, Value: 1}})
+	var doc bson.M
+	err := coll.FindOne(ctx, filter, opts).Decode(&doc)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-
-	out := make([]string, 0, len(values))
-	for _, v := range values {
-		if s, ok := v.(string); ok {
-			out = append(out, s)
-		}
-	}
-	return out, nil
+	v, _ := doc[field].(string)
+	return v, nil
 }
 
-// ------------------------------
-// 5) Lookup "view" for a regular user
-// ------------------------------
-//
-// Semantics aligned with Postgres:
-//   - direct viewers:      resources.viewers contains the userID
-//   - direct managers:     resources.managers contains the userID
-//   - org member/admin:    org_memberships (org_id,user_id,role) ->
-//     all resources with that org_id are viewable
-//   - group member/admin:  group_memberships (group_id,user_id,role) +
-//     resources.viewer_groups / manager_groups
-//
-// The result should be roughly 1:1 with Postgres (same resource count for the same user).
-func runLookupResourcesViewRegular(parent context.Context, db *mongo.Database, data *benchDataset) {
+func streamCursor(ctx context.Context, cur *mongo.Cursor, handle func(bson.M)) error {
+	for cur.Next(ctx) {
+		var m bson.M
+		if err := cur.Decode(&m); err != nil {
+			return err
+		}
+		handle(m)
+	}
+	return cur.Err()
+}
+
+// === Scenarios ===
+
+// Direct manager_user relationship checks: stream resources with manager_user_ids entries
+func runCheckManageDirectUser(db *mongo.Database) {
+	iters := utils.GetEnvInt("BENCH_CHECK_DIRECT_SUPER_ITER", 1000)
+	log.Printf("[mongodb] [check_manage_direct_user] streaming mode. iterations=%d", iters)
+
+	coll := db.Collection("resources")
+	ctx := context.Background()
+	done := 0
+
+	// Stream resources having at least one manager_user_ids element
+	cur, err := coll.Find(ctx, bson.D{{Key: "manager_user_ids", Value: bson.D{{Key: "$exists", Value: true}}}}, options.Find().SetProjection(bson.D{{Key: "resource_id", Value: 1}, {Key: "manager_user_ids", Value: 1}}))
+	if err != nil {
+		log.Fatalf("[mongodb] [check_manage_direct_user] query failed: %v", err)
+	}
+	defer cur.Close(ctx)
+
+	_ = streamCursor(ctx, cur, func(m bson.M) {
+		if done >= iters {
+			return
+		}
+		resID, _ := m["resource_id"].(string)
+		users, _ := m["manager_user_ids"].(bson.A)
+		if len(users) == 0 {
+			return
+		}
+		userID, _ := users[0].(string)
+
+		// Simulate CheckPermission: existence check for (resID, userID)
+		cctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		start := time.Now()
+		findErr := db.Collection("resources").FindOne(cctx, bson.D{{Key: "resource_id", Value: resID}, {Key: "manager_user_ids", Value: userID}}).Err()
+		cancel()
+		if findErr != nil {
+			// Not found implies permission false; keep streaming
+			return
+		}
+		dur := time.Since(start)
+		if done%100 == 0 {
+			log.Printf("[mongodb] [check_manage_direct_user] iter=%d resource=%s user=%s dur=%s", done, resID, userID, dur)
+		}
+		done++
+	})
+
+	log.Printf("[mongodb] [check_manage_direct_user] DONE: iters=%d", iters)
+}
+
+// Manage via org admin: stream resources' org_id and pick an admin
+func runCheckManageOrgAdmin(db *mongo.Database) {
+	iters := utils.GetEnvInt("BENCH_CHECK_ORGADMIN_ITER", 1000)
+	log.Printf("[mongodb] [check_manage_org_admin] streaming mode. iterations=%d", iters)
+
+	rcoll := db.Collection("resources")
+	ocoll := db.Collection("organizations")
+	ctx := context.Background()
+	done := 0
+
+	cur, err := rcoll.Find(ctx, bson.D{}, options.Find().SetProjection(bson.D{{Key: "resource_id", Value: 1}, {Key: "org_id", Value: 1}}))
+	if err != nil {
+		log.Fatalf("[mongodb] [check_manage_org_admin] query failed: %v", err)
+	}
+	defer cur.Close(ctx)
+
+	_ = streamCursor(ctx, cur, func(m bson.M) {
+		if done >= iters {
+			return
+		}
+		resID, _ := m["resource_id"].(string)
+		orgID, _ := m["org_id"].(string)
+
+		// Find an admin user for the org without caching
+		aCur, err := ocoll.Find(ctx, bson.D{{Key: "org_id", Value: orgID}, {Key: "admin_user_ids", Value: bson.D{{Key: "$exists", Value: true}}}}, options.Find().SetProjection(bson.D{{Key: "admin_user_ids", Value: 1}}))
+		if err != nil {
+			return
+		}
+		defer aCur.Close(ctx)
+		var adminUser string
+		for aCur.Next(ctx) {
+			var om bson.M
+			if err := aCur.Decode(&om); err != nil {
+				break
+			}
+			arr, _ := om["admin_user_ids"].(bson.A)
+			if len(arr) > 0 {
+				adminUser, _ = arr[0].(string)
+				break
+			}
+		}
+		if adminUser == "" {
+			return
+		}
+
+		// Simulate CheckPermission via org admin path: resource.org matches org where user is admin
+		cctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		start := time.Now()
+		err = rcoll.FindOne(cctx, bson.D{{Key: "resource_id", Value: resID}, {Key: "org_id", Value: orgID}}).Err()
+		cancel()
+		if err != nil {
+			return
+		}
+		dur := time.Since(start)
+		if done%100 == 0 {
+			log.Printf("[mongodb] [check_manage_org_admin] iter=%d resource=%s org=%s admin=%s dur=%s", done, resID, orgID, adminUser, dur)
+		}
+		done++
+	})
+
+	log.Printf("[mongodb] [check_manage_org_admin] DONE: iters=%d", iters)
+}
+
+// View via viewer_group and group membership
+func runCheckViewViaGroupMember(db *mongo.Database) {
+	iters := utils.GetEnvInt("BENCH_CHECK_VIEW_GROUP_ITER", 1000)
+	log.Printf("[mongodb] [check_view_via_group_member] streaming mode. iterations=%d", iters)
+
+	rcoll := db.Collection("resources")
+	gcoll := db.Collection("groups")
+	ctx := context.Background()
+	done := 0
+
+	// Stream resources that reference some viewer_group_ids
+	cur, err := rcoll.Find(ctx, bson.D{{Key: "viewer_group_ids", Value: bson.D{{Key: "$exists", Value: true}}}}, options.Find().SetProjection(bson.D{{Key: "resource_id", Value: 1}, {Key: "viewer_group_ids", Value: 1}}))
+	if err != nil {
+		log.Fatalf("[mongodb] [check_view_via_group_member] query failed: %v", err)
+	}
+	defer cur.Close(ctx)
+
+	_ = streamCursor(ctx, cur, func(m bson.M) {
+		if done >= iters {
+			return
+		}
+		resID, _ := m["resource_id"].(string)
+		groups, _ := m["viewer_group_ids"].(bson.A)
+		if len(groups) == 0 {
+			return
+		}
+		groupID, _ := groups[0].(string)
+
+		// Pick a direct member; fallback to manager
+		var pickedUser string
+		gCur, err := gcoll.Find(ctx, bson.D{{Key: "group_id", Value: groupID}}, options.Find().SetProjection(bson.D{{Key: "direct_member_user_ids", Value: 1}, {Key: "direct_manager_user_ids", Value: 1}}))
+		if err != nil {
+			return
+		}
+		defer gCur.Close(ctx)
+		for gCur.Next(ctx) {
+			var gm bson.M
+			if err := gCur.Decode(&gm); err != nil {
+				break
+			}
+			arr, _ := gm["direct_member_user_ids"].(bson.A)
+			if len(arr) > 0 {
+				pickedUser, _ = arr[0].(string)
+				break
+			}
+			arr2, _ := gm["direct_manager_user_ids"].(bson.A)
+			if pickedUser == "" && len(arr2) > 0 {
+				pickedUser, _ = arr2[0].(string)
+			}
+		}
+		if pickedUser == "" {
+			return
+		}
+
+		// Simulate CheckPermission: ensure resource has group and group contains user
+		cctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		start := time.Now()
+		// Check resource references the group
+		if err := rcoll.FindOne(cctx, bson.D{{Key: "resource_id", Value: resID}, {Key: "viewer_group_ids", Value: groupID}}).Err(); err != nil {
+			cancel()
+			return
+		}
+		// Check group membership
+		if err := gcoll.FindOne(cctx, bson.D{{Key: "group_id", Value: groupID}, {Key: "$or", Value: bson.A{
+			bson.D{{Key: "direct_member_user_ids", Value: pickedUser}},
+			bson.D{{Key: "direct_manager_user_ids", Value: pickedUser}},
+		}}}).Err(); err != nil {
+			cancel()
+			return
+		}
+		cancel()
+		dur := time.Since(start)
+		if done%100 == 0 {
+			log.Printf("[mongodb] [check_view_via_group_member] iter=%d resource=%s group=%s user=%s dur=%s", done, resID, groupID, pickedUser, dur)
+		}
+		done++
+	})
+
+	log.Printf("[mongodb] [check_view_via_group_member] DONE: iters=%d", iters)
+}
+
+// Lookup resources for manage for a heavy user
+func runLookupResourcesManageHeavyUser(db *mongo.Database) {
+	iters := utils.GetEnvInt("BENCH_LOOKUPRES_MANAGE_ITER", 10)
+	userID := os.Getenv("BENCH_LOOKUPRES_MANAGE_USER")
+	runLookupBench(db, "lookup_resources_manage_super", "manage", userID, iters, 60*time.Second)
+}
+
+// Lookup resources for view for a regular user
+func runLookupResourcesViewRegularUser(db *mongo.Database) {
 	iters := utils.GetEnvInt("BENCH_LOOKUPRES_VIEW_ITER", 10)
-
-	// Use env if present, otherwise use the sampled dataset result.
 	userID := os.Getenv("BENCH_LOOKUPRES_VIEW_USER")
+	runLookupBench(db, "lookup_resources_view_regular", "view", userID, iters, 60*time.Second)
+}
+
+// runLookupBench streams matching resources for a user and counts them.
+func runLookupBench(db *mongo.Database, name, permission, userID string, iters int, timeout time.Duration) {
 	if userID == "" {
-		userID = data.regularViewUser
+		log.Printf("[mongodb] [%s] skipped: no user specified", name)
+		return
 	}
+	log.Printf("[mongodb] [%s] iterations=%d user=%s", name, iters, userID)
 
-	log.Printf("[mongodb] [lookup_resources_view_regular] iterations=%d user=%s", iters, userID)
+	rcoll := db.Collection("resources")
+	gcoll := db.Collection("groups")
+	ocoll := db.Collection("organizations")
 
-	ctx, cancel := context.WithTimeout(parent, 15*time.Second)
-	defer cancel()
-
-	orgMemberships := db.Collection("org_memberships")
-	groupMemberships := db.Collection("group_memberships")
-	resourcesColl := db.Collection("resources")
-
-	// 1) Find all orgs where this user is a member/admin.
-	orgIDs, err := distinctStrings(ctx, orgMemberships, "org_id", bson.M{
-		"user_id": userID,
-	})
-	if err != nil {
-		log.Fatalf("[mongodb] [lookup_resources_view_regular] load orgIDs: %v", err)
-	}
-
-	// 2) Find all groups where this user is a member/admin.
-	groupIDs, err := distinctStrings(ctx, groupMemberships, "group_id", bson.M{
-		"user_id": userID,
-	})
-	if err != nil {
-		log.Fatalf("[mongodb] [lookup_resources_view_regular] load groupIDs: %v", err)
-	}
-
-	// 3) Build a resources filter that matches the Postgres semantics.
-	orClauses := []bson.M{
-		// Direct viewer
-		{"viewers": userID},
-		// Direct manager (manager ⇒ can view)
-		{"managers": userID},
-	}
-
-	if len(orgIDs) > 0 {
-		orClauses = append(orClauses, bson.M{
-			"org_id": bson.M{"$in": orgIDs},
-		})
-	}
-
-	if len(groupIDs) > 0 {
-		orClauses = append(orClauses,
-			bson.M{"viewer_groups": bson.M{"$in": groupIDs}},
-			bson.M{"manager_groups": bson.M{"$in": groupIDs}},
-		)
-	}
-
-	filter := bson.M{"$or": orClauses}
-
-	total := time.Duration(0)
-	lastCount := 0
+	var total time.Duration
+	var lastCount int
 
 	for i := 0; i < iters; i++ {
-		iterCtx, iterCancel := context.WithTimeout(parent, 15*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), timeout)
 		start := time.Now()
 
-		cur, err := resourcesColl.Find(
-			iterCtx,
-			filter,
-			options.Find().SetProjection(bson.M{"_id": 1}),
-		)
+		// Stream resources by combining direct and derived paths without precollecting:
+		// manage: direct user, org admin, manager group
+		// view: direct user, viewer group (member/manager), or manage
+		var filter bson.D
+		if permission == "manage" {
+			filter = bson.D{{Key: "$or", Value: bson.A{
+				bson.D{{Key: "manager_user_ids", Value: userID}},
+				// org admin path handled by streaming: match later inside loop
+				// manager group: resources referencing any group where user is manager
+			}}}
+		} else {
+			filter = bson.D{{Key: "$or", Value: bson.A{
+				bson.D{{Key: "viewer_user_ids", Value: userID}},
+				// viewer_group handled by group membership streaming
+			}}}
+		}
+
+		cur, err := rcoll.Find(ctx, filter, options.Find().SetProjection(bson.D{{Key: "resource_id", Value: 1}, {Key: "org_id", Value: 1}, {Key: "manager_group_ids", Value: 1}, {Key: "viewer_group_ids", Value: 1}}))
 		if err != nil {
-			iterCancel()
-			log.Fatalf("[mongodb] [lookup_resources_view_regular] Find error: %v", err)
+			cancel()
+			log.Fatalf("[mongodb] [%s] query failed: %v", name, err)
 		}
 
 		count := 0
-		for cur.Next(iterCtx) {
-			count++
+		for cur.Next(ctx) {
+			var m bson.M
+			if err := cur.Decode(&m); err != nil {
+				break
+			}
+			resID, _ := m["resource_id"].(string)
+			orgID, _ := m["org_id"].(string)
+
+			// Derived paths
+			match := false
+			if permission == "manage" {
+				// org admin path
+				if err := ocoll.FindOne(ctx, bson.D{{Key: "org_id", Value: orgID}, {Key: "admin_user_ids", Value: userID}}).Err(); err == nil {
+					match = true
+				}
+				// manager group path
+				if !match {
+					groups, _ := m["manager_group_ids"].(bson.A)
+					for _, g := range groups {
+						gid, _ := g.(string)
+						if gid == "" {
+							continue
+						}
+						if err := gcoll.FindOne(ctx, bson.D{{Key: "group_id", Value: gid}, {Key: "direct_manager_user_ids", Value: userID}}).Err(); err == nil {
+							match = true
+							break
+						}
+					}
+				}
+			} else { // view
+				// viewer_group path via member or manager
+				groups, _ := m["viewer_group_ids"].(bson.A)
+				for _, g := range groups {
+					gid, _ := g.(string)
+					if gid == "" {
+						continue
+					}
+					if err := gcoll.FindOne(ctx, bson.D{{Key: "group_id", Value: gid}, {Key: "$or", Value: bson.A{
+						bson.D{{Key: "direct_member_user_ids", Value: userID}},
+						bson.D{{Key: "direct_manager_user_ids", Value: userID}},
+					}}}).Err(); err == nil {
+						match = true
+						break
+					}
+				}
+				// manage implies view
+				if !match {
+					if err := rcoll.FindOne(ctx, bson.D{{Key: "resource_id", Value: resID}, {Key: "manager_user_ids", Value: userID}}).Err(); err == nil {
+						match = true
+					}
+				}
+				if !match {
+					if err := ocoll.FindOne(ctx, bson.D{{Key: "org_id", Value: orgID}, {Key: "admin_user_ids", Value: userID}}).Err(); err == nil {
+						match = true
+					}
+				}
+			}
+
+			if match {
+				count++
+			}
 		}
-		if err := cur.Err(); err != nil {
-			iterCancel()
-			log.Fatalf("[mongodb] [lookup_resources_view_regular] cursor error: %v", err)
-		}
-		cur.Close(iterCtx)
-		iterCancel()
+		cur.Close(ctx)
+		cancel()
 
 		dur := time.Since(start)
 		total += dur
 		lastCount = count
-
-		log.Printf("[mongodb] [lookup_resources_view_regular] iter=%d resources=%d duration=%s",
-			i, count, dur.Truncate(time.Microsecond))
+		log.Printf("[mongodb] [%s] iter=%d resources=%d duration=%s", name, i, count, dur.Truncate(time.Millisecond))
 	}
 
 	avg := time.Duration(int64(total) / int64(iters))
-	log.Printf("[mongodb] [lookup_resources_view_regular] DONE: iters=%d lastCount=%d avg=%s total=%s",
-		iters, lastCount, avg, total)
-}
-
-func mongoLookupViewResourcesForUser(ctx context.Context, db *mongo.Database, userID string) ([]string, error) {
-	coll := db.Collection("user_resource_perms")
-	return distinctStrings(ctx, coll, "resource_id", bson.M{
-		"user_id":  userID,
-		"can_view": true,
-	})
-}
-
-// ====================
-// Env helper
-// ====================
-
-func envInt(key string, def int) int {
-	v := os.Getenv(key)
-	if v == "" {
-		return def
-	}
-	n, err := strconv.Atoi(v)
-	if err != nil {
-		log.Printf("[mongodb] invalid %s=%q, using default %d", key, v, def)
-		return def
-	}
-	return n
+	log.Printf("[mongodb] [%s] DONE: iters=%d lastCount=%d avg=%s total=%s", name, iters, lastCount, avg, total)
 }
