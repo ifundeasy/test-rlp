@@ -16,6 +16,7 @@ import (
 // AuthzedDropSchemas deletes ALL relationship data for the resource types we care about.
 // It does NOT drop the schema itself, so you can recreate/recreate data afterwards.
 func AuthzedDropSchemas() {
+	start := time.Now()
 	client, _, cancel, err := infrastructure.NewAuthzedPgdbClientFromEnv(context.Background())
 	if err != nil {
 		log.Fatalf("[authzed_pgdb] failed to create authzed client: %v", err)
@@ -71,7 +72,8 @@ func AuthzedDropSchemas() {
 		log.Printf("[authzed_pgdb] Aggressive: DeleteRelationships succeeded (all relationships deleted)")
 	}
 
-	log.Println("[authzed_pgdb] DONE: delete attempt finished for resource, organization, usergroup (only existing types were processed)")
+	elapsed := time.Since(start).Truncate(time.Millisecond)
+	log.Printf("[authzed_pgdb] DONE: delete attempt finished for resource, organization, usergroup. elapsed=%s", elapsed)
 }
 
 // readCurrentSchema reads the current schema text from SpiceDB.

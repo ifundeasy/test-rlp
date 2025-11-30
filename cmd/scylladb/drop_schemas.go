@@ -21,7 +21,8 @@ func ScylladbDropSchemas() {
 	}
 	defer cleanup()
 
-	log.Printf("[scylladb] == Dropping ScyllaDB tables for benchmarks ==")
+	start := time.Now()
+	log.Printf("[scylladb] == Starting ScyllaDB drop schemas ==")
 
 	// Keep this list in sync with ScylladbCreateSchemas.
 	tables := []string{
@@ -50,5 +51,6 @@ func ScylladbDropSchemas() {
 		log.Printf("[scylladb] Dropped table: %s", tbl)
 	}
 
-	log.Printf("[scylladb] ScyllaDB benchmark tables drop DONE")
+	elapsed := time.Since(start).Truncate(time.Millisecond)
+	log.Printf("[scylladb] ScyllaDB drop schemas DONE: elapsed=%s", elapsed)
 }

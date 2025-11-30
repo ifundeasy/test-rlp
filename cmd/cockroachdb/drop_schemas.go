@@ -20,20 +20,29 @@ func CockroachdbDropSchemas() {
 	}
 	defer cleanup()
 
-	log.Printf("[cockroachdb] == Dropping Cockroachdb ACL tables ==")
+	start := time.Now()
+	log.Printf("[cockroachdb] == Starting CockroachDB drop schemas ==")
 
-	// Drop order: children -> parents to avoid FK issues, plus CASCADE for safety.
-	// Objects added by schemas.sql include:
-	// - materialized view: user_resource_permissions
-	// - helper function: refresh_user_resource_permissions()
-	// - table: group_hierarchy
-	// We drop the materialized view and function first, then tables.
+	// Drop indexes explicitly, then materialized view, then tables (children first).
 	statements := []string{
-		// materialized view and its refresh helper
-		`DROP MATERIALIZED VIEW IF EXISTS user_resource_permissions`,
-		`DROP FUNCTION IF EXISTS refresh_user_resource_permissions()`,
+		// Indexes
+		`DROP INDEX IF EXISTS uq_user_resource_permissions`,
+		`DROP INDEX IF EXISTS idx_urp_user_rel_res`,
+		`DROP INDEX IF EXISTS idx_urp_org_user_rel`,
+		`DROP INDEX IF EXISTS idx_group_hierarchy_parent`,
+		`DROP INDEX IF EXISTS idx_group_hierarchy_child`,
+		`DROP INDEX IF EXISTS idx_resource_acl_res_rel_type_subject`,
+		`DROP INDEX IF EXISTS idx_resource_acl_by_subject`,
+		`DROP INDEX IF EXISTS idx_resource_acl_by_resource_subject`,
+		`DROP INDEX IF EXISTS idx_resources_org`,
+		`DROP INDEX IF EXISTS idx_group_memberships_user`,
+		`DROP INDEX IF EXISTS idx_org_memberships_user`,
+		`DROP INDEX IF EXISTS idx_users_org`,
 
-		// ACL tables (children before parents)
+		// Materialized view (Cockroach supports this; no function present)
+		`DROP MATERIALIZED VIEW IF EXISTS user_resource_permissions`,
+
+		// Tables (children before parents)
 		`DROP TABLE IF EXISTS resource_acl CASCADE`,
 		`DROP TABLE IF EXISTS resources CASCADE`,
 		`DROP TABLE IF EXISTS group_memberships CASCADE`,
@@ -51,7 +60,8 @@ func CockroachdbDropSchemas() {
 		log.Printf("[cockroachdb] Executed: %s", stmt)
 	}
 
-	log.Printf("[cockroachdb] Cockroachdb ACL tables drop DONE")
+	elapsed := time.Since(start).Truncate(time.Millisecond)
+	log.Printf("[cockroachdb] CockroachDB drop schemas DONE: elapsed=%s", elapsed)
 }
 
 func execWithTimeout(parent context.Context, db *sql.DB, stmt string, timeout time.Duration) error {
