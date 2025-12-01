@@ -1,71 +1,80 @@
-# Row-Level Permission Benchmark – Database Schema Overview
+# Row-Level Permission Benchmark – Formal Schema Compendium
 
-This document summarizes the logical data model used by your Go benchmarking project for Row Level Permission (RLP) across the different database engines. It focuses **only on relationship schemas**, not on program flow.
+This document provides a formally structured, engine‑specific description of the eight distinct schema implementations used in the Row‑Level Permission (RLP) benchmark. Each database engine projects the same logical CSV source model into a physical form optimized for its execution characteristics. Diagrams are rendered in Mermaid. For relational / tabular engines and document stores, `erDiagram` is used; for Authzed (graph / relationship model) `flowchart` is used. Each diagram embeds index (or equivalent optimization) metadata as pseudo‑attributes prefixed with `index:` (or `projection:` / `mv:` where applicable).
 
-The core idea: you generate the same logical dataset from CSV files and then project it into different physical models depending on the engine.
-
----
-
-## 0. Logical Schema (From `cmd/csv/load_data.go`)
-
-Base CSVs and their logical tables:
-
-* `organizations.csv` → `organizations(org_id)`
-* `users.csv` → `users(user_id, org_id)`
-* `groups.csv` → `groups(group_id, org_id)`
-* `org_memberships.csv` → `org_memberships(org_id, user_id, role)`
-* `group_memberships.csv` → `group_memberships(group_id, user_id, role)`
-* `resources.csv` → `resources(resource_id, org_id)`
-* `resource_acl.csv` → `resource_acl(resource_id, subject_type, subject_id, relation)`
-* Closure / materialized permission tables (depending on engine):
-
-  * `user_resource_perms` or `user_resource_perms_*` with `(user_id, resource_id, can_manage, can_view, …)`
-
-Conceptually:
-
-* An **organization** owns many users, groups, and resources.
-* **Org membership** and **group membership** are bridge tables between users and organizations/groups.
-* **Resource ACL** describes directed edges from a resource to subjects (users or groups) with a relation (e.g., manager, viewer).
-* Some engines precompute **user-resource-permission closure** to accelerate checks and listings.
+The logical source dataset (CSV) comprises: organizations, users, groups, group hierarchy, organization memberships, group memberships, resources, resource ACL, and derived permission closures. Engines differ mainly in their handling of denormalization, transitive expansion, and permission closure materialization.
 
 ---
 
-## 1. PostgreSQL & CockroachDB
+## 1. PostgreSQL Schema
+Source: `cmd/postgres/schemas.sql`
 
-PostgreSQL and CockroachDB share the same logical schema (same `schemas.sql`), only differing by the engine.
+Features: Fully normalized core entities, Zanzibar‑style ACL edge table, recursive materialized view (`user_resource_permissions`) for nested groups and group role propagation, comprehensive B‑tree indexing for common access patterns.
 
 ```mermaid
 erDiagram
   ORGANIZATIONS {
-    int org_id
+    int org_id PK
+    index: PK(org_id)
   }
   USERS {
-    int user_id
-    int org_id
+    int user_id PK
+    int org_id FK
+    index: PK(user_id)
+    index: idx_users_org(org_id)
   }
   GROUPS {
-    int group_id
-    int org_id
+    int group_id PK
+    int org_id FK
+    index: PK(group_id)
   }
   ORG_MEMBERSHIPS {
-    int org_id
-    int user_id
+    int org_id FK
+    int user_id FK
     text role
+    index: PK(org_id,user_id)
+    index: idx_org_memberships_user(user_id,org_id,role)
   }
   GROUP_MEMBERSHIPS {
-    int group_id
-    int user_id
+    int group_id FK
+    int user_id FK
     text role
+    index: PK(group_id,user_id)
+    index: idx_group_memberships_user(user_id,group_id,role)
+  }
+  GROUP_HIERARCHY {
+    int parent_group_id FK
+    int child_group_id FK
+    text relation
+    index: PK(parent_group_id,child_group_id,relation)
+    index: idx_group_hierarchy_parent(parent_group_id,relation,child_group_id)
+    index: idx_group_hierarchy_child(child_group_id,relation,parent_group_id)
   }
   RESOURCES {
-    int resource_id
-    int org_id
+    int resource_id PK
+    int org_id FK
+    index: PK(resource_id)
+    index: idx_resources_org(org_id,resource_id)
   }
   RESOURCE_ACL {
-    int resource_id
+    int resource_id FK
     text subject_type
     int subject_id
     text relation
+    index: PK(resource_id,subject_type,subject_id,relation)
+    index: idx_resource_acl_by_resource_subject(resource_id,subject_type,subject_id,relation)
+    index: idx_resource_acl_by_subject(subject_type,subject_id,relation,resource_id)
+    index: idx_resource_acl_res_rel_type_subject(resource_id,relation,subject_type,subject_id)
+  }
+  USER_RESOURCE_PERMISSIONS {
+    int resource_id FK
+    int org_id FK
+    int user_id FK
+    text relation
+    mv: recursive expansion of groups & hierarchy
+    index: uq_user_resource_permissions(resource_id,user_id,relation)
+    index: idx_urp_user_rel_res(user_id,relation,resource_id)
+    index: idx_urp_org_user_rel(org_id,user_id,relation,resource_id)
   }
   ORGANIZATIONS ||--o{ USERS : org_id
   ORGANIZATIONS ||--o{ GROUPS : org_id
@@ -74,71 +83,84 @@ erDiagram
   USERS ||--o{ ORG_MEMBERSHIPS : user_id
   GROUPS ||--o{ GROUP_MEMBERSHIPS : group_id
   USERS ||--o{ GROUP_MEMBERSHIPS : user_id
+  GROUPS ||--o{ GROUP_HIERARCHY : parent_group_id
+  GROUPS ||--o{ GROUP_HIERARCHY : child_group_id
   RESOURCES ||--o{ RESOURCE_ACL : resource_id
+  RESOURCES ||--o{ USER_RESOURCE_PERMISSIONS : resource_id
+  USERS ||--o{ USER_RESOURCE_PERMISSIONS : user_id
 ```
-
-Key points:
-
-* All users, groups, and resources are anchored to an organization.
-* Org and group memberships are many-to-many via bridge tables.
-* `resource_acl` is a Zanzibar-style edge table `(resource) -[relation]-> (user|group)`.
 
 ---
 
-## 2. ScyllaDB
+## 2. CockroachDB Schema
+Source: `cmd/cockroachdb/schemas.sql`
 
-ScyllaDB keeps the same logical entities, but adds denormalized ACL and permission-closure tables tuned for specific access patterns (by resource and by subject).
+Logical structure mirrors PostgreSQL verbatim (including recursive CTE materialized view). Differences: absence of PL/pgSQL refresh function; manual `REFRESH MATERIALIZED VIEW` required. Index set identical to PostgreSQL.
 
 ```mermaid
 erDiagram
   ORGANIZATIONS {
-    int org_id
+    int org_id PK
+    index: PK(org_id)
   }
   USERS {
-    int user_id
-    int org_id
+    int user_id PK
+    int org_id FK
+    index: PK(user_id)
+    index: idx_users_org(org_id)
   }
   GROUPS {
-    int group_id
-    int org_id
+    int group_id PK
+    int org_id FK
+    index: PK(group_id)
   }
   ORG_MEMBERSHIPS {
-    int org_id
-    int user_id
+    int org_id FK
+    int user_id FK
     text role
+    index: PK(org_id,user_id)
+    index: idx_org_memberships_user(user_id,org_id,role)
   }
   GROUP_MEMBERSHIPS {
-    int group_id
-    int user_id
+    int group_id FK
+    int user_id FK
     text role
+    index: PK(group_id,user_id)
+    index: idx_group_memberships_user(user_id,group_id,role)
+  }
+  GROUP_HIERARCHY {
+    int parent_group_id FK
+    int child_group_id FK
+    text relation
+    index: PK(parent_group_id,child_group_id,relation)
+    index: idx_group_hierarchy_parent(parent_group_id,relation,child_group_id)
+    index: idx_group_hierarchy_child(child_group_id,relation,parent_group_id)
   }
   RESOURCES {
-    int resource_id
-    int org_id
+    int resource_id PK
+    int org_id FK
+    index: PK(resource_id)
+    index: idx_resources_org(org_id,resource_id)
   }
-  RESOURCE_ACL_BY_RESOURCE {
-    int resource_id
-    text relation
-    text subject_type
-    int subject_id
-  }
-  RESOURCE_ACL_BY_SUBJECT {
+  RESOURCE_ACL {
+    int resource_id FK
     text subject_type
     int subject_id
     text relation
-    int resource_id
+    index: PK(resource_id,subject_type,subject_id,relation)
+    index: idx_resource_acl_by_resource_subject(resource_id,subject_type,subject_id,relation)
+    index: idx_resource_acl_by_subject(subject_type,subject_id,relation,resource_id)
+    index: idx_resource_acl_res_rel_type_subject(resource_id,relation,subject_type,subject_id)
   }
-  USER_RESOURCE_PERMS_BY_USER {
-    int user_id
-    int resource_id
-    bool can_manage
-    bool can_view
-  }
-  USER_RESOURCE_PERMS_BY_RESOURCE {
-    int resource_id
-    int user_id
-    bool can_manage
-    bool can_view
+  USER_RESOURCE_PERMISSIONS {
+    int resource_id FK
+    int org_id FK
+    int user_id FK
+    text relation
+    mv: recursive expansion identical to PostgreSQL
+    index: uq_user_resource_permissions(resource_id,user_id,relation)
+    index: idx_urp_user_rel_res(user_id,relation,resource_id)
+    index: idx_urp_org_user_rel(org_id,user_id,relation,resource_id)
   }
   ORGANIZATIONS ||--o{ USERS : org_id
   ORGANIZATIONS ||--o{ GROUPS : org_id
@@ -147,254 +169,402 @@ erDiagram
   USERS ||--o{ ORG_MEMBERSHIPS : user_id
   GROUPS ||--o{ GROUP_MEMBERSHIPS : group_id
   USERS ||--o{ GROUP_MEMBERSHIPS : user_id
+  GROUPS ||--o{ GROUP_HIERARCHY : parent_group_id
+  GROUPS ||--o{ GROUP_HIERARCHY : child_group_id
+  RESOURCES ||--o{ RESOURCE_ACL : resource_id
+  RESOURCES ||--o{ USER_RESOURCE_PERMISSIONS : resource_id
+  USERS ||--o{ USER_RESOURCE_PERMISSIONS : user_id
+```
+
+---
+
+## 3. ScyllaDB Schema
+Sources: `cmd/scylladb/schemas.cql`, `cmd/scylladb/create_schemas.go`
+
+Design emphasizes partition‑localized access (denormalization) and dual‑direction ACL plus compiled permission closures. Limited secondary indexes are added only where valid (single‑column) and beneficial.
+
+```mermaid
+erDiagram
+  ORGANIZATIONS {
+    int org_id PK(partition)
+    index: PK(org_id)
+  }
+  USERS {
+    int user_id PK(partition)
+    int org_id
+    index: PK(user_id)
+  }
+  GROUPS {
+    int group_id PK(partition)
+    int org_id
+    index: PK(group_id)
+  }
+  ORG_MEMBERSHIPS {
+    int org_id partition
+    int user_id clustering
+    text role clustering
+    index: PK(org_id,user_id,role)
+  }
+  GROUP_MEMBERSHIPS {
+    int user_id partition
+    int group_id clustering
+    text role clustering
+    index: PK(user_id,group_id,role)
+  }
+  GROUP_HIERARCHY {
+    int parent_group_id partition
+    int child_group_id partition
+    text relation clustering
+    index: PK((parent_group_id,child_group_id),relation)
+    index: idx_group_hierarchy_child(child_group_id)
+  }
+  GROUP_MEMBERS_EXPANDED {
+    int group_id partition
+    int user_id clustering
+    text role clustering
+    index: PK(group_id,user_id,role)
+    index: idx_group_members_expanded_user(user_id)
+  }
+  RESOURCES {
+    int resource_id PK(partition)
+    int org_id
+    index: PK(resource_id)
+  }
+  RESOURCE_ACL_BY_RESOURCE {
+    int resource_id partition
+    text relation clustering
+    text subject_type clustering
+    int subject_id clustering
+    index: PK(resource_id,relation,subject_type,subject_id)
+  }
+  RESOURCE_ACL_BY_SUBJECT {
+    text subject_type partition
+    int subject_id partition
+    text relation clustering
+    int resource_id clustering
+    index: PK((subject_type,subject_id),relation,resource_id)
+  }
+  USER_RESOURCE_PERMS_BY_USER {
+    int user_id partition
+    int resource_id clustering
+    boolean can_manage
+    boolean can_view
+    index: PK(user_id,resource_id)
+  }
+  USER_RESOURCE_PERMS_BY_RESOURCE {
+    int resource_id partition
+    int user_id clustering
+    boolean can_manage
+    boolean can_view
+    index: PK(resource_id,user_id)
+  }
+  ORGANIZATIONS ||--o{ USERS : org_id
+  ORGANIZATIONS ||--o{ GROUPS : org_id
+  ORGANIZATIONS ||--o{ RESOURCES : org_id
+  ORGANIZATIONS ||--o{ ORG_MEMBERSHIPS : org_id
+  USERS ||--o{ ORG_MEMBERSHIPS : user_id
+  USERS ||--o{ GROUP_MEMBERSHIPS : user_id
+  GROUPS ||--o{ GROUP_MEMBERSHIPS : group_id
+  GROUPS ||--o{ GROUP_HIERARCHY : parent_group_id
+  GROUPS ||--o{ GROUP_HIERARCHY : child_group_id
+  GROUPS ||--o{ GROUP_MEMBERS_EXPANDED : group_id
+  USERS ||--o{ GROUP_MEMBERS_EXPANDED : user_id
   RESOURCES ||--o{ RESOURCE_ACL_BY_RESOURCE : resource_id
-  RESOURCES ||--o{ RESOURCE_ACL_BY_SUBJECT : resource_id
   USERS ||--o{ RESOURCE_ACL_BY_SUBJECT : subject_id
   GROUPS ||--o{ RESOURCE_ACL_BY_SUBJECT : subject_id
   USERS ||--o{ USER_RESOURCE_PERMS_BY_USER : user_id
-  RESOURCES ||--o{ USER_RESOURCE_PERMS_BY_USER : resource_id
   RESOURCES ||--o{ USER_RESOURCE_PERMS_BY_RESOURCE : resource_id
-  USERS ||--o{ USER_RESOURCE_PERMS_BY_RESOURCE : user_id
 ```
-
-Highlights in ScyllaDB:
-
-* ACL is stored in two denormalized tables:
-
-  * `resource_acl_by_resource`: partitioned by resource.
-  * `resource_acl_by_subject`: partitioned by subject (user/group).
-* Permissions closure is also stored two ways:
-
-  * `user_resource_perms_by_user`: all resources for a given user.
-  * `user_resource_perms_by_resource`: all users for a given resource.
-
-This design is explicitly tuned for both "check" and "list" queries without joins.
 
 ---
 
-## 3. MongoDB
+## 4. MongoDB Schema
+Source: `cmd/mongodb/create_schemas.go`
 
-MongoDB mirrors the CSV dataset closely, including a closure collection for user-resource permissions.
+Document collections with multikey and compound indexes to accelerate membership and ACL expansion queries. Permission closure is embedded directly inside resource documents during load, but indexes target array fields for access operations.
 
 ```mermaid
 erDiagram
   ORGANIZATIONS {
-    int _id
+    int org_id
+    array admin_user_ids
+    array admin_group_ids
+    array member_user_ids
+    array member_group_ids
+    index: org_id_unique(org_id) UNIQUE
+    index: admin_user_ids_idx(admin_user_ids)
+    index: admin_group_ids_idx(admin_group_ids)
+    index: member_user_ids_idx(member_user_ids)
+    index: member_group_ids_idx(member_group_ids)
   }
   USERS {
-    int _id
-    int org_id
+    int user_id
+    array org_ids
+    array group_ids
+    index: user_id_unique(user_id) UNIQUE
+    index: org_ids_idx(org_ids)
+    index: group_ids_idx(group_ids)
   }
   GROUPS {
-    int _id
-    int org_id
-  }
-  ORG_MEMBERSHIPS {
-    int org_id
-    int user_id
-    string role
-  }
-  GROUP_MEMBERSHIPS {
     int group_id
-    int user_id
-    string role
+    int org_id
+    array direct_member_user_ids
+    array direct_manager_user_ids
+    array member_group_ids
+    array manager_group_ids
+    index: group_id_unique(group_id) UNIQUE
+    index: org_id_idx(org_id)
+    index: direct_member_users_idx(direct_member_user_ids)
+    index: direct_manager_users_idx(direct_manager_user_ids)
+    index: member_group_ids_idx(member_group_ids)
+    index: manager_group_ids_idx(manager_group_ids)
   }
   RESOURCES {
-    int _id
+    int resource_id
     int org_id
+    array manager_user_ids
+    array viewer_user_ids
+    array manager_group_ids
+    array viewer_group_ids
+    index: resource_id_unique(resource_id) UNIQUE
+    index: org_id_idx(org_id)
+    index: manager_user_ids_idx(manager_user_ids)
+    index: viewer_user_ids_idx(viewer_user_ids)
+    index: manager_group_ids_idx(manager_group_ids)
+    index: viewer_group_ids_idx(viewer_group_ids)
+    index: org_manage_user_idx(org_id,manager_user_ids)
+    index: org_view_user_idx(org_id,viewer_user_ids)
+    index: org_manage_group_idx(org_id,manager_group_ids)
+    index: org_view_group_idx(org_id,viewer_group_ids)
   }
-  RESOURCE_ACL {
-    int resource_id
-    string subject_type
-    int subject_id
-    string relation
-  }
-  USER_RESOURCE_PERMS {
-    int user_id
-    int resource_id
-    bool can_manage
-    bool can_view
-  }
-  ORGANIZATIONS ||--o{ USERS : org_id
   ORGANIZATIONS ||--o{ GROUPS : org_id
+  ORGANIZATIONS ||--o{ USERS : org_ids
   ORGANIZATIONS ||--o{ RESOURCES : org_id
-  ORGANIZATIONS ||--o{ ORG_MEMBERSHIPS : org_id
-  USERS ||--o{ ORG_MEMBERSHIPS : user_id
-  GROUPS ||--o{ GROUP_MEMBERSHIPS : group_id
-  USERS ||--o{ GROUP_MEMBERSHIPS : user_id
-  RESOURCES ||--o{ RESOURCE_ACL : resource_id
-  USERS ||--o{ USER_RESOURCE_PERMS : user_id
-  RESOURCES ||--o{ USER_RESOURCE_PERMS : resource_id
+  GROUPS ||--o{ RESOURCES : manager_group_ids
+  GROUPS ||--o{ RESOURCES : viewer_group_ids
+  USERS ||--o{ GROUPS : direct_member_user_ids
+  USERS ||--o{ GROUPS : direct_manager_user_ids
+  USERS ||--o{ RESOURCES : manager_user_ids
+  USERS ||--o{ RESOURCES : viewer_user_ids
 ```
-
-MongoDB is essentially a direct document-shaped translation of the relational model plus a closure collection.
 
 ---
 
-## 4. ClickHouse
+## 5. ClickHouse Schema
+Source: `cmd/clickhouse/schemas.sql`
 
-ClickHouse uses a relational-style schema with some denormalization and projections focused on analytics and high-speed scans.
+Column‑oriented denormalization with projections and specialized index types (minmax, bloom filter) plus a materialized view stream populating the permission closure table.
 
 ```mermaid
 erDiagram
   ORGANIZATIONS {
     UInt32 org_id
+    engine: MergeTree
+    order: (org_id)
   }
   USERS {
     UInt32 user_id
     UInt32 primary_org_id
+    engine: MergeTree
+    order: (user_id)
   }
   GROUPS {
     UInt32 group_id
     UInt32 org_id
+    engine: MergeTree
+    partition: org_id
+    order: (org_id,group_id)
   }
   ORG_MEMBERSHIPS {
     UInt32 org_id
     UInt32 user_id
-    enum role
+    Enum8 role(member=1,admin=2)
+    engine: MergeTree
+    partition: org_id
+    order: (org_id,user_id,role)
+    index: idx_org_memberships_user(user_id) minmax
   }
   GROUP_MEMBERSHIPS {
     UInt32 group_id
     UInt32 user_id
-    enum role
+    Enum8 role(member=1,manager=2)
+    engine: MergeTree
+    order: (user_id,group_id,role)
+    index: idx_group_memberships_group(group_id) minmax
+  }
+  GROUP_HIERARCHY {
+    UInt32 parent_group_id
+    UInt32 child_group_id
+    Enum8 relation(member_group=1,manager_group=2)
+    engine: MergeTree
+    order: (parent_group_id,child_group_id)
+  }
+  GROUP_MEMBERS_EXPANDED {
+    UInt32 group_id
+    UInt32 user_id
+    Enum8 role(member=1,manager=2)
+    engine: MergeTree
+    order: (group_id,user_id,role)
+    index: idx_group_members_expanded_user(user_id) minmax
   }
   RESOURCES {
     UInt32 resource_id
     UInt32 org_id
+    engine: MergeTree
+    partition: org_id
+    order: (org_id,resource_id)
+    index: idx_resources_resource(resource_id) minmax
   }
   RESOURCE_ACL {
     UInt32 resource_id
     UInt32 org_id
-    enum subject_type
+    Enum8 subject_type(user=1,group=2)
     UInt32 subject_id
-    enum relation
+    Enum8 relation(viewer=1,manager=2)
+    engine: MergeTree
+    partition: org_id
+    order: (org_id,resource_id,relation,subject_type,subject_id)
+    projection: resource_acl_by_subject(org_id,subject_type,subject_id,relation,resource_id)
+    index: idx_resource_acl_subject_bf(subject_type,subject_id) bloom_filter
+    index: idx_resource_acl_resource_minmax(resource_id) minmax
   }
-  ORGANIZATIONS ||--o{ USERS : primary_org_id
+  USER_RESOURCE_PERMISSIONS {
+    UInt32 resource_id
+    UInt32 user_id
+    Enum8 relation(viewer=1,manager=2)
+    engine: MergeTree
+    partition: intDiv(user_id,10000)
+    order: (user_id,resource_id,relation)
+    mv: user_resource_permissions_mv (UNION ALL + joins)
+  }
   ORGANIZATIONS ||--o{ GROUPS : org_id
   ORGANIZATIONS ||--o{ RESOURCES : org_id
   ORGANIZATIONS ||--o{ ORG_MEMBERSHIPS : org_id
   USERS ||--o{ ORG_MEMBERSHIPS : user_id
   GROUPS ||--o{ GROUP_MEMBERSHIPS : group_id
   USERS ||--o{ GROUP_MEMBERSHIPS : user_id
+  GROUPS ||--o{ GROUP_HIERARCHY : parent_group_id
+  GROUPS ||--o{ GROUP_HIERARCHY : child_group_id
+  GROUPS ||--o{ GROUP_MEMBERS_EXPANDED : group_id
+  USERS ||--o{ GROUP_MEMBERS_EXPANDED : user_id
   RESOURCES ||--o{ RESOURCE_ACL : resource_id
+  RESOURCES ||--o{ USER_RESOURCE_PERMISSIONS : resource_id
+  USERS ||--o{ USER_RESOURCE_PERMISSIONS : user_id
 ```
-
-Key detail: `org_id` is duplicated into `resource_acl` to support partitioning and efficient org-scoped queries.
 
 ---
 
-## 5. Elasticsearch
+## 6. Elasticsearch Schema
+Source: `cmd/elasticsearch/create_schemas.go`
 
-Elasticsearch uses a single index with one document per resource. ACL and user closure are embedded inside the document.
+Single index `resources` with nested ACL documents and flattened arrays of allowed user identifiers per permission tier. Elasticsearch automatically inverts indexed fields; explicit index declarations are implicit.
 
 ```mermaid
 erDiagram
-    ORG {
-        long org_id PK
-    }
-
-    USER {
-        long user_id PK
-        string role
-    }
-
-    GROUP {
-        long group_id PK
-    }
-
-    RESOURCE {
-        long resource_id PK
-        long org_id FK
-        string allowed_user_ids_manage
-        string allowed_user_ids_view
-    }
-
-    ACL {
-        string relation
-        string subject_type
-        long subject_id
-    }
-
-    ORG ||--o{ RESOURCE : owns
-    ORG ||--o{ USER : has
-    GROUP ||--o{ USER : includes
-    RESOURCE ||--o{ ACL : defines
-    ACL }o--|| USER : may_grant
-    ACL }o--|| GROUP : may_grant
+  RESOURCE_DOCUMENT {
+    int resource_id PK(logical)
+    int org_id
+    array allowed_manage_user_id
+    array allowed_view_user_id
+    nested acl.subject_type(keyword)
+    nested acl.subject_id(integer)
+    nested acl.relation(keyword)
+    index: default_inverted(resource_id,org_id,allowed_* fields)
+    index: nested_acl(subject_type,subject_id,relation)
+  }
 ```
-
-Here:
-
-* Each `ResourceDocument` embeds:
-
-  * The resource metadata.
-  * The ACL edges as nested documents.
-  * The precomputed closure as arrays of user IDs per permission.
 
 ---
 
-## 6. Authzed (PostgreSQL & CockroachDB Backends)
+## 7. Authzed (PostgreSQL Backend) Graph Schema
+Source: `cmd/authzed_pgdb/schemas.zed`
 
-Authzed uses a **relation graph schema**, not explicit SQL tables. The storage engine may be PostgreSQL or CockroachDB, but the logical model is defined in `.zed` schema files.
+Logical authorization graph expressed as object definitions, relations, and computed permissions. Underlying persistence leverages PostgreSQL storage primitives internally; explicit index management is abstracted.
 
 ```mermaid
-flowchart TD
-  %% Object Types
-  user[User]
-  usergroup[UserGroup]
-  organization[Organization]
-  resource[Resource]
+flowchart LR
+  user([user])
+  usergroup([usergroup])
+  organization([organization])
+  resource([resource])
 
-  %% Relations: UserGroup
-  user -->|member_of| usergroup
-  user -->|manager_of| usergroup
-  usergroup -->|includes| usergroup
-  usergroup -->|member_user| user
-  usergroup -->|manager_user| user
+  usergroup -->|direct_member_user| user
+  usergroup -->|direct_manager_user| user
+  usergroup -->|member_group| usergroup
+  usergroup -->|manager_group| usergroup
 
-  %% Relations: Organization
-  user -->|member_of_org| organization
-  user -->|admin_of_org| organization
-  usergroup -->|member_group| organization
-  usergroup -->|admin_group| organization
+  organization -->|admin_user| user
+  organization -->|admin_group (usergroup#manager)| usergroup
+  organization -->|member_user| user
+  organization -->|member_group (usergroup#member)| usergroup
 
-  %% Relations: Resource
-  organization -->|owns| resource
-  user -->|viewer_user| resource
-  user -->|manager_user| resource
-  usergroup -->|viewer_group| resource
-  usergroup -->|manager_group| resource
+  resource -->|org| organization
+  resource -->|manager_user| user
+  resource -->|viewer_user| user
+  resource -->|manager_group (usergroup#manager)| usergroup
+  resource -->|viewer_group (usergroup#member)| usergroup
 
-  %% Permissions (computed)
-  resource -.->|compute: manage = manager_user + manager_group + org->admin| manage_perm
-  resource -.->|compute: view = viewer_user + viewer_group + manage + org->member| view_perm
-  organization -.->|compute: admin = admin_user + admin_group| org_admin_perm
-  organization -.->|compute: member = member_user + member_group + admin| org_member_perm
-
-  %% Permission nodes (for readability)
-  manage_perm(["Permission: manage"])
-  view_perm(["Permission: view"])
-  org_admin_perm(["Permission: org admin"])
-  org_member_perm(["Permission: org member"])
+  %% Permissions (computed expressions)
+  usergroup -.-> member_perm([permission member = direct_member_user + member_group->member + manager])
+  usergroup -.-> manager_perm([permission manager = direct_manager_user + manager_group->manager])
+  organization -.-> org_admin_perm([permission admin = admin_user + admin_group])
+  organization -.-> org_member_perm([permission member = member_user + member_group + admin])
+  resource -.-> res_manage_perm([permission manage = manager_user + manager_group + org->admin])
+  resource -.-> res_view_perm([permission view = viewer_user + viewer_group + manage + org->member])
 ```
-
-In Authzed:
-
-* Membership and ACL are all stored as relationships in a global authorization graph.
-* Permissions (`manage`, `view`, `member`, `admin`, etc.) are **computed** from expressions over these relationships, not stored as explicit boolean columns.
 
 ---
 
-## 7. Summary
+## 8. Authzed (CockroachDB Backend) Graph Schema
+Source: `cmd/authzed_crdb/schemas.zed`
 
-* **PostgreSQL & CockroachDB**: classic relational model mirroring the CSVs, with ACL as an edge table.
-* **MongoDB**: document model mirroring the relational structure, plus a dedicated closure collection.
-* **ScyllaDB**: relational-ish entities but heavily denormalized around access patterns:
+Identical logical model to PostgreSQL backend; storage engine differences are transparent to the schema language. Computed permission expressions mirror those above.
 
-  * ACL by resource and by subject.
-  * Permissions closure by user and by resource.
-* **ClickHouse**: relational layout optimized for analytical scans, with org-scoped denormalization in ACL.
-* **Elasticsearch**: single index, one document per resource, with nested ACL and flattened permission closure arrays.
-* **Authzed**: authorization graph schema where users, groups, organizations, and resources are all objects, and permissions are expressions over relationships.
+```mermaid
+flowchart LR
+  user([user])
+  usergroup([usergroup])
+  organization([organization])
+  resource([resource])
 
-This gives you a clean, engine-by-engine view of how the same RLP problem is modeled at the data/schema level across your benchmark.
+  usergroup -->|direct_member_user| user
+  usergroup -->|direct_manager_user| user
+  usergroup -->|member_group| usergroup
+  usergroup -->|manager_group| usergroup
+
+  organization -->|admin_user| user
+  organization -->|admin_group (usergroup#manager)| usergroup
+  organization -->|member_user| user
+  organization -->|member_group (usergroup#member)| usergroup
+
+  resource -->|org| organization
+  resource -->|manager_user| user
+  resource -->|viewer_user| user
+  resource -->|manager_group (usergroup#manager)| usergroup
+  resource -->|viewer_group (usergroup#member)| usergroup
+
+  usergroup -.-> member_perm([permission member = direct_member_user + member_group->member + manager])
+  usergroup -.-> manager_perm([permission manager = direct_manager_user + manager_group->manager])
+  organization -.-> org_admin_perm([permission admin = admin_user + admin_group])
+  organization -.-> org_member_perm([permission member = member_user + member_group + admin])
+  resource -.-> res_manage_perm([permission manage = manager_user + manager_group + org->admin])
+  resource -.-> res_view_perm([permission view = viewer_user + viewer_group + manage + org->member])
+```
+
+---
+
+## 9. Comparative Summary
+
+| Engine | Core Modeling Strategy | Closure Handling | Index / Optimization Highlights |
+|--------|------------------------|------------------|---------------------------------|
+| PostgreSQL | Normalized relational + MV | Recursive CTE → MV | Multi‑column B‑tree + specialized ACL indexes |
+| CockroachDB | Same as PostgreSQL | Recursive CTE → MV | Same as PostgreSQL (no function) |
+| ScyllaDB | Denormalized partitions | Precomputed tables | Partition keys + selective secondary indexes |
+| MongoDB | Document collections | Embedded arrays | Multikey & compound indexes on arrays |
+| ClickHouse | Columnar denormalized | MV stream union | Minmax, bloom filter, projection, partitioning |
+| Elasticsearch | Single index document | Arrays of user IDs | Inverted index + nested ACL mapping |
+| Authzed (PG) | Relation graph | Computed permissions | Internal storage; expressions replace closure table |
+| Authzed (CRDB) | Relation graph | Computed permissions | Same as PG backend |
+
+All eight implementations originate from one logical access control specification but diverge to exploit engine‑specific strengths (recursive SQL, partition locality, multikey arrays, columnar projections, graph expressions, and inverted indexing).
+
