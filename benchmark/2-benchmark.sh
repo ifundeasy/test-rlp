@@ -11,6 +11,16 @@ LOG_CREATE="$SCRIPT_DIR/2-1-create-schemas.log"
 LOG_LOAD="$SCRIPT_DIR/2-2-load-data.log"
 LOG_BENCH="$SCRIPT_DIR/2-3-benchmark.log"
 
+# === MINIMAL ADDITION START ===
+cleanup() {
+    echo "[cleanup] docker compose down -v"
+    pushd "$ROOT_DIR/docker" >/dev/null
+    docker compose down -v || true
+    popd >/dev/null
+}
+trap cleanup EXIT INT TERM
+# === MINIMAL ADDITION END ===
+
 # Delay seconds between benchmark runs
 DELAY_SECS=5
 
@@ -71,10 +81,10 @@ scenario_elasticsearch() { log_engine_header "elasticsearch"; run_with_log "$LOG
 
 benchmark_loop() {
 	local engine="$1"
-	for i in {1..5}; do
-		echo "[benchmark][$engine] run $i/5 (delay ${DELAY_SECS}s after)" | tee -a "$LOG_BENCH"
+	for i in {1..3}; do
+		echo "[benchmark][$engine] run $i/3 (delay ${DELAY_SECS}s after)" | tee -a "$LOG_BENCH"
 		run_with_log "$LOG_BENCH" go run cmd/main.go "$engine" benchmark
-		if [[ $i -lt 5 ]]; then
+		if [[ $i -lt 3 ]]; then
 			echo "[benchmark][$engine] sleep ${DELAY_SECS}s" | tee -a "$LOG_BENCH"
 			run_no_log sleep $DELAY_SECS
 		fi
@@ -87,7 +97,7 @@ wait_postgres_ready() { local tries=30; for i in {1..$tries}; do if docker compo
 wait_scylladb_ready() { local tries=40; for i in {1..$tries}; do if docker compose exec scylladb bash -c "cqlsh -e 'SELECT now() FROM system.local;'" >/dev/null 2>&1; then echo "[ready] scylladb"; return 0; fi; echo "[wait] scylladb ($i/$tries)"; sleep 3; done; echo "[error] scylladb not ready"; return 1; }
 wait_clickhouse_ready() { local tries=30; for i in {1..$tries}; do if docker compose exec clickhouse clickhouse-client --query 'SELECT 1' >/dev/null 2>&1; then echo "[ready] clickhouse"; return 0; fi; echo "[wait] clickhouse ($i/$tries)"; sleep 2; done; echo "[error] clickhouse not ready"; return 1; }
 wait_mongodb_ready() { local tries=40; for i in {1..$tries}; do if docker compose exec mongodb mongosh --quiet --eval 'db.runCommand({ping:1})' >/dev/null 2>&1; then echo "[ready] mongodb"; return 0; fi; echo "[wait] mongodb ($i/$tries)"; sleep 2; done; echo "[error] mongodb not ready"; return 1; }
-wait_elasticsearch_ready() { local tries=40; for i in {1..$tries}; do if curl -s localhost:9200 >/dev/null 2>&1 || docker compose exec elasticsearch curl -s localhost:9200 >/dev/null 2>&1; then echo "[ready] elasticsearch"; return 0; fi; echo "[wait] elasticsearch ($i/$tries)"; sleep 3; done; echo "[error] elasticsearch not ready"; return 1; }
+wait_elasticsearch_ready() { local tries=40; for i in {1..$tries}; do if curl -s localhost:9200 >/dev/null 2>&dirname efi || docker compose exec elasticsearch curl -s localhost:9200 >/dev/null 2>&1; then echo "[ready] elasticsearch"; return 0; fi; echo "[wait] elasticsearch ($i/$tries)"; sleep 3; done; echo "[error] elasticsearch not ready"; return 1; }
 
 usage() { echo "Usage: $0 [all|cockroachdb|authzed_crdb|postgres|authzed_pgdb|scylladb|clickhouse|mongodb|elasticsearch]"; exit 1; }
 
@@ -97,10 +107,9 @@ main() {
 	flush_logs
 	case "$choice" in
 		all)
-			# Ordered sequential run; uncomment scenarios to include others
 			echo "[run] authzed_crdb"; scenario_authzed_crdb
 			echo "[run] authzed_pgdb"; scenario_authzed_pgdb
-                        echo "[run] scylladb"; setup_scylladb; scenario_scylladb
+			echo "[run] scylladb"; setup_scylladb; scenario_scylladb
 			echo "[run] cockroachdb"; setup_crdb; scenario_cockroachdb
 			echo "[run] postgres"; setup_postgres; scenario_postgres
 			echo "[run] mongodb"; setup_mongodb; scenario_mongodb
@@ -120,4 +129,3 @@ main() {
 }
 
 main "$@"
-

@@ -7,13 +7,19 @@ Small Go playground for:
 - loading fixture data
 - running read benchmarks
 
-across different backends (Authzed, PostgreSQL, MongoDB, Redis, etc.).
+across different backends (Authzed/SpiceDB, PostgreSQL, MongoDB, ClickHouse,
+CockroachDB, Elasticsearch, ScyllaDB, etc.).
 
 The `cmd/` folder contains one-off commands (create schema, drop schema,
 load fixtures, benchmark reads), and `infrastructure/` contains the shared
 client/connection code for each backend.
 
 ---
+
+## Docs
+
+- Data schema: see [DATA_SCHEMA.md](./DATA_SCHEMA.md)
+- Benchmark report: see [BENCHMARK.md](./BENCHMARK.md)
 
 ## Project layout
 
@@ -34,7 +40,7 @@ Rough structure:
 │   │   └── ...
 │   ├── clickhouse/
 │   │   └── ...
-│   ├── cockroackdb/
+│   ├── cockroachdb/
 │   │   └── ...
 │   ├── elasticsearch/
 │   │   └── ...
@@ -54,10 +60,11 @@ Rough structure:
 │   ├── cockroachdb.go
 │   ├── elasticsearch.go
 │   ├── mongodb.go
+│   ├── postgres.go
 │   └── scylladb.go
 ├── go.mod
 └── go.sum
-````
+```
 
 ---
 
@@ -178,7 +185,7 @@ particular backend:
 * `clickhouse.go` – Clickhouse client and helpers
 * `cockroachdb.go` – CockroachDB client and helpers
 * `elasticsearch.go` – Elasticsearch client and helpers
-* `Mongodb.go` – MongoDB client and helpers
+* `mongodb.go` – MongoDB client and helpers
 * `postgres.go` – PostgreSQL client and helpers
 * `scylladb.go` – ScyllaDB client and helpers
 

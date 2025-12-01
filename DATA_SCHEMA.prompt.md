@@ -55,7 +55,7 @@ Accuracy Requirements:
   - Authzed (PG/CRDB): include relations and computed permissions exactly as in `.zed`.
 
 Output:
-- Emit a single Markdown document intended to replace the contents of `prompt/1-schemas.res.md`.
+- Emit a single Markdown document intended to replace the contents of `DATA_SCHEMA.md`.
 - Preserve the structure and diagram content exactly as generated from these instructions.
 
 Notes:
