@@ -50,7 +50,7 @@ type CockroachConfig struct {
 //	db, cleanup, err := infrastructure.NewCockroachFromEnv(context.Background())
 //	if err != nil { log.Fatal(err) }
 //	defer cleanup()
-func NewCockroachFromEnv(parentCtx context.Context) (*sql.DB, func(), error) {
+func NewCockroachDBFromEnv(parentCtx context.Context) (*sql.DB, func(), error) {
 	cfg, err := loadCockroachConfigFromEnv()
 	if err != nil {
 		return nil, func() {}, err

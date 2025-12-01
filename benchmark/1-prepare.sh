@@ -2,9 +2,12 @@
 set -euo pipefail
 
 LOGFILE="benchmark/1-prepare.log"
-ENVFILE="benchmark/bench.env"
+ENVFILE=".env"
 
-if [[ -f benchmark/bench.env ]]; then
+# Make log always fresh for each run
+: > "$LOGFILE"
+
+if [[ -f "$ENVFILE" ]]; then
   # shellcheck disable=SC1091
   source $ENVFILE
 else
@@ -12,12 +15,12 @@ else
   exit 1
 fi
 
-echo "❯ go run ./cmd/main.go csv load-data" | tee -a "$LOGFILE"
+echo "❯ go run ./cmd/main.go csv generate" | tee -a "$LOGFILE"
 
-# Run csv load-data:
+# Run csv generate:
 # - stdout+stderr displayed in terminal
 # - also appended to LOGFILE
-go run ./cmd/main.go csv load-data 2>&1 | tee -a "$LOGFILE"
+go run ./cmd/main.go csv generate 2>&1 | tee -a "$LOGFILE"
 
 # Get the last 2 lines containing BENCH_* from LOGFILE (must be from the latest run)
 # Example output:

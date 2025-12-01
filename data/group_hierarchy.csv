@@ -1,0 +1,15 @@
+parent_group_id,child_group_id,relation
+8,6,manager_group
+40,45,manager_group
+84,83,member_group
+93,85,member_group
+96,88,member_group
+96,89,member_group
+87,93,member_group
+102,107,manager_group
+113,108,member_group
+141,143,member_group
+141,142,member_group
+162,159,member_group
+145,159,member_group
+146,165,manager_group
