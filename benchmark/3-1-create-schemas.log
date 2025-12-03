@@ -1,0 +1,56 @@
+
+==== ENGINE: authzed_crdb ====
+2025/12/03 12:45:27.058366 [authzed_crdb] == Writing schema to SpiceDB from cmd/authzed_crdb/schemas.zed ==
+2025/12/03 12:45:27.133058 [authzed_crdb] Schema written at revision: GioKHjE3NjQ3NDA3MjcwODkxOTczMzYuMDAwMDAwMDAwMBIIMzVmNGIxMmQ=
+
+==== ENGINE: authzed_pgdb ====
+2025/12/03 12:48:24.284894 [authzed_pgdb] == Writing schema to SpiceDB from cmd/authzed_pgdb/schemas.zed ==
+2025/12/03 12:48:24.312965 [authzed_pgdb] Schema written at revision: GhAKBENNd0cSCGQ4YWJhMDk2
+
+==== ENGINE: scylladb ====
+2025/12/03 12:49:50.884109 [scylladb] Using hosts=[localhost] port=9042 keyspace="rlp" consistency=LOCAL_QUORUM
+2025/12/03 12:49:50.936426 [scylladb] == Creating ScyllaDB schemas ==
+2025/12/03 12:49:51.397310 [scylladb] ScyllaDB schemas created successfully.
+
+==== ENGINE: cockroachdb ====
+2025/12/03 12:51:25.153834 [cockroachdb] Connected host=localhost port=26257 db="rlp" user="root" sslmode=disable
+2025/12/03 12:51:25.153938 [cockroachdb] Creating schemas using cmd/cockroachdb/schemas.sql ...
+2025/12/03 12:51:36.179034 [cockroachdb] Schemas created successfully.
+
+==== ENGINE: postgres ====
+2025/12/03 13:00:31.535413 [postgres] Creating schemas using cmd/postgres/schemas.sql ...
+2025/12/03 13:00:31.567104 [postgres] Schemas created successfully.
+
+==== ENGINE: mongodb ====
+2025/12/03 13:01:41.477446 [mongodb] Index created on organizations: org_id_unique
+2025/12/03 13:01:41.477560 [mongodb] Index created on organizations: admin_user_ids_idx
+2025/12/03 13:01:41.477562 [mongodb] Index created on organizations: admin_group_ids_idx
+2025/12/03 13:01:41.477571 [mongodb] Index created on organizations: member_user_ids_idx
+2025/12/03 13:01:41.477573 [mongodb] Index created on organizations: member_group_ids_idx
+2025/12/03 13:01:41.497018 [mongodb] Index created on users: user_id_unique
+2025/12/03 13:01:41.497045 [mongodb] Index created on users: org_ids_idx
+2025/12/03 13:01:41.497047 [mongodb] Index created on users: group_ids_idx
+2025/12/03 13:01:41.526458 [mongodb] Index created on groups: group_id_unique
+2025/12/03 13:01:41.526468 [mongodb] Index created on groups: org_id_idx
+2025/12/03 13:01:41.526470 [mongodb] Index created on groups: direct_member_users_idx
+2025/12/03 13:01:41.526473 [mongodb] Index created on groups: direct_manager_users_idx
+2025/12/03 13:01:41.526474 [mongodb] Index created on groups: member_group_ids_idx
+2025/12/03 13:01:41.526476 [mongodb] Index created on groups: manager_group_ids_idx
+2025/12/03 13:01:41.566704 [mongodb] Index created on resources: resource_id_unique
+2025/12/03 13:01:41.566723 [mongodb] Index created on resources: org_id_idx
+2025/12/03 13:01:41.566724 [mongodb] Index created on resources: manager_user_ids_idx
+2025/12/03 13:01:41.566726 [mongodb] Index created on resources: viewer_user_ids_idx
+2025/12/03 13:01:41.566728 [mongodb] Index created on resources: manager_group_ids_idx
+2025/12/03 13:01:41.566729 [mongodb] Index created on resources: viewer_group_ids_idx
+2025/12/03 13:01:41.566731 [mongodb] Index created on resources: org_manage_user_idx
+2025/12/03 13:01:41.566734 [mongodb] Index created on resources: org_view_user_idx
+2025/12/03 13:01:41.566736 [mongodb] Index created on resources: org_manage_group_idx
+2025/12/03 13:01:41.566737 [mongodb] Index created on resources: org_view_group_idx
+2025/12/03 13:01:41.566765 [mongodb] schema creation complete: organizations, users, groups, resources
+
+==== ENGINE: clickhouse ====
+2025/12/03 13:03:47.128957 [clickhouse] Schemas created successfully.
+
+==== ENGINE: elasticsearch ====
+2025/12/03 13:06:08.037219 [elasticsearch] Using addresses=[http://localhost:9200] cloud_id_set=false auth_user=true timeout=5s insecure_tls=false
+2025/12/03 13:06:08.464022 [elasticsearch] created index "rlp" with mappings

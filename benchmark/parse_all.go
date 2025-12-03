@@ -40,7 +40,7 @@ type ScenarioMetrics struct {
 }
 
 func main() {
-	logPath := "benchmark/2-3-benchmark.log"
+	logPath := "benchmark/3-3-benchmark.log"
 	if len(os.Args) > 1 {
 		logPath = os.Args[1]
 	}

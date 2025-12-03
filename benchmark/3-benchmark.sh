@@ -7,9 +7,10 @@ SCRIPT_DIR=${0:a:h}
 ROOT_DIR=${SCRIPT_DIR:h}
 
 # Log files
-LOG_CREATE="$SCRIPT_DIR/2-1-create-schemas.log"
-LOG_LOAD="$SCRIPT_DIR/2-2-load-data.log"
-LOG_BENCH="$SCRIPT_DIR/2-3-benchmark.log"
+LOG_CREATE="$SCRIPT_DIR/3-1-create-schemas.log"
+LOG_LOAD="$SCRIPT_DIR/3-2-load-data.log"
+LOG_BENCH="$SCRIPT_DIR/3-3-benchmark.log"
+LOG_MONITOR="$SCRIPT_DIR/2-monitor.log"
 
 # === MINIMAL ADDITION START ===
 cleanup() {
@@ -17,17 +18,23 @@ cleanup() {
     pushd "$ROOT_DIR/docker" >/dev/null
     docker compose down -v || true
     popd >/dev/null
+	# Ensure monitor is stopped
+	if [[ -n "${MONITOR_PID:-}" ]]; then
+		kill "${MONITOR_PID}" >/dev/null 2>&1 || true
+		wait "${MONITOR_PID}" >/dev/null 2>&1 || true
+	fi
 }
 trap cleanup EXIT INT TERM
 # === MINIMAL ADDITION END ===
 
 # Delay seconds between benchmark runs
 DELAY_SECS=5
+READY_PAUSE_SECS=10
 
 # Blank line + engine heading in all logs + terminal
 log_engine_header() {
 	local engine="$1"
-	for lf in "$LOG_CREATE" "$LOG_LOAD" "$LOG_BENCH"; do
+	for lf in "$LOG_CREATE" "$LOG_LOAD" "$LOG_BENCH" "$LOG_MONITOR"; do
 		{ echo ""; echo "==== ENGINE: $engine ===="; } >> "$lf"
 	done
 	echo "==== ENGINE: $engine ===="
@@ -61,19 +68,24 @@ run_no_log() {
 	"$@" 2>&1
 }
 
+pause_ready() {
+	echo "[ready] pause ${READY_PAUSE_SECS}s before running scenario"
+	sleep ${READY_PAUSE_SECS}
+}
+
 # Setup containers & readiness
-setup_crdb() { pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d cockroachdb; wait_crdb_ready || { popd >/dev/null; return 1; }; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "CREATE DATABASE IF NOT EXISTS rlp"; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "CREATE DATABASE IF NOT EXISTS rlp_spicedb"; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "SHOW DATABASES"; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "SET CLUSTER SETTING kv.rangefeed.enabled = true"; popd >/dev/null; }
-setup_postgres() { pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d postgres; wait_postgres_ready || { popd >/dev/null; return 1; }; popd >/dev/null; }
-setup_scylladb() { pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d scylladb; wait_scylladb_ready || { popd >/dev/null; return 1; }; popd >/dev/null; }
-setup_clickhouse() { pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d clickhouse; wait_clickhouse_ready || { popd >/dev/null; return 1; }; popd >/dev/null; }
-setup_mongodb() { pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d mongodb; wait_mongodb_ready || { popd >/dev/null; return 1; }; popd >/dev/null; }
-setup_elasticsearch() { pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d elasticsearch; wait_elasticsearch_ready || { popd >/dev/null; return 1; }; popd >/dev/null; }
+setup_crdb() { pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d cockroachdb; wait_crdb_ready || { popd >/dev/null; return 1; }; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "CREATE DATABASE IF NOT EXISTS rlp"; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "CREATE DATABASE IF NOT EXISTS rlp_spicedb"; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "SHOW DATABASES"; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "SET CLUSTER SETTING kv.rangefeed.enabled = true"; pause_ready; popd >/dev/null; }
+setup_postgres() { pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d postgres; wait_postgres_ready || { popd >/dev/null; return 1; }; pause_ready; popd >/dev/null; }
+setup_scylladb() { pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d scylladb; wait_scylladb_ready || { popd >/dev/null; return 1; }; pause_ready; popd >/dev/null; }
+setup_clickhouse() { pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d clickhouse; wait_clickhouse_ready || { popd >/dev/null; return 1; }; pause_ready; popd >/dev/null; }
+setup_mongodb() { pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d mongodb; wait_mongodb_ready || { popd >/dev/null; return 1; }; pause_ready; popd >/dev/null; }
+setup_elasticsearch() { pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d elasticsearch; wait_elasticsearch_ready || { popd >/dev/null; return 1; }; pause_ready; popd >/dev/null; }
 
 # Scenarios
 scenario_cockroachdb() { log_engine_header "cockroachdb"; run_with_log "$LOG_CREATE" go run cmd/main.go cockroachdb create-schema; run_with_log "$LOG_LOAD" go run cmd/main.go cockroachdb load-data; benchmark_loop cockroachdb; }
-scenario_authzed_crdb() { log_engine_header "authzed_crdb"; pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d cockroachdb; wait_crdb_ready || { popd >/dev/null; return 1; }; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "CREATE DATABASE IF NOT EXISTS rlp"; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "CREATE DATABASE IF NOT EXISTS rlp_spicedb"; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "SHOW DATABASES"; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "SET CLUSTER SETTING kv.rangefeed.enabled = true"; run_no_log docker compose run --rm spicedb-crdb migrate head; run_no_log docker compose up -d spicedb-crdb spicedb-crdb-envoy; popd >/dev/null; run_with_log "$LOG_CREATE" go run cmd/main.go authzed_crdb create-schema; run_with_log "$LOG_LOAD" go run cmd/main.go authzed_crdb load-data; benchmark_loop authzed_crdb; }
+scenario_authzed_crdb() { log_engine_header "authzed_crdb"; pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d cockroachdb; wait_crdb_ready || { popd >/dev/null; return 1; }; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "CREATE DATABASE IF NOT EXISTS rlp"; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "CREATE DATABASE IF NOT EXISTS rlp_spicedb"; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "SHOW DATABASES"; run_no_log docker compose exec cockroachdb ./cockroach sql --insecure -e "SET CLUSTER SETTING kv.rangefeed.enabled = true"; run_no_log docker compose run --rm spicedb-crdb migrate head; run_no_log docker compose up -d spicedb-crdb spicedb-crdb-envoy; pause_ready; popd >/dev/null; run_with_log "$LOG_CREATE" go run cmd/main.go authzed_crdb create-schema; run_with_log "$LOG_LOAD" go run cmd/main.go authzed_crdb load-data; benchmark_loop authzed_crdb; }
 scenario_postgres() { log_engine_header "postgres"; run_with_log "$LOG_CREATE" go run cmd/main.go postgres create-schema; run_with_log "$LOG_LOAD" go run cmd/main.go postgres load-data; benchmark_loop postgres; }
-scenario_authzed_pgdb() { log_engine_header "authzed_pgdb"; pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d postgres; wait_postgres_ready || { popd >/dev/null; return 1; }; run_no_log docker compose run --rm spicedb-pgdb migrate head; run_no_log docker compose up -d spicedb-pgdb spicedb-pgdb-envoy; popd >/dev/null; run_with_log "$LOG_CREATE" go run cmd/main.go authzed_pgdb create-schema; run_with_log "$LOG_LOAD" go run cmd/main.go authzed_pgdb load-data; benchmark_loop authzed_pgdb; }
+scenario_authzed_pgdb() { log_engine_header "authzed_pgdb"; pushd "$ROOT_DIR/docker" >/dev/null; run_no_log docker compose down -v; run_no_log docker compose up -d postgres; wait_postgres_ready || { popd >/dev/null; return 1; }; run_no_log docker compose run --rm spicedb-pgdb migrate head; run_no_log docker compose up -d spicedb-pgdb spicedb-pgdb-envoy; pause_ready; popd >/dev/null; run_with_log "$LOG_CREATE" go run cmd/main.go authzed_pgdb create-schema; run_with_log "$LOG_LOAD" go run cmd/main.go authzed_pgdb load-data; benchmark_loop authzed_pgdb; }
 scenario_scylladb() { log_engine_header "scylladb"; run_with_log "$LOG_CREATE" go run cmd/main.go scylladb create-schema; run_with_log "$LOG_LOAD" go run cmd/main.go scylladb load-data; benchmark_loop scylladb; }
 scenario_clickhouse() { log_engine_header "clickhouse"; run_with_log "$LOG_CREATE" go run cmd/main.go clickhouse create-schema; run_with_log "$LOG_LOAD" go run cmd/main.go clickhouse load-data; benchmark_loop clickhouse; }
 scenario_mongodb() { log_engine_header "mongodb"; run_with_log "$LOG_CREATE" go run cmd/main.go mongodb create-schema; run_with_log "$LOG_LOAD" go run cmd/main.go mongodb load-data; benchmark_loop mongodb; }
@@ -105,6 +117,11 @@ main() {
 	local choice=${1:-all}
 	source_env
 	flush_logs
+	# Start monitor before first scenario; follow this script's PID
+	: > "$LOG_MONITOR"
+	echo "[monitor] starting 2-monitor.sh (logging to $LOG_MONITOR)"
+	"$SCRIPT_DIR/2-monitor.sh" "" $$ >/dev/null 2>&1 &
+	MONITOR_PID=$!
 	case "$choice" in
 		all)
 			echo "[run] authzed_crdb"; scenario_authzed_crdb

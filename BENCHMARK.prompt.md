@@ -6,18 +6,34 @@ You are an expert technical writer and tooling engineer maintaining the benchmar
 - Project root: `test-rlp`
 - Primary report: `BENCHMARK.md`
 - Data schema reference: `DATA_SCHEMA.md`
-- Read benchmark log: `benchmark/2-3-benchmark.log`
-- (Optional) Write/ingest log: `benchmark/2-2-load-data.log`
-- Parsers: `benchmark/parse_all.go`, `benchmark/parse_direct_user.go`
+- Read benchmark log: `benchmark/3-3-benchmark.log`
+- (Optional) Write/ingest log: `benchmark/3-2-load-data.log`
+- Parsers: `benchmark/parse_all.go`, `benchmark/parse_direct_user.go`, `benchmark/parse_monitor.go`
 
 ## Objectives
-- Parse read benchmark scenarios from `benchmark/2-3-benchmark.log` and ensure sections 6.2.1–6.2.5 in `BENCHMARK.md` are complete and accurate.
+- Parse read benchmark scenarios from `benchmark/3-3-benchmark.log` and ensure sections 6.2.1–6.2.5 in `BENCHMARK.md` are complete and accurate.
 - Sort each 6.2.x table by ascending Mean latency (“best first”). Backends with zero/absent samples must be placed last.
 - Remove any “Completed” column from 6.2.x tables (do not include it).
 - Include Elasticsearch and MongoDB entries for 6.2.1 `check_manage_direct_user` using actual log samples.
 - Maintain unit normalization (ns/µs/s → ms) and the agreed p95 calculation on sparse samples.
 - Populate narrative sections 7–12 derived from the data (write analysis, read analysis, validity & limitations, recommendations, risks, conclusions).
 - Ensure the entire document is in formal technical English. In narrative text, emphasize quantified values using bold (e.g., **5 runs**, **50 samples**). Do not bold numbers in tables.
+
+Monitor Tables (new requirement):
+- Parse engine monitor data from `benchmark/2-monitor.log` and add CPU/RAM summary tables under sections 6.1 and 6.2.1–6.2.5.
+- Compute per‑engine min, max, and mean for CPU% and RAM% using the log lines emitted by `2-monitor.sh`.
+- Normalize CPU% so that **100% equals fully consuming the allocated Docker CPUs** (divide raw Docker CPU% by the allocated CPUs, e.g., **8**).
+- Table columns must be: `| Backend | CPU Mean (%) | CPU Min (%) | CPU Max (%) | RAM Mean (%) | RAM Min (%) | RAM Max (%) | Samples |` (no Notes column).
+- Rows grouped by engine name (e.g., `authzed_crdb`, `postgres`, `cockroachdb`, etc.). If an engine has zero samples, omit it.
+
+Monitor Parser Usage (when and where):
+- Run the monitor parser immediately after a benchmark run and before updating section 6 in `BENCHMARK.md`.
+- Command: `go run ./benchmark/parse_monitor.go --cpus <allocated_cpus> benchmark/2-monitor.log` (use your Docker Desktop CPU allocation, e.g., `--cpus 8`).
+- Paste the generated markdown table:
+  - Under 6.1, directly after the main ingest table, titled “Monitor Summary (CPU/RAM)”.
+  - Under each of 6.2.1–6.2.5, directly after the scenario table, titled “Monitor Summary (CPU/RAM)”.
+-
+Note: Re-run the parser whenever `benchmark/2-monitor.log` changes to keep these tables in sync.
 
 ## Scenarios & Sampling
 - Streaming scenarios: `check_manage_direct_user`, `check_manage_org_admin`, `check_view_via_group_member`.
@@ -39,6 +55,9 @@ You are an expert technical writer and tooling engineer maintaining the benchmar
   - `| Backend | Iterations | Mean Iter Dur (ms) | p95 Iter Dur (ms) | Total Resources | Mean Resources/Iter | Last Iter Count | Notes |`
 - Sorting: rows ordered by ascending Mean; in equality ties, preserve original engine order. Entries with no samples/`0` should appear at the bottom.
 - Do not re-add a “Completed” column anywhere.
+
+Monitor Table placement:
+- Add the CPU/RAM monitor table immediately after the main table in 6.1 and after each scenario table in 6.2.1–6.2.5, titled “Monitor Summary (CPU/RAM)”.
 
 ## Special Handling & Notes
 - 6.2.1 must include Elasticsearch and MongoDB (they exist near the end of the log). Use actual samples to compute mean/p95/min/max.
@@ -63,9 +82,10 @@ You are an expert technical writer and tooling engineer maintaining the benchmar
 
 ## Inputs & Commands (optional)
 - To refresh scenario metrics:
-  - `go run ./benchmark/parse_all.go benchmark/2-3-benchmark.log`
-  - For direct‑user only: `go run ./benchmark/parse_direct_user.go benchmark/2-3-benchmark.log`
+  - `go run ./benchmark/parse_all.go benchmark/3-3-benchmark.log`
+  - For direct‑user only: `go run ./benchmark/parse_direct_user.go benchmark/3-3-benchmark.log`
 - Capture outputs and update the corresponding tables (6.2.1–6.2.5) sorted by Mean ascending.
+- For monitor tables, you may generate via: `go run ./benchmark/parse_monitor.go --cpus 8 benchmark/2-monitor.log` and paste the resulting markdown in the specified sections.
 
 ## Acceptance Criteria
 - 6.2.x tables are sorted by Mean ascending and contain complete rows for all available backends, including Elasticsearch and MongoDB in 6.2.1.

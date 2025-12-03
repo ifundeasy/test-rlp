@@ -1,0 +1,1562 @@
+
+==== ENGINE: authzed_crdb ====
+[benchmark][authzed_crdb] run 1/3 (delay 5s after)
+2025/12/03 12:46:22.450533 [authzed_crdb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 12:46:22.450718 [authzed_crdb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 12:46:22.513608 [authzed_crdb] [check_manage_direct_user] lookup iter=0 resource=1 user=1388 dur=17.828723ms
+2025/12/03 12:46:23.475575 [authzed_crdb] [check_manage_direct_user] lookup iter=100 resource=1184 user=1388 dur=9.335232ms
+2025/12/03 12:46:24.291427 [authzed_crdb] [check_manage_direct_user] lookup iter=200 resource=1403 user=1388 dur=7.103614ms
+2025/12/03 12:46:25.221014 [authzed_crdb] [check_manage_direct_user] lookup iter=300 resource=260 user=1388 dur=8.374256ms
+2025/12/03 12:46:26.121550 [authzed_crdb] [check_manage_direct_user] lookup iter=400 resource=459 user=1388 dur=7.308458ms
+2025/12/03 12:46:27.094380 [authzed_crdb] [check_manage_direct_user] lookup iter=500 resource=657 user=1388 dur=11.258922ms
+2025/12/03 12:46:28.066214 [authzed_crdb] [check_manage_direct_user] lookup iter=600 resource=868 user=1388 dur=7.481728ms
+2025/12/03 12:46:28.895843 [authzed_crdb] [check_manage_direct_user] lookup iter=700 resource=11479 user=1388 dur=5.807466ms
+2025/12/03 12:46:29.526423 [authzed_crdb] [check_manage_direct_user] lookup iter=800 resource=903 user=1388 dur=5.239288ms
+2025/12/03 12:46:30.387013 [authzed_crdb] [check_manage_direct_user] lookup iter=900 resource=1144 user=1388 dur=5.224166ms
+2025/12/03 12:46:31.259190 [authzed_crdb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 12:46:31.259205 [authzed_crdb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 12:46:31.281478 [authzed_crdb] [check_manage_org_admin] lookup iter=0 resource=1 user=1388 dur=8.823495ms
+2025/12/03 12:46:32.059540 [authzed_crdb] [check_manage_org_admin] lookup iter=100 resource=1184 user=1388 dur=9.719358ms
+2025/12/03 12:46:33.038193 [authzed_crdb] [check_manage_org_admin] lookup iter=200 resource=1403 user=1388 dur=7.495244ms
+2025/12/03 12:46:33.799041 [authzed_crdb] [check_manage_org_admin] lookup iter=300 resource=260 user=1388 dur=8.283356ms
+2025/12/03 12:46:34.653322 [authzed_crdb] [check_manage_org_admin] lookup iter=400 resource=459 user=1388 dur=7.648811ms
+2025/12/03 12:46:35.501631 [authzed_crdb] [check_manage_org_admin] lookup iter=500 resource=657 user=1388 dur=8.657428ms
+2025/12/03 12:46:36.287067 [authzed_crdb] [check_manage_org_admin] lookup iter=600 resource=868 user=1388 dur=11.55765ms
+2025/12/03 12:46:37.126158 [authzed_crdb] [check_manage_org_admin] lookup iter=700 resource=11479 user=1388 dur=5.357422ms
+2025/12/03 12:46:37.710358 [authzed_crdb] [check_manage_org_admin] lookup iter=800 resource=903 user=1388 dur=7.201749ms
+2025/12/03 12:46:38.551948 [authzed_crdb] [check_manage_org_admin] lookup iter=900 resource=1144 user=1388 dur=5.228496ms
+2025/12/03 12:46:39.402712 [authzed_crdb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 12:46:39.402737 [authzed_crdb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 12:46:39.511118 [authzed_crdb] [check_view_via_group_member] lookup iter=0 resource=17792 user=1539 dur=9.620808ms
+2025/12/03 12:46:40.542492 [authzed_crdb] [check_view_via_group_member] lookup iter=100 resource=17892 user=1539 dur=8.436485ms
+2025/12/03 12:46:41.369830 [authzed_crdb] [check_view_via_group_member] lookup iter=200 resource=17992 user=1539 dur=8.148043ms
+2025/12/03 12:46:42.228101 [authzed_crdb] [check_view_via_group_member] lookup iter=300 resource=18092 user=1539 dur=10.410471ms
+2025/12/03 12:46:43.296559 [authzed_crdb] [check_view_via_group_member] lookup iter=400 resource=18192 user=1539 dur=8.687232ms
+2025/12/03 12:46:44.382633 [authzed_crdb] [check_view_via_group_member] lookup iter=500 resource=18292 user=1539 dur=7.536083ms
+2025/12/03 12:46:45.549267 [authzed_crdb] [check_view_via_group_member] lookup iter=600 resource=18392 user=1539 dur=18.14649ms
+2025/12/03 12:46:46.636018 [authzed_crdb] [check_view_via_group_member] lookup iter=700 resource=18492 user=1539 dur=7.969673ms
+2025/12/03 12:46:47.523006 [authzed_crdb] [check_view_via_group_member] lookup iter=800 resource=18592 user=1539 dur=7.814693ms
+2025/12/03 12:46:48.792265 [authzed_crdb] [check_view_via_group_member] lookup iter=900 resource=18692 user=1539 dur=24.112128ms
+2025/12/03 12:46:49.780472 [authzed_crdb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 12:46:49.781273 [authzed_crdb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 12:46:49.803016 [authzed_crdb] [lookup_resources_manage_super] iter=0 resources=821 duration=21ms
+2025/12/03 12:46:49.832222 [authzed_crdb] [lookup_resources_manage_super] iter=1 resources=821 duration=28ms
+2025/12/03 12:46:49.868544 [authzed_crdb] [lookup_resources_manage_super] iter=2 resources=821 duration=36ms
+2025/12/03 12:46:49.902239 [authzed_crdb] [lookup_resources_manage_super] iter=3 resources=821 duration=33ms
+2025/12/03 12:46:49.937271 [authzed_crdb] [lookup_resources_manage_super] iter=4 resources=821 duration=35ms
+2025/12/03 12:46:49.974155 [authzed_crdb] [lookup_resources_manage_super] iter=5 resources=821 duration=36ms
+2025/12/03 12:46:50.026071 [authzed_crdb] [lookup_resources_manage_super] iter=6 resources=821 duration=51ms
+2025/12/03 12:46:50.064917 [authzed_crdb] [lookup_resources_manage_super] iter=7 resources=821 duration=38ms
+2025/12/03 12:46:50.102027 [authzed_crdb] [lookup_resources_manage_super] iter=8 resources=821 duration=37ms
+2025/12/03 12:46:50.138661 [authzed_crdb] [lookup_resources_manage_super] iter=9 resources=821 duration=36ms
+2025/12/03 12:46:50.138918 [authzed_crdb] [lookup_resources_manage_super] DONE: iters=10 lastCount=821 avg=35.655212ms total=356.552121ms
+2025/12/03 12:46:50.138929 [authzed_crdb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 12:46:50.345000 [authzed_crdb] [lookup_resources_view_regular] iter=0 resources=3145 duration=206ms
+2025/12/03 12:46:50.540916 [authzed_crdb] [lookup_resources_view_regular] iter=1 resources=3145 duration=195ms
+2025/12/03 12:46:50.685512 [authzed_crdb] [lookup_resources_view_regular] iter=2 resources=3145 duration=144ms
+2025/12/03 12:46:50.794538 [authzed_crdb] [lookup_resources_view_regular] iter=3 resources=3145 duration=108ms
+2025/12/03 12:46:50.899244 [authzed_crdb] [lookup_resources_view_regular] iter=4 resources=3145 duration=104ms
+2025/12/03 12:46:51.006463 [authzed_crdb] [lookup_resources_view_regular] iter=5 resources=3145 duration=107ms
+2025/12/03 12:46:51.125891 [authzed_crdb] [lookup_resources_view_regular] iter=6 resources=3145 duration=119ms
+2025/12/03 12:46:51.218340 [authzed_crdb] [lookup_resources_view_regular] iter=7 resources=3145 duration=92ms
+2025/12/03 12:46:51.338922 [authzed_crdb] [lookup_resources_view_regular] iter=8 resources=3145 duration=120ms
+2025/12/03 12:46:51.447935 [authzed_crdb] [lookup_resources_view_regular] iter=9 resources=3145 duration=108ms
+2025/12/03 12:46:51.447951 [authzed_crdb] [lookup_resources_view_regular] DONE: iters=10 lastCount=3145 avg=130.874222ms total=1.308742229s
+2025/12/03 12:46:51.447955 [authzed_crdb] == Authzed read benchmarks DONE ==
+[benchmark][authzed_crdb] sleep 5s
+[benchmark][authzed_crdb] run 2/3 (delay 5s after)
+2025/12/03 12:46:57.337438 [authzed_crdb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 12:46:57.337540 [authzed_crdb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 12:46:57.392036 [authzed_crdb] [check_manage_direct_user] lookup iter=0 resource=1 user=1388 dur=9.705156ms
+2025/12/03 12:46:58.188013 [authzed_crdb] [check_manage_direct_user] lookup iter=100 resource=1184 user=1388 dur=8.275031ms
+2025/12/03 12:46:59.001501 [authzed_crdb] [check_manage_direct_user] lookup iter=200 resource=1403 user=1388 dur=8.243557ms
+2025/12/03 12:46:59.820215 [authzed_crdb] [check_manage_direct_user] lookup iter=300 resource=260 user=1388 dur=8.361494ms
+2025/12/03 12:47:00.615134 [authzed_crdb] [check_manage_direct_user] lookup iter=400 resource=459 user=1388 dur=8.908043ms
+2025/12/03 12:47:01.498899 [authzed_crdb] [check_manage_direct_user] lookup iter=500 resource=657 user=1388 dur=7.737982ms
+2025/12/03 12:47:02.437760 [authzed_crdb] [check_manage_direct_user] lookup iter=600 resource=868 user=1388 dur=9.891128ms
+2025/12/03 12:47:03.246756 [authzed_crdb] [check_manage_direct_user] lookup iter=700 resource=11479 user=1388 dur=10.343763ms
+2025/12/03 12:47:03.896942 [authzed_crdb] [check_manage_direct_user] lookup iter=800 resource=903 user=1388 dur=8.941711ms
+2025/12/03 12:47:05.236315 [authzed_crdb] [check_manage_direct_user] lookup iter=900 resource=1144 user=1388 dur=4.767705ms
+2025/12/03 12:47:06.113329 [authzed_crdb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 12:47:06.113344 [authzed_crdb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 12:47:06.137916 [authzed_crdb] [check_manage_org_admin] lookup iter=0 resource=1 user=1388 dur=9.591496ms
+2025/12/03 12:47:06.987463 [authzed_crdb] [check_manage_org_admin] lookup iter=100 resource=1184 user=1388 dur=9.724348ms
+2025/12/03 12:47:07.895910 [authzed_crdb] [check_manage_org_admin] lookup iter=200 resource=1403 user=1388 dur=8.229415ms
+2025/12/03 12:47:08.842017 [authzed_crdb] [check_manage_org_admin] lookup iter=300 resource=260 user=1388 dur=19.315127ms
+2025/12/03 12:47:09.969391 [authzed_crdb] [check_manage_org_admin] lookup iter=400 resource=459 user=1388 dur=6.957381ms
+2025/12/03 12:47:11.283821 [authzed_crdb] [check_manage_org_admin] lookup iter=500 resource=657 user=1388 dur=8.059914ms
+2025/12/03 12:47:12.210222 [authzed_crdb] [check_manage_org_admin] lookup iter=600 resource=868 user=1388 dur=8.949409ms
+2025/12/03 12:47:12.893595 [authzed_crdb] [check_manage_org_admin] lookup iter=700 resource=11479 user=1388 dur=4.985115ms
+2025/12/03 12:47:13.427086 [authzed_crdb] [check_manage_org_admin] lookup iter=800 resource=903 user=1388 dur=5.048104ms
+2025/12/03 12:47:14.186070 [authzed_crdb] [check_manage_org_admin] lookup iter=900 resource=1144 user=1388 dur=4.835375ms
+2025/12/03 12:47:14.972920 [authzed_crdb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 12:47:14.972939 [authzed_crdb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 12:47:15.034348 [authzed_crdb] [check_view_via_group_member] lookup iter=0 resource=17792 user=1539 dur=9.474299ms
+2025/12/03 12:47:15.875112 [authzed_crdb] [check_view_via_group_member] lookup iter=100 resource=17892 user=1539 dur=8.981355ms
+2025/12/03 12:47:17.037279 [authzed_crdb] [check_view_via_group_member] lookup iter=200 resource=17992 user=1539 dur=12.818872ms
+2025/12/03 12:47:18.157132 [authzed_crdb] [check_view_via_group_member] lookup iter=300 resource=18092 user=1539 dur=13.435291ms
+2025/12/03 12:47:19.212560 [authzed_crdb] [check_view_via_group_member] lookup iter=400 resource=18192 user=1539 dur=14.169061ms
+2025/12/03 12:47:20.281415 [authzed_crdb] [check_view_via_group_member] lookup iter=500 resource=18292 user=1539 dur=8.269011ms
+2025/12/03 12:47:21.811257 [authzed_crdb] [check_view_via_group_member] lookup iter=600 resource=18392 user=1539 dur=10.868528ms
+2025/12/03 12:47:22.990652 [authzed_crdb] [check_view_via_group_member] lookup iter=700 resource=18492 user=1539 dur=13.414615ms
+2025/12/03 12:47:24.244996 [authzed_crdb] [check_view_via_group_member] lookup iter=800 resource=18592 user=1539 dur=10.040338ms
+2025/12/03 12:47:25.140062 [authzed_crdb] [check_view_via_group_member] lookup iter=900 resource=18692 user=1539 dur=9.223885ms
+2025/12/03 12:47:26.022554 [authzed_crdb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 12:47:26.022580 [authzed_crdb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 12:47:26.045306 [authzed_crdb] [lookup_resources_manage_super] iter=0 resources=821 duration=22ms
+2025/12/03 12:47:26.066433 [authzed_crdb] [lookup_resources_manage_super] iter=1 resources=821 duration=21ms
+2025/12/03 12:47:26.088721 [authzed_crdb] [lookup_resources_manage_super] iter=2 resources=821 duration=22ms
+2025/12/03 12:47:26.118626 [authzed_crdb] [lookup_resources_manage_super] iter=3 resources=821 duration=29ms
+2025/12/03 12:47:26.142732 [authzed_crdb] [lookup_resources_manage_super] iter=4 resources=821 duration=24ms
+2025/12/03 12:47:26.162488 [authzed_crdb] [lookup_resources_manage_super] iter=5 resources=821 duration=19ms
+2025/12/03 12:47:26.183705 [authzed_crdb] [lookup_resources_manage_super] iter=6 resources=821 duration=21ms
+2025/12/03 12:47:26.208505 [authzed_crdb] [lookup_resources_manage_super] iter=7 resources=821 duration=24ms
+2025/12/03 12:47:26.229509 [authzed_crdb] [lookup_resources_manage_super] iter=8 resources=821 duration=20ms
+2025/12/03 12:47:26.259373 [authzed_crdb] [lookup_resources_manage_super] iter=9 resources=821 duration=29ms
+2025/12/03 12:47:26.259389 [authzed_crdb] [lookup_resources_manage_super] DONE: iters=10 lastCount=821 avg=23.657324ms total=236.573243ms
+2025/12/03 12:47:26.259396 [authzed_crdb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 12:47:26.351572 [authzed_crdb] [lookup_resources_view_regular] iter=0 resources=3145 duration=92ms
+2025/12/03 12:47:26.460531 [authzed_crdb] [lookup_resources_view_regular] iter=1 resources=3145 duration=108ms
+2025/12/03 12:47:26.561672 [authzed_crdb] [lookup_resources_view_regular] iter=2 resources=3145 duration=101ms
+2025/12/03 12:47:26.657303 [authzed_crdb] [lookup_resources_view_regular] iter=3 resources=3145 duration=95ms
+2025/12/03 12:47:26.758610 [authzed_crdb] [lookup_resources_view_regular] iter=4 resources=3145 duration=101ms
+2025/12/03 12:47:26.861512 [authzed_crdb] [lookup_resources_view_regular] iter=5 resources=3145 duration=102ms
+2025/12/03 12:47:26.956628 [authzed_crdb] [lookup_resources_view_regular] iter=6 resources=3145 duration=95ms
+2025/12/03 12:47:27.090043 [authzed_crdb] [lookup_resources_view_regular] iter=7 resources=3145 duration=133ms
+2025/12/03 12:47:27.189119 [authzed_crdb] [lookup_resources_view_regular] iter=8 resources=3145 duration=99ms
+2025/12/03 12:47:27.317370 [authzed_crdb] [lookup_resources_view_regular] iter=9 resources=3145 duration=128ms
+2025/12/03 12:47:27.317384 [authzed_crdb] [lookup_resources_view_regular] DONE: iters=10 lastCount=3145 avg=105.760507ms total=1.057605076s
+2025/12/03 12:47:27.317390 [authzed_crdb] == Authzed read benchmarks DONE ==
+[benchmark][authzed_crdb] sleep 5s
+[benchmark][authzed_crdb] run 3/3 (delay 5s after)
+2025/12/03 12:47:33.359337 [authzed_crdb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 12:47:33.359548 [authzed_crdb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 12:47:33.536177 [authzed_crdb] [check_manage_direct_user] lookup iter=0 resource=1 user=1388 dur=19.64419ms
+2025/12/03 12:47:34.611196 [authzed_crdb] [check_manage_direct_user] lookup iter=100 resource=1184 user=1388 dur=8.905272ms
+2025/12/03 12:47:35.934586 [authzed_crdb] [check_manage_direct_user] lookup iter=200 resource=1403 user=1388 dur=10.871615ms
+2025/12/03 12:47:37.652290 [authzed_crdb] [check_manage_direct_user] lookup iter=300 resource=260 user=1388 dur=14.269515ms
+2025/12/03 12:47:38.913207 [authzed_crdb] [check_manage_direct_user] lookup iter=400 resource=459 user=1388 dur=14.93241ms
+2025/12/03 12:47:40.213312 [authzed_crdb] [check_manage_direct_user] lookup iter=500 resource=657 user=1388 dur=8.288433ms
+2025/12/03 12:47:41.241572 [authzed_crdb] [check_manage_direct_user] lookup iter=600 resource=868 user=1388 dur=13.334807ms
+2025/12/03 12:47:42.267174 [authzed_crdb] [check_manage_direct_user] lookup iter=700 resource=11479 user=1388 dur=6.915448ms
+2025/12/03 12:47:42.901379 [authzed_crdb] [check_manage_direct_user] lookup iter=800 resource=903 user=1388 dur=5.679391ms
+2025/12/03 12:47:43.737196 [authzed_crdb] [check_manage_direct_user] lookup iter=900 resource=1144 user=1388 dur=4.965178ms
+2025/12/03 12:47:44.684260 [authzed_crdb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 12:47:44.684278 [authzed_crdb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 12:47:44.714890 [authzed_crdb] [check_manage_org_admin] lookup iter=0 resource=1 user=1388 dur=15.601613ms
+2025/12/03 12:47:46.357236 [authzed_crdb] [check_manage_org_admin] lookup iter=100 resource=1184 user=1388 dur=13.272496ms
+2025/12/03 12:47:47.494013 [authzed_crdb] [check_manage_org_admin] lookup iter=200 resource=1403 user=1388 dur=13.98551ms
+2025/12/03 12:47:48.689333 [authzed_crdb] [check_manage_org_admin] lookup iter=300 resource=260 user=1388 dur=8.026087ms
+2025/12/03 12:47:49.506139 [authzed_crdb] [check_manage_org_admin] lookup iter=400 resource=459 user=1388 dur=7.472243ms
+2025/12/03 12:47:50.369663 [authzed_crdb] [check_manage_org_admin] lookup iter=500 resource=657 user=1388 dur=8.318706ms
+2025/12/03 12:47:51.268573 [authzed_crdb] [check_manage_org_admin] lookup iter=600 resource=868 user=1388 dur=12.155658ms
+2025/12/03 12:47:52.084509 [authzed_crdb] [check_manage_org_admin] lookup iter=700 resource=11479 user=1388 dur=4.883179ms
+2025/12/03 12:47:52.619336 [authzed_crdb] [check_manage_org_admin] lookup iter=800 resource=903 user=1388 dur=5.181321ms
+2025/12/03 12:47:53.425475 [authzed_crdb] [check_manage_org_admin] lookup iter=900 resource=1144 user=1388 dur=8.305874ms
+2025/12/03 12:47:54.375195 [authzed_crdb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 12:47:54.375218 [authzed_crdb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 12:47:54.439358 [authzed_crdb] [check_view_via_group_member] lookup iter=0 resource=17792 user=1539 dur=9.033455ms
+2025/12/03 12:47:55.335914 [authzed_crdb] [check_view_via_group_member] lookup iter=100 resource=17892 user=1539 dur=8.5437ms
+2025/12/03 12:47:56.312398 [authzed_crdb] [check_view_via_group_member] lookup iter=200 resource=17992 user=1539 dur=8.39685ms
+2025/12/03 12:47:57.239112 [authzed_crdb] [check_view_via_group_member] lookup iter=300 resource=18092 user=1539 dur=10.253956ms
+2025/12/03 12:47:58.182661 [authzed_crdb] [check_view_via_group_member] lookup iter=400 resource=18192 user=1539 dur=8.715477ms
+2025/12/03 12:47:59.160244 [authzed_crdb] [check_view_via_group_member] lookup iter=500 resource=18292 user=1539 dur=10.083624ms
+2025/12/03 12:48:00.075875 [authzed_crdb] [check_view_via_group_member] lookup iter=600 resource=18392 user=1539 dur=9.062774ms
+2025/12/03 12:48:00.941205 [authzed_crdb] [check_view_via_group_member] lookup iter=700 resource=18492 user=1539 dur=8.867671ms
+2025/12/03 12:48:01.887563 [authzed_crdb] [check_view_via_group_member] lookup iter=800 resource=18592 user=1539 dur=9.277574ms
+2025/12/03 12:48:02.870191 [authzed_crdb] [check_view_via_group_member] lookup iter=900 resource=18692 user=1539 dur=9.385724ms
+2025/12/03 12:48:03.911824 [authzed_crdb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 12:48:03.911842 [authzed_crdb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 12:48:03.933291 [authzed_crdb] [lookup_resources_manage_super] iter=0 resources=821 duration=21ms
+2025/12/03 12:48:03.955558 [authzed_crdb] [lookup_resources_manage_super] iter=1 resources=821 duration=22ms
+2025/12/03 12:48:03.980118 [authzed_crdb] [lookup_resources_manage_super] iter=2 resources=821 duration=24ms
+2025/12/03 12:48:04.020668 [authzed_crdb] [lookup_resources_manage_super] iter=3 resources=821 duration=40ms
+2025/12/03 12:48:04.054546 [authzed_crdb] [lookup_resources_manage_super] iter=4 resources=821 duration=33ms
+2025/12/03 12:48:04.081654 [authzed_crdb] [lookup_resources_manage_super] iter=5 resources=821 duration=27ms
+2025/12/03 12:48:04.110581 [authzed_crdb] [lookup_resources_manage_super] iter=6 resources=821 duration=28ms
+2025/12/03 12:48:04.137144 [authzed_crdb] [lookup_resources_manage_super] iter=7 resources=821 duration=26ms
+2025/12/03 12:48:04.167898 [authzed_crdb] [lookup_resources_manage_super] iter=8 resources=821 duration=30ms
+2025/12/03 12:48:04.193227 [authzed_crdb] [lookup_resources_manage_super] iter=9 resources=821 duration=25ms
+2025/12/03 12:48:04.193245 [authzed_crdb] [lookup_resources_manage_super] DONE: iters=10 lastCount=821 avg=28.116205ms total=281.162058ms
+2025/12/03 12:48:04.193256 [authzed_crdb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 12:48:04.305806 [authzed_crdb] [lookup_resources_view_regular] iter=0 resources=3145 duration=112ms
+2025/12/03 12:48:04.424196 [authzed_crdb] [lookup_resources_view_regular] iter=1 resources=3145 duration=118ms
+2025/12/03 12:48:04.566259 [authzed_crdb] [lookup_resources_view_regular] iter=2 resources=3145 duration=142ms
+2025/12/03 12:48:04.719920 [authzed_crdb] [lookup_resources_view_regular] iter=3 resources=3145 duration=153ms
+2025/12/03 12:48:04.902782 [authzed_crdb] [lookup_resources_view_regular] iter=4 resources=3145 duration=182ms
+2025/12/03 12:48:05.035083 [authzed_crdb] [lookup_resources_view_regular] iter=5 resources=3145 duration=132ms
+2025/12/03 12:48:05.141154 [authzed_crdb] [lookup_resources_view_regular] iter=6 resources=3145 duration=106ms
+2025/12/03 12:48:05.281974 [authzed_crdb] [lookup_resources_view_regular] iter=7 resources=3145 duration=140ms
+2025/12/03 12:48:05.375924 [authzed_crdb] [lookup_resources_view_regular] iter=8 resources=3145 duration=93ms
+2025/12/03 12:48:05.486754 [authzed_crdb] [lookup_resources_view_regular] iter=9 resources=3145 duration=110ms
+2025/12/03 12:48:05.486769 [authzed_crdb] [lookup_resources_view_regular] DONE: iters=10 lastCount=3145 avg=129.31589ms total=1.293158907s
+2025/12/03 12:48:05.486774 [authzed_crdb] == Authzed read benchmarks DONE ==
+
+==== ENGINE: authzed_pgdb ====
+[benchmark][authzed_pgdb] run 1/3 (delay 5s after)
+2025/12/03 12:48:53.701583 [authzed_pgdb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 12:48:53.702547 [authzed_pgdb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 12:48:53.838352 [authzed_pgdb] [check_manage_direct_user] lookup iter=0 resource=1 user=1388 dur=9.906638ms
+2025/12/03 12:48:54.225527 [authzed_pgdb] [check_manage_direct_user] lookup iter=100 resource=1184 user=1388 dur=5.064075ms
+2025/12/03 12:48:54.456699 [authzed_pgdb] [check_manage_direct_user] lookup iter=200 resource=1403 user=1388 dur=1.839401ms
+2025/12/03 12:48:54.678631 [authzed_pgdb] [check_manage_direct_user] lookup iter=300 resource=260 user=1388 dur=2.182422ms
+2025/12/03 12:48:54.889131 [authzed_pgdb] [check_manage_direct_user] lookup iter=400 resource=459 user=1388 dur=1.825429ms
+2025/12/03 12:48:55.083669 [authzed_pgdb] [check_manage_direct_user] lookup iter=500 resource=657 user=1388 dur=2.047397ms
+2025/12/03 12:48:55.273690 [authzed_pgdb] [check_manage_direct_user] lookup iter=600 resource=868 user=1388 dur=1.817666ms
+2025/12/03 12:48:55.456835 [authzed_pgdb] [check_manage_direct_user] lookup iter=700 resource=11479 user=1388 dur=1.558954ms
+2025/12/03 12:48:55.648295 [authzed_pgdb] [check_manage_direct_user] lookup iter=800 resource=903 user=1388 dur=1.821459ms
+2025/12/03 12:48:55.786139 [authzed_pgdb] [check_manage_direct_user] lookup iter=900 resource=1144 user=1388 dur=1.128994ms
+2025/12/03 12:48:55.894549 [authzed_pgdb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 12:48:55.894564 [authzed_pgdb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 12:48:55.899990 [authzed_pgdb] [check_manage_org_admin] lookup iter=0 resource=1 user=1388 dur=2.685647ms
+2025/12/03 12:48:56.016031 [authzed_pgdb] [check_manage_org_admin] lookup iter=100 resource=1184 user=1388 dur=1.469251ms
+2025/12/03 12:48:56.135218 [authzed_pgdb] [check_manage_org_admin] lookup iter=200 resource=1403 user=1388 dur=1.054954ms
+2025/12/03 12:48:56.246856 [authzed_pgdb] [check_manage_org_admin] lookup iter=300 resource=260 user=1388 dur=1.290725ms
+2025/12/03 12:48:56.365423 [authzed_pgdb] [check_manage_org_admin] lookup iter=400 resource=459 user=1388 dur=1.054744ms
+2025/12/03 12:48:56.479408 [authzed_pgdb] [check_manage_org_admin] lookup iter=500 resource=657 user=1388 dur=1.21994ms
+2025/12/03 12:48:56.592043 [authzed_pgdb] [check_manage_org_admin] lookup iter=600 resource=868 user=1388 dur=980.891µs
+2025/12/03 12:48:56.710390 [authzed_pgdb] [check_manage_org_admin] lookup iter=700 resource=11479 user=1388 dur=1.022539ms
+2025/12/03 12:48:56.825038 [authzed_pgdb] [check_manage_org_admin] lookup iter=800 resource=903 user=1388 dur=1.214548ms
+2025/12/03 12:48:56.941691 [authzed_pgdb] [check_manage_org_admin] lookup iter=900 resource=1144 user=1388 dur=1.077185ms
+2025/12/03 12:48:57.054170 [authzed_pgdb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 12:48:57.054188 [authzed_pgdb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 12:48:57.126975 [authzed_pgdb] [check_view_via_group_member] lookup iter=0 resource=17792 user=1539 dur=7.372642ms
+2025/12/03 12:48:57.369881 [authzed_pgdb] [check_view_via_group_member] lookup iter=100 resource=17892 user=1539 dur=2.101786ms
+2025/12/03 12:48:57.612091 [authzed_pgdb] [check_view_via_group_member] lookup iter=200 resource=17992 user=1539 dur=2.91353ms
+2025/12/03 12:48:57.941730 [authzed_pgdb] [check_view_via_group_member] lookup iter=300 resource=18092 user=1539 dur=3.398077ms
+2025/12/03 12:48:58.222682 [authzed_pgdb] [check_view_via_group_member] lookup iter=400 resource=18192 user=1539 dur=1.946839ms
+2025/12/03 12:48:58.444752 [authzed_pgdb] [check_view_via_group_member] lookup iter=500 resource=18292 user=1539 dur=2.677283ms
+2025/12/03 12:48:58.687518 [authzed_pgdb] [check_view_via_group_member] lookup iter=600 resource=18392 user=1539 dur=1.860353ms
+2025/12/03 12:48:58.964515 [authzed_pgdb] [check_view_via_group_member] lookup iter=700 resource=18492 user=1539 dur=2.116597ms
+2025/12/03 12:48:59.195270 [authzed_pgdb] [check_view_via_group_member] lookup iter=800 resource=18592 user=1539 dur=1.885856ms
+2025/12/03 12:48:59.414303 [authzed_pgdb] [check_view_via_group_member] lookup iter=900 resource=18692 user=1539 dur=1.820204ms
+2025/12/03 12:48:59.708311 [authzed_pgdb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 12:48:59.708329 [authzed_pgdb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 12:48:59.751110 [authzed_pgdb] [lookup_resources_manage_super] iter=0 resources=821 duration=42ms
+2025/12/03 12:48:59.766227 [authzed_pgdb] [lookup_resources_manage_super] iter=1 resources=821 duration=15ms
+2025/12/03 12:48:59.782639 [authzed_pgdb] [lookup_resources_manage_super] iter=2 resources=821 duration=16ms
+2025/12/03 12:48:59.798981 [authzed_pgdb] [lookup_resources_manage_super] iter=3 resources=821 duration=16ms
+2025/12/03 12:48:59.814471 [authzed_pgdb] [lookup_resources_manage_super] iter=4 resources=821 duration=15ms
+2025/12/03 12:48:59.830704 [authzed_pgdb] [lookup_resources_manage_super] iter=5 resources=821 duration=16ms
+2025/12/03 12:48:59.844161 [authzed_pgdb] [lookup_resources_manage_super] iter=6 resources=821 duration=13ms
+2025/12/03 12:48:59.864193 [authzed_pgdb] [lookup_resources_manage_super] iter=7 resources=821 duration=20ms
+2025/12/03 12:48:59.878174 [authzed_pgdb] [lookup_resources_manage_super] iter=8 resources=821 duration=13ms
+2025/12/03 12:48:59.890391 [authzed_pgdb] [lookup_resources_manage_super] iter=9 resources=821 duration=12ms
+2025/12/03 12:48:59.890407 [authzed_pgdb] [lookup_resources_manage_super] DONE: iters=10 lastCount=821 avg=18.17879ms total=181.787906ms
+2025/12/03 12:48:59.890416 [authzed_pgdb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 12:49:00.007454 [authzed_pgdb] [lookup_resources_view_regular] iter=0 resources=3145 duration=117ms
+2025/12/03 12:49:00.052565 [authzed_pgdb] [lookup_resources_view_regular] iter=1 resources=3145 duration=45ms
+2025/12/03 12:49:00.106640 [authzed_pgdb] [lookup_resources_view_regular] iter=2 resources=3145 duration=54ms
+2025/12/03 12:49:00.168392 [authzed_pgdb] [lookup_resources_view_regular] iter=3 resources=3145 duration=61ms
+2025/12/03 12:49:00.225886 [authzed_pgdb] [lookup_resources_view_regular] iter=4 resources=3145 duration=57ms
+2025/12/03 12:49:00.272267 [authzed_pgdb] [lookup_resources_view_regular] iter=5 resources=3145 duration=46ms
+2025/12/03 12:49:00.313958 [authzed_pgdb] [lookup_resources_view_regular] iter=6 resources=3145 duration=41ms
+2025/12/03 12:49:00.372270 [authzed_pgdb] [lookup_resources_view_regular] iter=7 resources=3145 duration=58ms
+2025/12/03 12:49:00.433814 [authzed_pgdb] [lookup_resources_view_regular] iter=8 resources=3145 duration=61ms
+2025/12/03 12:49:00.499057 [authzed_pgdb] [lookup_resources_view_regular] iter=9 resources=3145 duration=65ms
+2025/12/03 12:49:00.499079 [authzed_pgdb] [lookup_resources_view_regular] DONE: iters=10 lastCount=3145 avg=60.826506ms total=608.265064ms
+2025/12/03 12:49:00.499087 [authzed_pgdb] == Authzed read benchmarks DONE ==
+[benchmark][authzed_pgdb] sleep 5s
+[benchmark][authzed_pgdb] run 2/3 (delay 5s after)
+2025/12/03 12:49:06.475018 [authzed_pgdb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 12:49:06.475121 [authzed_pgdb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 12:49:06.529128 [authzed_pgdb] [check_manage_direct_user] lookup iter=0 resource=1 user=1388 dur=5.343451ms
+2025/12/03 12:49:06.773507 [authzed_pgdb] [check_manage_direct_user] lookup iter=100 resource=1184 user=1388 dur=2.172939ms
+2025/12/03 12:49:06.970727 [authzed_pgdb] [check_manage_direct_user] lookup iter=200 resource=1403 user=1388 dur=1.847029ms
+2025/12/03 12:49:07.244339 [authzed_pgdb] [check_manage_direct_user] lookup iter=300 resource=260 user=1388 dur=3.041982ms
+2025/12/03 12:49:07.639822 [authzed_pgdb] [check_manage_direct_user] lookup iter=400 resource=459 user=1388 dur=3.488171ms
+2025/12/03 12:49:07.964536 [authzed_pgdb] [check_manage_direct_user] lookup iter=500 resource=657 user=1388 dur=1.980393ms
+2025/12/03 12:49:08.161625 [authzed_pgdb] [check_manage_direct_user] lookup iter=600 resource=868 user=1388 dur=1.925909ms
+2025/12/03 12:49:08.371789 [authzed_pgdb] [check_manage_direct_user] lookup iter=700 resource=11479 user=1388 dur=1.93737ms
+2025/12/03 12:49:08.568220 [authzed_pgdb] [check_manage_direct_user] lookup iter=800 resource=903 user=1388 dur=1.972772ms
+2025/12/03 12:49:08.829989 [authzed_pgdb] [check_manage_direct_user] lookup iter=900 resource=1144 user=1388 dur=1.761914ms
+2025/12/03 12:49:09.026398 [authzed_pgdb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 12:49:09.026420 [authzed_pgdb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 12:49:09.030174 [authzed_pgdb] [check_manage_org_admin] lookup iter=0 resource=1 user=1388 dur=1.871451ms
+2025/12/03 12:49:09.160808 [authzed_pgdb] [check_manage_org_admin] lookup iter=100 resource=1184 user=1388 dur=1.556861ms
+2025/12/03 12:49:09.308683 [authzed_pgdb] [check_manage_org_admin] lookup iter=200 resource=1403 user=1388 dur=1.809654ms
+2025/12/03 12:49:09.518389 [authzed_pgdb] [check_manage_org_admin] lookup iter=300 resource=260 user=1388 dur=1.787266ms
+2025/12/03 12:49:09.756409 [authzed_pgdb] [check_manage_org_admin] lookup iter=400 resource=459 user=1388 dur=3.370376ms
+2025/12/03 12:49:09.986085 [authzed_pgdb] [check_manage_org_admin] lookup iter=500 resource=657 user=1388 dur=1.789136ms
+2025/12/03 12:49:10.180609 [authzed_pgdb] [check_manage_org_admin] lookup iter=600 resource=868 user=1388 dur=1.975453ms
+2025/12/03 12:49:10.394216 [authzed_pgdb] [check_manage_org_admin] lookup iter=700 resource=11479 user=1388 dur=1.698098ms
+2025/12/03 12:49:10.569835 [authzed_pgdb] [check_manage_org_admin] lookup iter=800 resource=903 user=1388 dur=1.847764ms
+2025/12/03 12:49:10.785784 [authzed_pgdb] [check_manage_org_admin] lookup iter=900 resource=1144 user=1388 dur=1.865035ms
+2025/12/03 12:49:10.976414 [authzed_pgdb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 12:49:10.976436 [authzed_pgdb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 12:49:11.038033 [authzed_pgdb] [check_view_via_group_member] lookup iter=0 resource=17792 user=1539 dur=5.271195ms
+2025/12/03 12:49:11.368618 [authzed_pgdb] [check_view_via_group_member] lookup iter=100 resource=17892 user=1539 dur=3.346641ms
+2025/12/03 12:49:11.614094 [authzed_pgdb] [check_view_via_group_member] lookup iter=200 resource=17992 user=1539 dur=1.979976ms
+2025/12/03 12:49:11.864793 [authzed_pgdb] [check_view_via_group_member] lookup iter=300 resource=18092 user=1539 dur=2.206681ms
+2025/12/03 12:49:12.083580 [authzed_pgdb] [check_view_via_group_member] lookup iter=400 resource=18192 user=1539 dur=2.328634ms
+2025/12/03 12:49:12.295715 [authzed_pgdb] [check_view_via_group_member] lookup iter=500 resource=18292 user=1539 dur=2.028027ms
+2025/12/03 12:49:12.510405 [authzed_pgdb] [check_view_via_group_member] lookup iter=600 resource=18392 user=1539 dur=2.037871ms
+2025/12/03 12:49:12.722631 [authzed_pgdb] [check_view_via_group_member] lookup iter=700 resource=18492 user=1539 dur=1.902902ms
+2025/12/03 12:49:12.966364 [authzed_pgdb] [check_view_via_group_member] lookup iter=800 resource=18592 user=1539 dur=3.901113ms
+2025/12/03 12:49:13.251135 [authzed_pgdb] [check_view_via_group_member] lookup iter=900 resource=18692 user=1539 dur=2.852776ms
+2025/12/03 12:49:13.546169 [authzed_pgdb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 12:49:13.546201 [authzed_pgdb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 12:49:13.581974 [authzed_pgdb] [lookup_resources_manage_super] iter=0 resources=821 duration=35ms
+2025/12/03 12:49:13.594016 [authzed_pgdb] [lookup_resources_manage_super] iter=1 resources=821 duration=12ms
+2025/12/03 12:49:13.607720 [authzed_pgdb] [lookup_resources_manage_super] iter=2 resources=821 duration=13ms
+2025/12/03 12:49:13.622577 [authzed_pgdb] [lookup_resources_manage_super] iter=3 resources=821 duration=14ms
+2025/12/03 12:49:13.634137 [authzed_pgdb] [lookup_resources_manage_super] iter=4 resources=821 duration=11ms
+2025/12/03 12:49:13.645548 [authzed_pgdb] [lookup_resources_manage_super] iter=5 resources=821 duration=11ms
+2025/12/03 12:49:13.657172 [authzed_pgdb] [lookup_resources_manage_super] iter=6 resources=821 duration=11ms
+2025/12/03 12:49:13.668796 [authzed_pgdb] [lookup_resources_manage_super] iter=7 resources=821 duration=11ms
+2025/12/03 12:49:13.680705 [authzed_pgdb] [lookup_resources_manage_super] iter=8 resources=821 duration=11ms
+2025/12/03 12:49:13.695964 [authzed_pgdb] [lookup_resources_manage_super] iter=9 resources=821 duration=15ms
+2025/12/03 12:49:13.695985 [authzed_pgdb] [lookup_resources_manage_super] DONE: iters=10 lastCount=821 avg=14.953911ms total=149.539112ms
+2025/12/03 12:49:13.695994 [authzed_pgdb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 12:49:13.805301 [authzed_pgdb] [lookup_resources_view_regular] iter=0 resources=3145 duration=109ms
+2025/12/03 12:49:13.857598 [authzed_pgdb] [lookup_resources_view_regular] iter=1 resources=3145 duration=52ms
+2025/12/03 12:49:13.920825 [authzed_pgdb] [lookup_resources_view_regular] iter=2 resources=3145 duration=63ms
+2025/12/03 12:49:13.962876 [authzed_pgdb] [lookup_resources_view_regular] iter=3 resources=3145 duration=42ms
+2025/12/03 12:49:14.006745 [authzed_pgdb] [lookup_resources_view_regular] iter=4 resources=3145 duration=43ms
+2025/12/03 12:49:14.062705 [authzed_pgdb] [lookup_resources_view_regular] iter=5 resources=3145 duration=55ms
+2025/12/03 12:49:14.108452 [authzed_pgdb] [lookup_resources_view_regular] iter=6 resources=3145 duration=45ms
+2025/12/03 12:49:14.164272 [authzed_pgdb] [lookup_resources_view_regular] iter=7 resources=3145 duration=55ms
+2025/12/03 12:49:14.237905 [authzed_pgdb] [lookup_resources_view_regular] iter=8 resources=3145 duration=73ms
+2025/12/03 12:49:14.317054 [authzed_pgdb] [lookup_resources_view_regular] iter=9 resources=3145 duration=79ms
+2025/12/03 12:49:14.317080 [authzed_pgdb] [lookup_resources_view_regular] DONE: iters=10 lastCount=3145 avg=62.073251ms total=620.732517ms
+2025/12/03 12:49:14.317087 [authzed_pgdb] == Authzed read benchmarks DONE ==
+[benchmark][authzed_pgdb] sleep 5s
+[benchmark][authzed_pgdb] run 3/3 (delay 5s after)
+2025/12/03 12:49:20.295874 [authzed_pgdb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 12:49:20.295991 [authzed_pgdb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 12:49:20.362813 [authzed_pgdb] [check_manage_direct_user] lookup iter=0 resource=1 user=1388 dur=4.042457ms
+2025/12/03 12:49:20.636618 [authzed_pgdb] [check_manage_direct_user] lookup iter=100 resource=1184 user=1388 dur=2.417591ms
+2025/12/03 12:49:20.842316 [authzed_pgdb] [check_manage_direct_user] lookup iter=200 resource=1403 user=1388 dur=1.881502ms
+2025/12/03 12:49:21.108900 [authzed_pgdb] [check_manage_direct_user] lookup iter=300 resource=260 user=1388 dur=2.901218ms
+2025/12/03 12:49:21.382780 [authzed_pgdb] [check_manage_direct_user] lookup iter=400 resource=459 user=1388 dur=3.310981ms
+2025/12/03 12:49:21.630568 [authzed_pgdb] [check_manage_direct_user] lookup iter=500 resource=657 user=1388 dur=1.727468ms
+2025/12/03 12:49:21.867293 [authzed_pgdb] [check_manage_direct_user] lookup iter=600 resource=868 user=1388 dur=2.330836ms
+2025/12/03 12:49:22.082197 [authzed_pgdb] [check_manage_direct_user] lookup iter=700 resource=11479 user=1388 dur=1.779288ms
+2025/12/03 12:49:22.294353 [authzed_pgdb] [check_manage_direct_user] lookup iter=800 resource=903 user=1388 dur=2.660822ms
+2025/12/03 12:49:22.474189 [authzed_pgdb] [check_manage_direct_user] lookup iter=900 resource=1144 user=1388 dur=1.198362ms
+2025/12/03 12:49:22.599494 [authzed_pgdb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 12:49:22.599511 [authzed_pgdb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 12:49:22.602804 [authzed_pgdb] [check_manage_org_admin] lookup iter=0 resource=1 user=1388 dur=1.519375ms
+2025/12/03 12:49:22.719707 [authzed_pgdb] [check_manage_org_admin] lookup iter=100 resource=1184 user=1388 dur=1.104678ms
+2025/12/03 12:49:22.835750 [authzed_pgdb] [check_manage_org_admin] lookup iter=200 resource=1403 user=1388 dur=1.093537ms
+2025/12/03 12:49:22.945384 [authzed_pgdb] [check_manage_org_admin] lookup iter=300 resource=260 user=1388 dur=1.075836ms
+2025/12/03 12:49:23.057978 [authzed_pgdb] [check_manage_org_admin] lookup iter=400 resource=459 user=1388 dur=1.057663ms
+2025/12/03 12:49:23.173867 [authzed_pgdb] [check_manage_org_admin] lookup iter=500 resource=657 user=1388 dur=1.124618ms
+2025/12/03 12:49:23.292229 [authzed_pgdb] [check_manage_org_admin] lookup iter=600 resource=868 user=1388 dur=1.27053ms
+2025/12/03 12:49:23.406356 [authzed_pgdb] [check_manage_org_admin] lookup iter=700 resource=11479 user=1388 dur=1.158639ms
+2025/12/03 12:49:23.564727 [authzed_pgdb] [check_manage_org_admin] lookup iter=800 resource=903 user=1388 dur=1.648812ms
+2025/12/03 12:49:23.785534 [authzed_pgdb] [check_manage_org_admin] lookup iter=900 resource=1144 user=1388 dur=1.833472ms
+2025/12/03 12:49:23.984665 [authzed_pgdb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 12:49:23.984692 [authzed_pgdb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 12:49:24.056211 [authzed_pgdb] [check_view_via_group_member] lookup iter=0 resource=17792 user=1539 dur=6.18537ms
+2025/12/03 12:49:24.381418 [authzed_pgdb] [check_view_via_group_member] lookup iter=100 resource=17892 user=1539 dur=2.743112ms
+2025/12/03 12:49:24.679883 [authzed_pgdb] [check_view_via_group_member] lookup iter=200 resource=17992 user=1539 dur=6.45105ms
+2025/12/03 12:49:25.023092 [authzed_pgdb] [check_view_via_group_member] lookup iter=300 resource=18092 user=1539 dur=2.3729ms
+2025/12/03 12:49:25.304875 [authzed_pgdb] [check_view_via_group_member] lookup iter=400 resource=18192 user=1539 dur=2.365674ms
+2025/12/03 12:49:25.583659 [authzed_pgdb] [check_view_via_group_member] lookup iter=500 resource=18292 user=1539 dur=2.780026ms
+2025/12/03 12:49:25.899918 [authzed_pgdb] [check_view_via_group_member] lookup iter=600 resource=18392 user=1539 dur=4.814089ms
+2025/12/03 12:49:26.249849 [authzed_pgdb] [check_view_via_group_member] lookup iter=700 resource=18492 user=1539 dur=3.198483ms
+2025/12/03 12:49:26.573801 [authzed_pgdb] [check_view_via_group_member] lookup iter=800 resource=18592 user=1539 dur=3.249125ms
+2025/12/03 12:49:26.952172 [authzed_pgdb] [check_view_via_group_member] lookup iter=900 resource=18692 user=1539 dur=3.568631ms
+2025/12/03 12:49:27.299860 [authzed_pgdb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 12:49:27.299891 [authzed_pgdb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 12:49:27.328841 [authzed_pgdb] [lookup_resources_manage_super] iter=0 resources=821 duration=28ms
+2025/12/03 12:49:27.342399 [authzed_pgdb] [lookup_resources_manage_super] iter=1 resources=821 duration=13ms
+2025/12/03 12:49:27.353317 [authzed_pgdb] [lookup_resources_manage_super] iter=2 resources=821 duration=10ms
+2025/12/03 12:49:27.365051 [authzed_pgdb] [lookup_resources_manage_super] iter=3 resources=821 duration=11ms
+2025/12/03 12:49:27.377754 [authzed_pgdb] [lookup_resources_manage_super] iter=4 resources=821 duration=12ms
+2025/12/03 12:49:27.391160 [authzed_pgdb] [lookup_resources_manage_super] iter=5 resources=821 duration=13ms
+2025/12/03 12:49:27.408144 [authzed_pgdb] [lookup_resources_manage_super] iter=6 resources=821 duration=16ms
+2025/12/03 12:49:27.418998 [authzed_pgdb] [lookup_resources_manage_super] iter=7 resources=821 duration=10ms
+2025/12/03 12:49:27.428729 [authzed_pgdb] [lookup_resources_manage_super] iter=8 resources=821 duration=9ms
+2025/12/03 12:49:27.440821 [authzed_pgdb] [lookup_resources_manage_super] iter=9 resources=821 duration=12ms
+2025/12/03 12:49:27.440835 [authzed_pgdb] [lookup_resources_manage_super] DONE: iters=10 lastCount=821 avg=14.070881ms total=140.708816ms
+2025/12/03 12:49:27.440841 [authzed_pgdb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 12:49:27.525559 [authzed_pgdb] [lookup_resources_view_regular] iter=0 resources=3145 duration=84ms
+2025/12/03 12:49:27.592714 [authzed_pgdb] [lookup_resources_view_regular] iter=1 resources=3145 duration=67ms
+2025/12/03 12:49:27.656298 [authzed_pgdb] [lookup_resources_view_regular] iter=2 resources=3145 duration=63ms
+2025/12/03 12:49:27.718162 [authzed_pgdb] [lookup_resources_view_regular] iter=3 resources=3145 duration=61ms
+2025/12/03 12:49:27.769659 [authzed_pgdb] [lookup_resources_view_regular] iter=4 resources=3145 duration=51ms
+2025/12/03 12:49:27.820516 [authzed_pgdb] [lookup_resources_view_regular] iter=5 resources=3145 duration=50ms
+2025/12/03 12:49:27.865928 [authzed_pgdb] [lookup_resources_view_regular] iter=6 resources=3145 duration=45ms
+2025/12/03 12:49:27.931329 [authzed_pgdb] [lookup_resources_view_regular] iter=7 resources=3145 duration=65ms
+2025/12/03 12:49:27.984247 [authzed_pgdb] [lookup_resources_view_regular] iter=8 resources=3145 duration=52ms
+2025/12/03 12:49:28.036609 [authzed_pgdb] [lookup_resources_view_regular] iter=9 resources=3145 duration=52ms
+2025/12/03 12:49:28.036627 [authzed_pgdb] [lookup_resources_view_regular] DONE: iters=10 lastCount=3145 avg=59.549745ms total=595.497457ms
+2025/12/03 12:49:28.036636 [authzed_pgdb] == Authzed read benchmarks DONE ==
+
+==== ENGINE: scylladb ====
+[benchmark][scylladb] run 1/3 (delay 5s after)
+2025/12/03 12:50:41.270629 [scylladb] Using hosts=[localhost] port=9042 keyspace="rlp" consistency=LOCAL_QUORUM
+2025/12/03 12:50:41.326582 [scylladb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 12:50:41.326639 [scylladb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 12:50:41.347653 [scylladb] [check_manage_direct_user] lookup iter=0 resource=5 user=1388 dur=9.840913ms
+2025/12/03 12:50:41.763720 [scylladb] [check_manage_direct_user] lookup iter=100 resource=1048 user=1388 dur=2.958951ms
+2025/12/03 12:50:42.283975 [scylladb] [check_manage_direct_user] lookup iter=200 resource=13163 user=1388 dur=5.011421ms
+2025/12/03 12:50:42.771860 [scylladb] [check_manage_direct_user] lookup iter=300 resource=835 user=1388 dur=4.682913ms
+2025/12/03 12:50:43.145753 [scylladb] [check_manage_direct_user] lookup iter=400 resource=11360 user=1388 dur=4.559702ms
+2025/12/03 12:50:43.460825 [scylladb] [check_manage_direct_user] lookup iter=500 resource=620 user=1388 dur=1.163215ms
+2025/12/03 12:50:43.715124 [scylladb] [check_manage_direct_user] lookup iter=600 resource=10271 user=1388 dur=1.145994ms
+2025/12/03 12:50:43.831001 [scylladb] [check_manage_direct_user] lookup iter=700 resource=369 user=1388 dur=1.04147ms
+2025/12/03 12:50:43.960110 [scylladb] [check_manage_direct_user] lookup iter=800 resource=9090 user=1388 dur=1.426135ms
+2025/12/03 12:50:44.070776 [scylladb] [check_manage_direct_user] lookup iter=900 resource=121 user=1388 dur=1.018472ms
+2025/12/03 12:50:44.166515 [scylladb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 12:50:44.166540 [scylladb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 12:50:44.169892 [scylladb] [check_manage_org_admin] lookup iter=0 resource=5 user=1388 dur=1.111784ms
+2025/12/03 12:50:44.275643 [scylladb] [check_manage_org_admin] lookup iter=100 resource=1048 user=1388 dur=1.020774ms
+2025/12/03 12:50:44.384768 [scylladb] [check_manage_org_admin] lookup iter=200 resource=13163 user=1388 dur=1.073564ms
+2025/12/03 12:50:44.491839 [scylladb] [check_manage_org_admin] lookup iter=300 resource=835 user=1388 dur=1.129926ms
+2025/12/03 12:50:44.608642 [scylladb] [check_manage_org_admin] lookup iter=400 resource=11360 user=1388 dur=1.447365ms
+2025/12/03 12:50:44.730589 [scylladb] [check_manage_org_admin] lookup iter=500 resource=620 user=1388 dur=1.161486ms
+2025/12/03 12:50:44.831201 [scylladb] [check_manage_org_admin] lookup iter=600 resource=10271 user=1388 dur=951.722µs
+2025/12/03 12:50:44.938161 [scylladb] [check_manage_org_admin] lookup iter=700 resource=369 user=1388 dur=1.12271ms
+2025/12/03 12:50:45.111943 [scylladb] [check_manage_org_admin] lookup iter=800 resource=9090 user=1388 dur=1.02948ms
+2025/12/03 12:50:45.210823 [scylladb] [check_manage_org_admin] lookup iter=900 resource=121 user=1388 dur=1.052784ms
+2025/12/03 12:50:45.308727 [scylladb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 12:50:45.308748 [scylladb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 12:50:45.314105 [scylladb] [check_view_via_group_member] lookup iter=0 resource=17866 user=1539 dur=2.808273ms
+2025/12/03 12:50:45.435508 [scylladb] [check_view_via_group_member] lookup iter=100 resource=18193 user=1539 dur=674.088µs
+2025/12/03 12:50:45.513675 [scylladb] [check_view_via_group_member] lookup iter=200 resource=18318 user=1539 dur=747.255µs
+2025/12/03 12:50:45.591380 [scylladb] [check_view_via_group_member] lookup iter=300 resource=18427 user=1539 dur=813.872µs
+2025/12/03 12:50:45.670127 [scylladb] [check_view_via_group_member] lookup iter=400 resource=18910 user=1539 dur=833.037µs
+2025/12/03 12:50:45.749994 [scylladb] [check_view_via_group_member] lookup iter=500 resource=19069 user=1539 dur=822.041µs
+2025/12/03 12:50:45.829514 [scylladb] [check_view_via_group_member] lookup iter=600 resource=19237 user=1539 dur=780.792µs
+2025/12/03 12:50:45.909052 [scylladb] [check_view_via_group_member] lookup iter=700 resource=20588 user=1539 dur=801.893µs
+2025/12/03 12:50:45.989695 [scylladb] [check_view_via_group_member] lookup iter=800 resource=20737 user=1539 dur=821.693µs
+2025/12/03 12:50:46.071538 [scylladb] [check_view_via_group_member] lookup iter=900 resource=20893 user=1539 dur=971.723µs
+2025/12/03 12:50:46.156851 [scylladb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 12:50:46.157593 [scylladb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 12:50:46.160054 [scylladb] [lookup_resources_manage_super] iter=0 resources=221 duration=2ms
+2025/12/03 12:50:46.161268 [scylladb] [lookup_resources_manage_super] iter=1 resources=221 duration=1ms
+2025/12/03 12:50:46.162457 [scylladb] [lookup_resources_manage_super] iter=2 resources=221 duration=1ms
+2025/12/03 12:50:46.163514 [scylladb] [lookup_resources_manage_super] iter=3 resources=221 duration=1ms
+2025/12/03 12:50:46.164603 [scylladb] [lookup_resources_manage_super] iter=4 resources=221 duration=1ms
+2025/12/03 12:50:46.165614 [scylladb] [lookup_resources_manage_super] iter=5 resources=221 duration=1ms
+2025/12/03 12:50:46.166711 [scylladb] [lookup_resources_manage_super] iter=6 resources=221 duration=1ms
+2025/12/03 12:50:46.167899 [scylladb] [lookup_resources_manage_super] iter=7 resources=221 duration=1ms
+2025/12/03 12:50:46.168989 [scylladb] [lookup_resources_manage_super] iter=8 resources=221 duration=1ms
+2025/12/03 12:50:46.170065 [scylladb] [lookup_resources_manage_super] iter=9 resources=221 duration=1ms
+2025/12/03 12:50:46.170072 [scylladb] [lookup_resources_manage_super] DONE: iters=10 lastCount=221 avg=1.238417ms total=12.38417ms
+2025/12/03 12:50:46.170083 [scylladb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 12:50:46.171023 [scylladb] [lookup_resources_view_regular] iter=0 resources=95 duration=0s
+2025/12/03 12:50:46.172025 [scylladb] [lookup_resources_view_regular] iter=1 resources=95 duration=0s
+2025/12/03 12:50:46.173039 [scylladb] [lookup_resources_view_regular] iter=2 resources=95 duration=1ms
+2025/12/03 12:50:46.173947 [scylladb] [lookup_resources_view_regular] iter=3 resources=95 duration=0s
+2025/12/03 12:50:46.174850 [scylladb] [lookup_resources_view_regular] iter=4 resources=95 duration=0s
+2025/12/03 12:50:46.175791 [scylladb] [lookup_resources_view_regular] iter=5 resources=95 duration=0s
+2025/12/03 12:50:46.176744 [scylladb] [lookup_resources_view_regular] iter=6 resources=95 duration=0s
+2025/12/03 12:50:46.177656 [scylladb] [lookup_resources_view_regular] iter=7 resources=95 duration=0s
+2025/12/03 12:50:46.178671 [scylladb] [lookup_resources_view_regular] iter=8 resources=95 duration=1ms
+2025/12/03 12:50:46.179671 [scylladb] [lookup_resources_view_regular] iter=9 resources=95 duration=0s
+2025/12/03 12:50:46.179678 [scylladb] [lookup_resources_view_regular] DONE: iters=10 lastCount=95 avg=951.27µs total=9.512709ms
+2025/12/03 12:50:46.179682 [scylladb] == ScyllaDB read benchmarks DONE ==
+[benchmark][scylladb] sleep 5s
+[benchmark][scylladb] run 2/3 (delay 5s after)
+2025/12/03 12:50:52.625666 [scylladb] Using hosts=[localhost] port=9042 keyspace="rlp" consistency=LOCAL_QUORUM
+2025/12/03 12:50:52.674310 [scylladb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 12:50:52.674333 [scylladb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 12:50:52.678676 [scylladb] [check_manage_direct_user] lookup iter=0 resource=5 user=1388 dur=2.113052ms
+2025/12/03 12:50:52.777235 [scylladb] [check_manage_direct_user] lookup iter=100 resource=1048 user=1388 dur=799.695µs
+2025/12/03 12:50:52.877962 [scylladb] [check_manage_direct_user] lookup iter=200 resource=13163 user=1388 dur=925.767µs
+2025/12/03 12:50:52.969976 [scylladb] [check_manage_direct_user] lookup iter=300 resource=835 user=1388 dur=908.949µs
+2025/12/03 12:50:53.062722 [scylladb] [check_manage_direct_user] lookup iter=400 resource=11360 user=1388 dur=857.569µs
+2025/12/03 12:50:53.153256 [scylladb] [check_manage_direct_user] lookup iter=500 resource=620 user=1388 dur=849.837µs
+2025/12/03 12:50:53.241770 [scylladb] [check_manage_direct_user] lookup iter=600 resource=10271 user=1388 dur=966.908µs
+2025/12/03 12:50:53.335072 [scylladb] [check_manage_direct_user] lookup iter=700 resource=369 user=1388 dur=1.068767ms
+2025/12/03 12:50:53.426482 [scylladb] [check_manage_direct_user] lookup iter=800 resource=9090 user=1388 dur=864.368µs
+2025/12/03 12:50:53.514524 [scylladb] [check_manage_direct_user] lookup iter=900 resource=121 user=1388 dur=896.161µs
+2025/12/03 12:50:53.597578 [scylladb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 12:50:53.597598 [scylladb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 12:50:53.599659 [scylladb] [check_manage_org_admin] lookup iter=0 resource=5 user=1388 dur=935.268µs
+2025/12/03 12:50:53.684487 [scylladb] [check_manage_org_admin] lookup iter=100 resource=1048 user=1388 dur=812.002µs
+2025/12/03 12:50:53.768063 [scylladb] [check_manage_org_admin] lookup iter=200 resource=13163 user=1388 dur=887.799µs
+2025/12/03 12:50:53.855401 [scylladb] [check_manage_org_admin] lookup iter=300 resource=835 user=1388 dur=893.151µs
+2025/12/03 12:50:53.942217 [scylladb] [check_manage_org_admin] lookup iter=400 resource=11360 user=1388 dur=864.053µs
+2025/12/03 12:50:54.029807 [scylladb] [check_manage_org_admin] lookup iter=500 resource=620 user=1388 dur=971.543µs
+2025/12/03 12:50:54.117556 [scylladb] [check_manage_org_admin] lookup iter=600 resource=10271 user=1388 dur=864.664µs
+2025/12/03 12:50:54.204832 [scylladb] [check_manage_org_admin] lookup iter=700 resource=369 user=1388 dur=908.747µs
+2025/12/03 12:50:54.291658 [scylladb] [check_manage_org_admin] lookup iter=800 resource=9090 user=1388 dur=746.894µs
+2025/12/03 12:50:54.379075 [scylladb] [check_manage_org_admin] lookup iter=900 resource=121 user=1388 dur=843.592µs
+2025/12/03 12:50:54.466139 [scylladb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 12:50:54.466158 [scylladb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 12:50:54.470142 [scylladb] [check_view_via_group_member] lookup iter=0 resource=17866 user=1539 dur=1.906034ms
+2025/12/03 12:50:54.558898 [scylladb] [check_view_via_group_member] lookup iter=100 resource=18193 user=1539 dur=772.984µs
+2025/12/03 12:50:54.644408 [scylladb] [check_view_via_group_member] lookup iter=200 resource=18318 user=1539 dur=792.468µs
+2025/12/03 12:50:54.728838 [scylladb] [check_view_via_group_member] lookup iter=300 resource=18427 user=1539 dur=926.367µs
+2025/12/03 12:50:54.820309 [scylladb] [check_view_via_group_member] lookup iter=400 resource=18910 user=1539 dur=1.047989ms
+2025/12/03 12:50:54.917758 [scylladb] [check_view_via_group_member] lookup iter=500 resource=19069 user=1539 dur=915.996µs
+2025/12/03 12:50:55.016806 [scylladb] [check_view_via_group_member] lookup iter=600 resource=19237 user=1539 dur=984.506µs
+2025/12/03 12:50:55.118168 [scylladb] [check_view_via_group_member] lookup iter=700 resource=20588 user=1539 dur=889.062µs
+2025/12/03 12:50:55.206451 [scylladb] [check_view_via_group_member] lookup iter=800 resource=20737 user=1539 dur=890.389µs
+2025/12/03 12:50:55.301707 [scylladb] [check_view_via_group_member] lookup iter=900 resource=20893 user=1539 dur=991.582µs
+2025/12/03 12:50:55.412508 [scylladb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 12:50:55.412538 [scylladb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 12:50:55.415902 [scylladb] [lookup_resources_manage_super] iter=0 resources=221 duration=3ms
+2025/12/03 12:50:55.417585 [scylladb] [lookup_resources_manage_super] iter=1 resources=221 duration=1ms
+2025/12/03 12:50:55.419746 [scylladb] [lookup_resources_manage_super] iter=2 resources=221 duration=2ms
+2025/12/03 12:50:55.421998 [scylladb] [lookup_resources_manage_super] iter=3 resources=221 duration=2ms
+2025/12/03 12:50:55.423866 [scylladb] [lookup_resources_manage_super] iter=4 resources=221 duration=1ms
+2025/12/03 12:50:55.425955 [scylladb] [lookup_resources_manage_super] iter=5 resources=221 duration=2ms
+2025/12/03 12:50:55.427737 [scylladb] [lookup_resources_manage_super] iter=6 resources=221 duration=1ms
+2025/12/03 12:50:55.429570 [scylladb] [lookup_resources_manage_super] iter=7 resources=221 duration=1ms
+2025/12/03 12:50:55.431661 [scylladb] [lookup_resources_manage_super] iter=8 resources=221 duration=2ms
+2025/12/03 12:50:55.433551 [scylladb] [lookup_resources_manage_super] iter=9 resources=221 duration=1ms
+2025/12/03 12:50:55.433565 [scylladb] [lookup_resources_manage_super] DONE: iters=10 lastCount=221 avg=2.081031ms total=20.810317ms
+2025/12/03 12:50:55.433587 [scylladb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 12:50:55.435075 [scylladb] [lookup_resources_view_regular] iter=0 resources=95 duration=1ms
+2025/12/03 12:50:55.436465 [scylladb] [lookup_resources_view_regular] iter=1 resources=95 duration=1ms
+2025/12/03 12:50:55.438265 [scylladb] [lookup_resources_view_regular] iter=2 resources=95 duration=1ms
+2025/12/03 12:50:55.439682 [scylladb] [lookup_resources_view_regular] iter=3 resources=95 duration=1ms
+2025/12/03 12:50:55.441084 [scylladb] [lookup_resources_view_regular] iter=4 resources=95 duration=1ms
+2025/12/03 12:50:55.442495 [scylladb] [lookup_resources_view_regular] iter=5 resources=95 duration=1ms
+2025/12/03 12:50:55.443846 [scylladb] [lookup_resources_view_regular] iter=6 resources=95 duration=1ms
+2025/12/03 12:50:55.445114 [scylladb] [lookup_resources_view_regular] iter=7 resources=95 duration=1ms
+2025/12/03 12:50:55.446369 [scylladb] [lookup_resources_view_regular] iter=8 resources=95 duration=1ms
+2025/12/03 12:50:55.447712 [scylladb] [lookup_resources_view_regular] iter=9 resources=95 duration=1ms
+2025/12/03 12:50:55.447722 [scylladb] [lookup_resources_view_regular] DONE: iters=10 lastCount=95 avg=1.397433ms total=13.974331ms
+2025/12/03 12:50:55.447733 [scylladb] == ScyllaDB read benchmarks DONE ==
+[benchmark][scylladb] sleep 5s
+[benchmark][scylladb] run 3/3 (delay 5s after)
+2025/12/03 12:51:02.015221 [scylladb] Using hosts=[localhost] port=9042 keyspace="rlp" consistency=LOCAL_QUORUM
+2025/12/03 12:51:02.049196 [scylladb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 12:51:02.049252 [scylladb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 12:51:02.055157 [scylladb] [check_manage_direct_user] lookup iter=0 resource=5 user=1388 dur=2.842377ms
+2025/12/03 12:51:02.153178 [scylladb] [check_manage_direct_user] lookup iter=100 resource=1048 user=1388 dur=693.702µs
+2025/12/03 12:51:02.241591 [scylladb] [check_manage_direct_user] lookup iter=200 resource=13163 user=1388 dur=883.483µs
+2025/12/03 12:51:02.331802 [scylladb] [check_manage_direct_user] lookup iter=300 resource=835 user=1388 dur=806.532µs
+2025/12/03 12:51:02.417042 [scylladb] [check_manage_direct_user] lookup iter=400 resource=11360 user=1388 dur=935.765µs
+2025/12/03 12:51:02.505891 [scylladb] [check_manage_direct_user] lookup iter=500 resource=620 user=1388 dur=860.376µs
+2025/12/03 12:51:02.595881 [scylladb] [check_manage_direct_user] lookup iter=600 resource=10271 user=1388 dur=1.019078ms
+2025/12/03 12:51:02.682271 [scylladb] [check_manage_direct_user] lookup iter=700 resource=369 user=1388 dur=843.221µs
+2025/12/03 12:51:02.767053 [scylladb] [check_manage_direct_user] lookup iter=800 resource=9090 user=1388 dur=837.187µs
+2025/12/03 12:51:02.857874 [scylladb] [check_manage_direct_user] lookup iter=900 resource=121 user=1388 dur=864.275µs
+2025/12/03 12:51:02.946283 [scylladb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 12:51:02.946299 [scylladb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 12:51:02.948249 [scylladb] [check_manage_org_admin] lookup iter=0 resource=5 user=1388 dur=914.254µs
+2025/12/03 12:51:03.039003 [scylladb] [check_manage_org_admin] lookup iter=100 resource=1048 user=1388 dur=897.508µs
+2025/12/03 12:51:03.127966 [scylladb] [check_manage_org_admin] lookup iter=200 resource=13163 user=1388 dur=1.031776ms
+2025/12/03 12:51:03.217273 [scylladb] [check_manage_org_admin] lookup iter=300 resource=835 user=1388 dur=865.849µs
+2025/12/03 12:51:03.307898 [scylladb] [check_manage_org_admin] lookup iter=400 resource=11360 user=1388 dur=895.339µs
+2025/12/03 12:51:03.407140 [scylladb] [check_manage_org_admin] lookup iter=500 resource=620 user=1388 dur=1.060255ms
+2025/12/03 12:51:03.506249 [scylladb] [check_manage_org_admin] lookup iter=600 resource=10271 user=1388 dur=869.033µs
+2025/12/03 12:51:03.592208 [scylladb] [check_manage_org_admin] lookup iter=700 resource=369 user=1388 dur=824.466µs
+2025/12/03 12:51:03.677355 [scylladb] [check_manage_org_admin] lookup iter=800 resource=9090 user=1388 dur=867.004µs
+2025/12/03 12:51:03.762734 [scylladb] [check_manage_org_admin] lookup iter=900 resource=121 user=1388 dur=835.315µs
+2025/12/03 12:51:03.864161 [scylladb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 12:51:03.864178 [scylladb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 12:51:03.868720 [scylladb] [check_view_via_group_member] lookup iter=0 resource=17866 user=1539 dur=2.272495ms
+2025/12/03 12:51:03.956805 [scylladb] [check_view_via_group_member] lookup iter=100 resource=18193 user=1539 dur=678.645µs
+2025/12/03 12:51:04.041683 [scylladb] [check_view_via_group_member] lookup iter=200 resource=18318 user=1539 dur=866.764µs
+2025/12/03 12:51:04.123394 [scylladb] [check_view_via_group_member] lookup iter=300 resource=18427 user=1539 dur=908.354µs
+2025/12/03 12:51:04.207183 [scylladb] [check_view_via_group_member] lookup iter=400 resource=18910 user=1539 dur=832.631µs
+2025/12/03 12:51:04.293765 [scylladb] [check_view_via_group_member] lookup iter=500 resource=19069 user=1539 dur=881.985µs
+2025/12/03 12:51:04.379748 [scylladb] [check_view_via_group_member] lookup iter=600 resource=19237 user=1539 dur=900.768µs
+2025/12/03 12:51:04.464857 [scylladb] [check_view_via_group_member] lookup iter=700 resource=20588 user=1539 dur=1.13412ms
+2025/12/03 12:51:04.555967 [scylladb] [check_view_via_group_member] lookup iter=800 resource=20737 user=1539 dur=964.491µs
+2025/12/03 12:51:04.645887 [scylladb] [check_view_via_group_member] lookup iter=900 resource=20893 user=1539 dur=836.321µs
+2025/12/03 12:51:04.731900 [scylladb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 12:51:04.732272 [scylladb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 12:51:04.734750 [scylladb] [lookup_resources_manage_super] iter=0 resources=221 duration=2ms
+2025/12/03 12:51:04.735824 [scylladb] [lookup_resources_manage_super] iter=1 resources=221 duration=1ms
+2025/12/03 12:51:04.736958 [scylladb] [lookup_resources_manage_super] iter=2 resources=221 duration=1ms
+2025/12/03 12:51:04.738046 [scylladb] [lookup_resources_manage_super] iter=3 resources=221 duration=1ms
+2025/12/03 12:51:04.739134 [scylladb] [lookup_resources_manage_super] iter=4 resources=221 duration=1ms
+2025/12/03 12:51:04.740229 [scylladb] [lookup_resources_manage_super] iter=5 resources=221 duration=1ms
+2025/12/03 12:51:04.741321 [scylladb] [lookup_resources_manage_super] iter=6 resources=221 duration=1ms
+2025/12/03 12:51:04.742370 [scylladb] [lookup_resources_manage_super] iter=7 resources=221 duration=1ms
+2025/12/03 12:51:04.743519 [scylladb] [lookup_resources_manage_super] iter=8 resources=221 duration=1ms
+2025/12/03 12:51:04.744589 [scylladb] [lookup_resources_manage_super] iter=9 resources=221 duration=1ms
+2025/12/03 12:51:04.744596 [scylladb] [lookup_resources_manage_super] DONE: iters=10 lastCount=221 avg=1.22369ms total=12.236906ms
+2025/12/03 12:51:04.744606 [scylladb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 12:51:04.745808 [scylladb] [lookup_resources_view_regular] iter=0 resources=95 duration=1ms
+2025/12/03 12:51:04.746899 [scylladb] [lookup_resources_view_regular] iter=1 resources=95 duration=1ms
+2025/12/03 12:51:04.747887 [scylladb] [lookup_resources_view_regular] iter=2 resources=95 duration=0s
+2025/12/03 12:51:04.748814 [scylladb] [lookup_resources_view_regular] iter=3 resources=95 duration=0s
+2025/12/03 12:51:04.749882 [scylladb] [lookup_resources_view_regular] iter=4 resources=95 duration=1ms
+2025/12/03 12:51:04.750948 [scylladb] [lookup_resources_view_regular] iter=5 resources=95 duration=1ms
+2025/12/03 12:51:04.751880 [scylladb] [lookup_resources_view_regular] iter=6 resources=95 duration=0s
+2025/12/03 12:51:04.752880 [scylladb] [lookup_resources_view_regular] iter=7 resources=95 duration=0s
+2025/12/03 12:51:04.753926 [scylladb] [lookup_resources_view_regular] iter=8 resources=95 duration=1ms
+2025/12/03 12:51:04.754875 [scylladb] [lookup_resources_view_regular] iter=9 resources=95 duration=0s
+2025/12/03 12:51:04.754882 [scylladb] [lookup_resources_view_regular] DONE: iters=10 lastCount=95 avg=1.015949ms total=10.159492ms
+2025/12/03 12:51:04.754887 [scylladb] == ScyllaDB read benchmarks DONE ==
+
+==== ENGINE: cockroachdb ====
+[benchmark][cockroachdb] run 1/3 (delay 5s after)
+2025/12/03 12:59:43.242418 [cockroachdb] Connected host=localhost port=26257 db="rlp" user="root" sslmode=disable
+2025/12/03 12:59:43.242571 [cockroachdb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 12:59:43.242588 [cockroachdb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 12:59:43.260226 [cockroachdb] [check_manage_direct_user] lookup iter=0 resource=5 user=1388 dur=6.329457ms
+2025/12/03 12:59:43.554586 [cockroachdb] [check_manage_direct_user] lookup iter=100 resource=1048 user=1388 dur=1.488878ms
+2025/12/03 12:59:43.768587 [cockroachdb] [check_manage_direct_user] lookup iter=200 resource=13163 user=1388 dur=2.850255ms
+2025/12/03 12:59:43.972303 [cockroachdb] [check_manage_direct_user] lookup iter=300 resource=835 user=1388 dur=1.947779ms
+2025/12/03 12:59:44.168851 [cockroachdb] [check_manage_direct_user] lookup iter=400 resource=11360 user=1388 dur=2.543768ms
+2025/12/03 12:59:44.396028 [cockroachdb] [check_manage_direct_user] lookup iter=500 resource=620 user=1388 dur=1.873134ms
+2025/12/03 12:59:44.592205 [cockroachdb] [check_manage_direct_user] lookup iter=600 resource=10271 user=1388 dur=2.083172ms
+2025/12/03 12:59:44.789042 [cockroachdb] [check_manage_direct_user] lookup iter=700 resource=369 user=1388 dur=1.389603ms
+2025/12/03 12:59:44.980686 [cockroachdb] [check_manage_direct_user] lookup iter=800 resource=9090 user=1388 dur=3.094136ms
+2025/12/03 12:59:45.205825 [cockroachdb] [check_manage_direct_user] lookup iter=900 resource=121 user=1388 dur=2.157718ms
+2025/12/03 12:59:45.410187 [cockroachdb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 12:59:45.410212 [cockroachdb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 12:59:45.415159 [cockroachdb] [check_manage_org_admin] lookup iter=0 resource=5 user=1388 dur=1.787533ms
+2025/12/03 12:59:45.596448 [cockroachdb] [check_manage_org_admin] lookup iter=100 resource=1048 user=1388 dur=1.902885ms
+2025/12/03 12:59:45.769896 [cockroachdb] [check_manage_org_admin] lookup iter=200 resource=13163 user=1388 dur=1.416553ms
+2025/12/03 12:59:45.920877 [cockroachdb] [check_manage_org_admin] lookup iter=300 resource=835 user=1388 dur=1.428072ms
+2025/12/03 12:59:46.120400 [cockroachdb] [check_manage_org_admin] lookup iter=400 resource=11360 user=1388 dur=1.896701ms
+2025/12/03 12:59:46.292675 [cockroachdb] [check_manage_org_admin] lookup iter=500 resource=620 user=1388 dur=1.464616ms
+2025/12/03 12:59:46.459021 [cockroachdb] [check_manage_org_admin] lookup iter=600 resource=10271 user=1388 dur=2.587379ms
+2025/12/03 12:59:46.645279 [cockroachdb] [check_manage_org_admin] lookup iter=700 resource=369 user=1388 dur=2.214574ms
+2025/12/03 12:59:46.873296 [cockroachdb] [check_manage_org_admin] lookup iter=800 resource=9090 user=1388 dur=1.875537ms
+2025/12/03 12:59:47.210286 [cockroachdb] [check_manage_org_admin] lookup iter=900 resource=121 user=1388 dur=2.250449ms
+2025/12/03 12:59:47.389374 [cockroachdb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 12:59:47.389698 [cockroachdb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 12:59:47.395339 [cockroachdb] [check_view_via_group_member] lookup iter=0 resource=17866 user=1539 dur=2.359019ms
+2025/12/03 12:59:47.574082 [cockroachdb] [check_view_via_group_member] lookup iter=100 resource=18193 user=1539 dur=1.851845ms
+2025/12/03 12:59:47.737670 [cockroachdb] [check_view_via_group_member] lookup iter=200 resource=18318 user=1539 dur=1.430482ms
+2025/12/03 12:59:47.893479 [cockroachdb] [check_view_via_group_member] lookup iter=300 resource=18427 user=1539 dur=1.372133ms
+2025/12/03 12:59:48.060269 [cockroachdb] [check_view_via_group_member] lookup iter=400 resource=18910 user=1539 dur=1.805816ms
+2025/12/03 12:59:48.265761 [cockroachdb] [check_view_via_group_member] lookup iter=500 resource=19069 user=1539 dur=1.626441ms
+2025/12/03 12:59:48.436242 [cockroachdb] [check_view_via_group_member] lookup iter=600 resource=19237 user=1539 dur=1.602667ms
+2025/12/03 12:59:48.629663 [cockroachdb] [check_view_via_group_member] lookup iter=700 resource=20588 user=1539 dur=1.60493ms
+2025/12/03 12:59:48.804170 [cockroachdb] [check_view_via_group_member] lookup iter=800 resource=20737 user=1539 dur=1.49109ms
+2025/12/03 12:59:48.963892 [cockroachdb] [check_view_via_group_member] lookup iter=900 resource=20893 user=1539 dur=1.565975ms
+2025/12/03 12:59:49.126450 [cockroachdb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 12:59:49.127233 [cockroachdb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 12:59:49.129248 [cockroachdb] [lookup_resources_manage_super] iter=0 resources=221 duration=2ms
+2025/12/03 12:59:49.131003 [cockroachdb] [lookup_resources_manage_super] iter=1 resources=221 duration=1ms
+2025/12/03 12:59:49.132651 [cockroachdb] [lookup_resources_manage_super] iter=2 resources=221 duration=1ms
+2025/12/03 12:59:49.134514 [cockroachdb] [lookup_resources_manage_super] iter=3 resources=221 duration=1ms
+2025/12/03 12:59:49.136187 [cockroachdb] [lookup_resources_manage_super] iter=4 resources=221 duration=1ms
+2025/12/03 12:59:49.137882 [cockroachdb] [lookup_resources_manage_super] iter=5 resources=221 duration=1ms
+2025/12/03 12:59:49.139445 [cockroachdb] [lookup_resources_manage_super] iter=6 resources=221 duration=1ms
+2025/12/03 12:59:49.141189 [cockroachdb] [lookup_resources_manage_super] iter=7 resources=221 duration=1ms
+2025/12/03 12:59:49.142943 [cockroachdb] [lookup_resources_manage_super] iter=8 resources=221 duration=1ms
+2025/12/03 12:59:49.144427 [cockroachdb] [lookup_resources_manage_super] iter=9 resources=221 duration=1ms
+2025/12/03 12:59:49.144434 [cockroachdb] [lookup_resources_manage_super] DONE: iters=10 lastCount=221 avg=1.710748ms total=17.10748ms
+2025/12/03 12:59:49.144440 [cockroachdb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 12:59:49.146234 [cockroachdb] [lookup_resources_view_regular] iter=0 resources=95 duration=1ms
+2025/12/03 12:59:49.147876 [cockroachdb] [lookup_resources_view_regular] iter=1 resources=95 duration=1ms
+2025/12/03 12:59:49.149302 [cockroachdb] [lookup_resources_view_regular] iter=2 resources=95 duration=1ms
+2025/12/03 12:59:49.151063 [cockroachdb] [lookup_resources_view_regular] iter=3 resources=95 duration=1ms
+2025/12/03 12:59:49.153005 [cockroachdb] [lookup_resources_view_regular] iter=4 resources=95 duration=1ms
+2025/12/03 12:59:49.154516 [cockroachdb] [lookup_resources_view_regular] iter=5 resources=95 duration=1ms
+2025/12/03 12:59:49.156129 [cockroachdb] [lookup_resources_view_regular] iter=6 resources=95 duration=1ms
+2025/12/03 12:59:49.157688 [cockroachdb] [lookup_resources_view_regular] iter=7 resources=95 duration=1ms
+2025/12/03 12:59:49.159224 [cockroachdb] [lookup_resources_view_regular] iter=8 resources=95 duration=1ms
+2025/12/03 12:59:49.160666 [cockroachdb] [lookup_resources_view_regular] iter=9 resources=95 duration=1ms
+2025/12/03 12:59:49.160673 [cockroachdb] [lookup_resources_view_regular] DONE: iters=10 lastCount=95 avg=1.614347ms total=16.143478ms
+2025/12/03 12:59:49.160682 [cockroachdb] == CockroachDB read benchmarks DONE ==
+[benchmark][cockroachdb] sleep 5s
+[benchmark][cockroachdb] run 2/3 (delay 5s after)
+2025/12/03 12:59:55.517243 [cockroachdb] Connected host=localhost port=26257 db="rlp" user="root" sslmode=disable
+2025/12/03 12:59:55.517383 [cockroachdb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 12:59:55.517396 [cockroachdb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 12:59:55.525506 [cockroachdb] [check_manage_direct_user] lookup iter=0 resource=5 user=1388 dur=5.170197ms
+2025/12/03 12:59:55.697779 [cockroachdb] [check_manage_direct_user] lookup iter=100 resource=1048 user=1388 dur=1.512939ms
+2025/12/03 12:59:55.866021 [cockroachdb] [check_manage_direct_user] lookup iter=200 resource=13163 user=1388 dur=1.435014ms
+2025/12/03 12:59:56.051133 [cockroachdb] [check_manage_direct_user] lookup iter=300 resource=835 user=1388 dur=2.081152ms
+2025/12/03 12:59:56.755955 [cockroachdb] [check_manage_direct_user] lookup iter=400 resource=11360 user=1388 dur=2.090055ms
+2025/12/03 12:59:57.121039 [cockroachdb] [check_manage_direct_user] lookup iter=500 resource=620 user=1388 dur=2.813611ms
+2025/12/03 12:59:57.357188 [cockroachdb] [check_manage_direct_user] lookup iter=600 resource=10271 user=1388 dur=2.079553ms
+2025/12/03 12:59:57.602403 [cockroachdb] [check_manage_direct_user] lookup iter=700 resource=369 user=1388 dur=2.271935ms
+2025/12/03 12:59:57.815851 [cockroachdb] [check_manage_direct_user] lookup iter=800 resource=9090 user=1388 dur=1.800171ms
+2025/12/03 12:59:58.022904 [cockroachdb] [check_manage_direct_user] lookup iter=900 resource=121 user=1388 dur=2.23869ms
+2025/12/03 12:59:58.254833 [cockroachdb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 12:59:58.254857 [cockroachdb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 12:59:58.260114 [cockroachdb] [check_manage_org_admin] lookup iter=0 resource=5 user=1388 dur=2.445015ms
+2025/12/03 12:59:58.501285 [cockroachdb] [check_manage_org_admin] lookup iter=100 resource=1048 user=1388 dur=2.02924ms
+2025/12/03 12:59:58.753671 [cockroachdb] [check_manage_org_admin] lookup iter=200 resource=13163 user=1388 dur=2.078484ms
+2025/12/03 12:59:58.960718 [cockroachdb] [check_manage_org_admin] lookup iter=300 resource=835 user=1388 dur=2.341722ms
+2025/12/03 12:59:59.163871 [cockroachdb] [check_manage_org_admin] lookup iter=400 resource=11360 user=1388 dur=2.341795ms
+2025/12/03 12:59:59.370928 [cockroachdb] [check_manage_org_admin] lookup iter=500 resource=620 user=1388 dur=1.998541ms
+2025/12/03 12:59:59.567850 [cockroachdb] [check_manage_org_admin] lookup iter=600 resource=10271 user=1388 dur=1.830218ms
+2025/12/03 12:59:59.783473 [cockroachdb] [check_manage_org_admin] lookup iter=700 resource=369 user=1388 dur=1.754055ms
+2025/12/03 13:00:00.004548 [cockroachdb] [check_manage_org_admin] lookup iter=800 resource=9090 user=1388 dur=3.521573ms
+2025/12/03 13:00:00.244533 [cockroachdb] [check_manage_org_admin] lookup iter=900 resource=121 user=1388 dur=2.237343ms
+2025/12/03 13:00:00.472684 [cockroachdb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:00:00.472702 [cockroachdb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:00:00.477960 [cockroachdb] [check_view_via_group_member] lookup iter=0 resource=17866 user=1539 dur=2.515373ms
+2025/12/03 13:00:00.709348 [cockroachdb] [check_view_via_group_member] lookup iter=100 resource=18193 user=1539 dur=1.738619ms
+2025/12/03 13:00:00.930402 [cockroachdb] [check_view_via_group_member] lookup iter=200 resource=18318 user=1539 dur=2.325201ms
+2025/12/03 13:00:01.149420 [cockroachdb] [check_view_via_group_member] lookup iter=300 resource=18427 user=1539 dur=2.183145ms
+2025/12/03 13:00:01.347549 [cockroachdb] [check_view_via_group_member] lookup iter=400 resource=18910 user=1539 dur=2.105338ms
+2025/12/03 13:00:01.597984 [cockroachdb] [check_view_via_group_member] lookup iter=500 resource=19069 user=1539 dur=26.133852ms
+2025/12/03 13:00:01.816806 [cockroachdb] [check_view_via_group_member] lookup iter=600 resource=19237 user=1539 dur=1.86118ms
+2025/12/03 13:00:02.055976 [cockroachdb] [check_view_via_group_member] lookup iter=700 resource=20588 user=1539 dur=1.871667ms
+2025/12/03 13:00:02.280499 [cockroachdb] [check_view_via_group_member] lookup iter=800 resource=20737 user=1539 dur=2.37257ms
+2025/12/03 13:00:02.504507 [cockroachdb] [check_view_via_group_member] lookup iter=900 resource=20893 user=1539 dur=2.267527ms
+2025/12/03 13:00:02.753271 [cockroachdb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:00:02.753295 [cockroachdb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:00:02.755908 [cockroachdb] [lookup_resources_manage_super] iter=0 resources=221 duration=2ms
+2025/12/03 13:00:02.758272 [cockroachdb] [lookup_resources_manage_super] iter=1 resources=221 duration=2ms
+2025/12/03 13:00:02.761381 [cockroachdb] [lookup_resources_manage_super] iter=2 resources=221 duration=3ms
+2025/12/03 13:00:02.764307 [cockroachdb] [lookup_resources_manage_super] iter=3 resources=221 duration=2ms
+2025/12/03 13:00:02.766932 [cockroachdb] [lookup_resources_manage_super] iter=4 resources=221 duration=2ms
+2025/12/03 13:00:02.769400 [cockroachdb] [lookup_resources_manage_super] iter=5 resources=221 duration=2ms
+2025/12/03 13:00:02.771682 [cockroachdb] [lookup_resources_manage_super] iter=6 resources=221 duration=2ms
+2025/12/03 13:00:02.774116 [cockroachdb] [lookup_resources_manage_super] iter=7 resources=221 duration=2ms
+2025/12/03 13:00:02.776374 [cockroachdb] [lookup_resources_manage_super] iter=8 resources=221 duration=2ms
+2025/12/03 13:00:02.779427 [cockroachdb] [lookup_resources_manage_super] iter=9 resources=221 duration=3ms
+2025/12/03 13:00:02.779442 [cockroachdb] [lookup_resources_manage_super] DONE: iters=10 lastCount=221 avg=2.598125ms total=25.981252ms
+2025/12/03 13:00:02.779449 [cockroachdb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:00:02.781587 [cockroachdb] [lookup_resources_view_regular] iter=0 resources=95 duration=2ms
+2025/12/03 13:00:02.783703 [cockroachdb] [lookup_resources_view_regular] iter=1 resources=95 duration=2ms
+2025/12/03 13:00:02.785953 [cockroachdb] [lookup_resources_view_regular] iter=2 resources=95 duration=2ms
+2025/12/03 13:00:02.788355 [cockroachdb] [lookup_resources_view_regular] iter=3 resources=95 duration=2ms
+2025/12/03 13:00:02.790263 [cockroachdb] [lookup_resources_view_regular] iter=4 resources=95 duration=1ms
+2025/12/03 13:00:02.792186 [cockroachdb] [lookup_resources_view_regular] iter=5 resources=95 duration=1ms
+2025/12/03 13:00:02.794620 [cockroachdb] [lookup_resources_view_regular] iter=6 resources=95 duration=2ms
+2025/12/03 13:00:02.796931 [cockroachdb] [lookup_resources_view_regular] iter=7 resources=95 duration=2ms
+2025/12/03 13:00:02.799819 [cockroachdb] [lookup_resources_view_regular] iter=8 resources=95 duration=2ms
+2025/12/03 13:00:02.801663 [cockroachdb] [lookup_resources_view_regular] iter=9 resources=95 duration=1ms
+2025/12/03 13:00:02.801671 [cockroachdb] [lookup_resources_view_regular] DONE: iters=10 lastCount=95 avg=2.209406ms total=22.094067ms
+2025/12/03 13:00:02.801677 [cockroachdb] == CockroachDB read benchmarks DONE ==
+[benchmark][cockroachdb] sleep 5s
+[benchmark][cockroachdb] run 3/3 (delay 5s after)
+2025/12/03 13:00:08.857579 [cockroachdb] Connected host=localhost port=26257 db="rlp" user="root" sslmode=disable
+2025/12/03 13:00:08.857697 [cockroachdb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:00:08.857708 [cockroachdb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:00:08.865342 [cockroachdb] [check_manage_direct_user] lookup iter=0 resource=5 user=1388 dur=4.351818ms
+2025/12/03 13:00:09.095742 [cockroachdb] [check_manage_direct_user] lookup iter=100 resource=1048 user=1388 dur=1.80704ms
+2025/12/03 13:00:09.256565 [cockroachdb] [check_manage_direct_user] lookup iter=200 resource=13163 user=1388 dur=1.663205ms
+2025/12/03 13:00:09.439839 [cockroachdb] [check_manage_direct_user] lookup iter=300 resource=835 user=1388 dur=1.477193ms
+2025/12/03 13:00:09.655660 [cockroachdb] [check_manage_direct_user] lookup iter=400 resource=11360 user=1388 dur=1.650705ms
+2025/12/03 13:00:09.852511 [cockroachdb] [check_manage_direct_user] lookup iter=500 resource=620 user=1388 dur=1.442171ms
+2025/12/03 13:00:10.032108 [cockroachdb] [check_manage_direct_user] lookup iter=600 resource=10271 user=1388 dur=1.922402ms
+2025/12/03 13:00:10.213091 [cockroachdb] [check_manage_direct_user] lookup iter=700 resource=369 user=1388 dur=1.392062ms
+2025/12/03 13:00:10.388509 [cockroachdb] [check_manage_direct_user] lookup iter=800 resource=9090 user=1388 dur=1.414905ms
+2025/12/03 13:00:10.562578 [cockroachdb] [check_manage_direct_user] lookup iter=900 resource=121 user=1388 dur=1.981175ms
+2025/12/03 13:00:10.769912 [cockroachdb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:00:10.769930 [cockroachdb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:00:10.776587 [cockroachdb] [check_manage_org_admin] lookup iter=0 resource=5 user=1388 dur=3.028784ms
+2025/12/03 13:00:10.957301 [cockroachdb] [check_manage_org_admin] lookup iter=100 resource=1048 user=1388 dur=1.706051ms
+2025/12/03 13:00:11.122212 [cockroachdb] [check_manage_org_admin] lookup iter=200 resource=13163 user=1388 dur=1.372221ms
+2025/12/03 13:00:11.297276 [cockroachdb] [check_manage_org_admin] lookup iter=300 resource=835 user=1388 dur=1.678048ms
+2025/12/03 13:00:11.473392 [cockroachdb] [check_manage_org_admin] lookup iter=400 resource=11360 user=1388 dur=1.577299ms
+2025/12/03 13:00:11.636716 [cockroachdb] [check_manage_org_admin] lookup iter=500 resource=620 user=1388 dur=1.456259ms
+2025/12/03 13:00:11.822832 [cockroachdb] [check_manage_org_admin] lookup iter=600 resource=10271 user=1388 dur=11.160105ms
+2025/12/03 13:00:12.012145 [cockroachdb] [check_manage_org_admin] lookup iter=700 resource=369 user=1388 dur=1.39604ms
+2025/12/03 13:00:12.198935 [cockroachdb] [check_manage_org_admin] lookup iter=800 resource=9090 user=1388 dur=2.541599ms
+2025/12/03 13:00:12.376561 [cockroachdb] [check_manage_org_admin] lookup iter=900 resource=121 user=1388 dur=3.008172ms
+2025/12/03 13:00:12.573237 [cockroachdb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:00:12.573272 [cockroachdb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:00:12.577005 [cockroachdb] [check_view_via_group_member] lookup iter=0 resource=17866 user=1539 dur=1.685578ms
+2025/12/03 13:00:12.787107 [cockroachdb] [check_view_via_group_member] lookup iter=100 resource=18193 user=1539 dur=2.697751ms
+2025/12/03 13:00:12.979215 [cockroachdb] [check_view_via_group_member] lookup iter=200 resource=18318 user=1539 dur=1.485216ms
+2025/12/03 13:00:13.167041 [cockroachdb] [check_view_via_group_member] lookup iter=300 resource=18427 user=1539 dur=1.923819ms
+2025/12/03 13:00:13.388572 [cockroachdb] [check_view_via_group_member] lookup iter=400 resource=18910 user=1539 dur=2.212027ms
+2025/12/03 13:00:13.606243 [cockroachdb] [check_view_via_group_member] lookup iter=500 resource=19069 user=1539 dur=2.174839ms
+2025/12/03 13:00:13.831864 [cockroachdb] [check_view_via_group_member] lookup iter=600 resource=19237 user=1539 dur=1.518263ms
+2025/12/03 13:00:14.008976 [cockroachdb] [check_view_via_group_member] lookup iter=700 resource=20588 user=1539 dur=1.762701ms
+2025/12/03 13:00:14.219269 [cockroachdb] [check_view_via_group_member] lookup iter=800 resource=20737 user=1539 dur=1.951599ms
+2025/12/03 13:00:14.431367 [cockroachdb] [check_view_via_group_member] lookup iter=900 resource=20893 user=1539 dur=2.304597ms
+2025/12/03 13:00:14.599876 [cockroachdb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:00:14.599892 [cockroachdb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:00:14.601726 [cockroachdb] [lookup_resources_manage_super] iter=0 resources=221 duration=1ms
+2025/12/03 13:00:14.603386 [cockroachdb] [lookup_resources_manage_super] iter=1 resources=221 duration=1ms
+2025/12/03 13:00:14.604943 [cockroachdb] [lookup_resources_manage_super] iter=2 resources=221 duration=1ms
+2025/12/03 13:00:14.606746 [cockroachdb] [lookup_resources_manage_super] iter=3 resources=221 duration=1ms
+2025/12/03 13:00:14.608437 [cockroachdb] [lookup_resources_manage_super] iter=4 resources=221 duration=1ms
+2025/12/03 13:00:14.610226 [cockroachdb] [lookup_resources_manage_super] iter=5 resources=221 duration=1ms
+2025/12/03 13:00:14.611965 [cockroachdb] [lookup_resources_manage_super] iter=6 resources=221 duration=1ms
+2025/12/03 13:00:14.613908 [cockroachdb] [lookup_resources_manage_super] iter=7 resources=221 duration=1ms
+2025/12/03 13:00:14.615640 [cockroachdb] [lookup_resources_manage_super] iter=8 resources=221 duration=1ms
+2025/12/03 13:00:14.617530 [cockroachdb] [lookup_resources_manage_super] iter=9 resources=221 duration=1ms
+2025/12/03 13:00:14.617538 [cockroachdb] [lookup_resources_manage_super] DONE: iters=10 lastCount=221 avg=1.752826ms total=17.528264ms
+2025/12/03 13:00:14.617550 [cockroachdb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:00:14.619736 [cockroachdb] [lookup_resources_view_regular] iter=0 resources=95 duration=2ms
+2025/12/03 13:00:14.622695 [cockroachdb] [lookup_resources_view_regular] iter=1 resources=95 duration=2ms
+2025/12/03 13:00:14.628730 [cockroachdb] [lookup_resources_view_regular] iter=2 resources=95 duration=6ms
+2025/12/03 13:00:14.633656 [cockroachdb] [lookup_resources_view_regular] iter=3 resources=95 duration=4ms
+2025/12/03 13:00:14.638506 [cockroachdb] [lookup_resources_view_regular] iter=4 resources=95 duration=4ms
+2025/12/03 13:00:14.642245 [cockroachdb] [lookup_resources_view_regular] iter=5 resources=95 duration=3ms
+2025/12/03 13:00:14.646801 [cockroachdb] [lookup_resources_view_regular] iter=6 resources=95 duration=4ms
+2025/12/03 13:00:14.651701 [cockroachdb] [lookup_resources_view_regular] iter=7 resources=95 duration=4ms
+2025/12/03 13:00:14.656679 [cockroachdb] [lookup_resources_view_regular] iter=8 resources=95 duration=4ms
+2025/12/03 13:00:14.661396 [cockroachdb] [lookup_resources_view_regular] iter=9 resources=95 duration=4ms
+2025/12/03 13:00:14.661423 [cockroachdb] [lookup_resources_view_regular] DONE: iters=10 lastCount=95 avg=4.353981ms total=43.539814ms
+2025/12/03 13:00:14.661430 [cockroachdb] == CockroachDB read benchmarks DONE ==
+
+==== ENGINE: postgres ====
+[benchmark][postgres] run 1/3 (delay 5s after)
+2025/12/03 13:01:06.424262 [postgres] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:01:06.424360 [postgres] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:01:06.439125 [postgres] [check_manage_direct_user] lookup iter=0 resource=1 user=1388 dur=9.94393ms
+2025/12/03 13:01:06.518248 [postgres] [check_manage_direct_user] lookup iter=100 resource=192 user=1388 dur=803.494µs
+2025/12/03 13:01:06.599745 [postgres] [check_manage_direct_user] lookup iter=200 resource=390 user=1388 dur=954.992µs
+2025/12/03 13:01:07.070483 [postgres] [check_manage_direct_user] lookup iter=300 resource=597 user=1388 dur=2.007302ms
+2025/12/03 13:01:07.214542 [postgres] [check_manage_direct_user] lookup iter=400 resource=792 user=1388 dur=2.895393ms
+2025/12/03 13:01:07.530174 [postgres] [check_manage_direct_user] lookup iter=500 resource=1007 user=1388 dur=1.002293ms
+2025/12/03 13:01:07.668042 [postgres] [check_manage_direct_user] lookup iter=600 resource=1210 user=1388 dur=957.304µs
+2025/12/03 13:01:07.770309 [postgres] [check_manage_direct_user] lookup iter=700 resource=1427 user=1388 dur=791.2µs
+2025/12/03 13:01:07.862067 [postgres] [check_manage_direct_user] lookup iter=800 resource=13163 user=1388 dur=986.112µs
+2025/12/03 13:01:07.945824 [postgres] [check_manage_direct_user] lookup iter=900 resource=144 user=1388 dur=747.61µs
+2025/12/03 13:01:08.021421 [postgres] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:01:08.021435 [postgres] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:01:08.024238 [postgres] [check_manage_org_admin] lookup iter=0 resource=1 user=1388 dur=1.03341ms
+2025/12/03 13:01:08.112448 [postgres] [check_manage_org_admin] lookup iter=100 resource=192 user=1388 dur=802.369µs
+2025/12/03 13:01:08.210706 [postgres] [check_manage_org_admin] lookup iter=200 resource=390 user=1388 dur=943.54µs
+2025/12/03 13:01:08.297735 [postgres] [check_manage_org_admin] lookup iter=300 resource=597 user=1388 dur=939.926µs
+2025/12/03 13:01:08.376769 [postgres] [check_manage_org_admin] lookup iter=400 resource=792 user=1388 dur=749.818µs
+2025/12/03 13:01:08.451861 [postgres] [check_manage_org_admin] lookup iter=500 resource=1007 user=1388 dur=708.986µs
+2025/12/03 13:01:08.526489 [postgres] [check_manage_org_admin] lookup iter=600 resource=1210 user=1388 dur=955.36µs
+2025/12/03 13:01:08.607300 [postgres] [check_manage_org_admin] lookup iter=700 resource=1427 user=1388 dur=855.308µs
+2025/12/03 13:01:08.688010 [postgres] [check_manage_org_admin] lookup iter=800 resource=13163 user=1388 dur=786.141µs
+2025/12/03 13:01:08.778095 [postgres] [check_manage_org_admin] lookup iter=900 resource=144 user=1388 dur=1.095958ms
+2025/12/03 13:01:08.869566 [postgres] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:01:08.869893 [postgres] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:01:08.885427 [postgres] [check_view_via_group_member] lookup iter=0 resource=17792 user=1539 dur=2.370489ms
+2025/12/03 13:01:08.975588 [postgres] [check_view_via_group_member] lookup iter=100 resource=17897 user=1539 dur=1.080897ms
+2025/12/03 13:01:09.062182 [postgres] [check_view_via_group_member] lookup iter=200 resource=18011 user=1539 dur=772.298µs
+2025/12/03 13:01:09.147762 [postgres] [check_view_via_group_member] lookup iter=300 resource=18129 user=1539 dur=757.171µs
+2025/12/03 13:01:09.249402 [postgres] [check_view_via_group_member] lookup iter=400 resource=18246 user=1539 dur=993.406µs
+2025/12/03 13:01:09.349465 [postgres] [check_view_via_group_member] lookup iter=500 resource=18362 user=1539 dur=925.878µs
+2025/12/03 13:01:09.435051 [postgres] [check_view_via_group_member] lookup iter=600 resource=18469 user=1539 dur=806.738µs
+2025/12/03 13:01:09.518319 [postgres] [check_view_via_group_member] lookup iter=700 resource=18581 user=1539 dur=922.418µs
+2025/12/03 13:01:09.606454 [postgres] [check_view_via_group_member] lookup iter=800 resource=18690 user=1539 dur=763.519µs
+2025/12/03 13:01:09.697093 [postgres] [check_view_via_group_member] lookup iter=900 resource=18800 user=1539 dur=1.155047ms
+2025/12/03 13:01:09.808490 [postgres] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:01:09.808507 [postgres] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:01:09.810261 [postgres] [lookup_resources_manage_super] iter=0 resources=821 duration=1ms
+2025/12/03 13:01:09.811908 [postgres] [lookup_resources_manage_super] iter=1 resources=821 duration=1ms
+2025/12/03 13:01:09.813546 [postgres] [lookup_resources_manage_super] iter=2 resources=821 duration=1ms
+2025/12/03 13:01:09.815286 [postgres] [lookup_resources_manage_super] iter=3 resources=821 duration=1ms
+2025/12/03 13:01:09.817239 [postgres] [lookup_resources_manage_super] iter=4 resources=821 duration=1ms
+2025/12/03 13:01:09.819036 [postgres] [lookup_resources_manage_super] iter=5 resources=821 duration=1ms
+2025/12/03 13:01:09.820926 [postgres] [lookup_resources_manage_super] iter=6 resources=821 duration=1ms
+2025/12/03 13:01:09.822674 [postgres] [lookup_resources_manage_super] iter=7 resources=821 duration=1ms
+2025/12/03 13:01:09.824403 [postgres] [lookup_resources_manage_super] iter=8 resources=821 duration=1ms
+2025/12/03 13:01:09.826245 [postgres] [lookup_resources_manage_super] iter=9 resources=821 duration=1ms
+2025/12/03 13:01:09.826255 [postgres] [lookup_resources_manage_super] DONE: iters=10 lastCount=821 avg=1.760094ms total=17.600949ms
+2025/12/03 13:01:09.826272 [postgres] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:01:09.830318 [postgres] [lookup_resources_view_regular] iter=0 resources=2360 duration=4ms
+2025/12/03 13:01:09.834790 [postgres] [lookup_resources_view_regular] iter=1 resources=2360 duration=4ms
+2025/12/03 13:01:09.838634 [postgres] [lookup_resources_view_regular] iter=2 resources=2360 duration=3ms
+2025/12/03 13:01:09.842231 [postgres] [lookup_resources_view_regular] iter=3 resources=2360 duration=3ms
+2025/12/03 13:01:09.845513 [postgres] [lookup_resources_view_regular] iter=4 resources=2360 duration=3ms
+2025/12/03 13:01:09.849073 [postgres] [lookup_resources_view_regular] iter=5 resources=2360 duration=3ms
+2025/12/03 13:01:09.852436 [postgres] [lookup_resources_view_regular] iter=6 resources=2360 duration=3ms
+2025/12/03 13:01:09.855931 [postgres] [lookup_resources_view_regular] iter=7 resources=2360 duration=3ms
+2025/12/03 13:01:09.859260 [postgres] [lookup_resources_view_regular] iter=8 resources=2360 duration=3ms
+2025/12/03 13:01:09.862728 [postgres] [lookup_resources_view_regular] iter=9 resources=2360 duration=3ms
+2025/12/03 13:01:09.862737 [postgres] [lookup_resources_view_regular] DONE: iters=10 lastCount=2360 avg=3.634987ms total=36.349873ms
+2025/12/03 13:01:09.862741 [postgres] == Postgres read benchmarks DONE ==
+[benchmark][postgres] sleep 5s
+[benchmark][postgres] run 2/3 (delay 5s after)
+2025/12/03 13:01:15.412886 [postgres] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:01:15.413021 [postgres] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:01:15.426956 [postgres] [check_manage_direct_user] lookup iter=0 resource=1 user=1388 dur=10.511839ms
+2025/12/03 13:01:15.517763 [postgres] [check_manage_direct_user] lookup iter=100 resource=192 user=1388 dur=851.123µs
+2025/12/03 13:01:15.607875 [postgres] [check_manage_direct_user] lookup iter=200 resource=390 user=1388 dur=820.96µs
+2025/12/03 13:01:15.685528 [postgres] [check_manage_direct_user] lookup iter=300 resource=597 user=1388 dur=727.001µs
+2025/12/03 13:01:15.762446 [postgres] [check_manage_direct_user] lookup iter=400 resource=792 user=1388 dur=1.101611ms
+2025/12/03 13:01:15.840039 [postgres] [check_manage_direct_user] lookup iter=500 resource=1007 user=1388 dur=706.075µs
+2025/12/03 13:01:15.919116 [postgres] [check_manage_direct_user] lookup iter=600 resource=1210 user=1388 dur=776.272µs
+2025/12/03 13:01:16.002537 [postgres] [check_manage_direct_user] lookup iter=700 resource=1427 user=1388 dur=999.148µs
+2025/12/03 13:01:16.091275 [postgres] [check_manage_direct_user] lookup iter=800 resource=13163 user=1388 dur=876.568µs
+2025/12/03 13:01:16.180587 [postgres] [check_manage_direct_user] lookup iter=900 resource=144 user=1388 dur=958.833µs
+2025/12/03 13:01:16.260940 [postgres] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:01:16.261003 [postgres] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:01:16.264498 [postgres] [check_manage_org_admin] lookup iter=0 resource=1 user=1388 dur=1.854641ms
+2025/12/03 13:01:16.349089 [postgres] [check_manage_org_admin] lookup iter=100 resource=192 user=1388 dur=867.893µs
+2025/12/03 13:01:16.434651 [postgres] [check_manage_org_admin] lookup iter=200 resource=390 user=1388 dur=797.065µs
+2025/12/03 13:01:16.521216 [postgres] [check_manage_org_admin] lookup iter=300 resource=597 user=1388 dur=1.110262ms
+2025/12/03 13:01:16.609225 [postgres] [check_manage_org_admin] lookup iter=400 resource=792 user=1388 dur=887.137µs
+2025/12/03 13:01:16.700854 [postgres] [check_manage_org_admin] lookup iter=500 resource=1007 user=1388 dur=908.6µs
+2025/12/03 13:01:16.798052 [postgres] [check_manage_org_admin] lookup iter=600 resource=1210 user=1388 dur=1.076929ms
+2025/12/03 13:01:16.920610 [postgres] [check_manage_org_admin] lookup iter=700 resource=1427 user=1388 dur=1.153755ms
+2025/12/03 13:01:17.020946 [postgres] [check_manage_org_admin] lookup iter=800 resource=13163 user=1388 dur=919.608µs
+2025/12/03 13:01:17.123905 [postgres] [check_manage_org_admin] lookup iter=900 resource=144 user=1388 dur=1.018677ms
+2025/12/03 13:01:17.225311 [postgres] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:01:17.225328 [postgres] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:01:17.229194 [postgres] [check_view_via_group_member] lookup iter=0 resource=17792 user=1539 dur=1.129626ms
+2025/12/03 13:01:17.332128 [postgres] [check_view_via_group_member] lookup iter=100 resource=17897 user=1539 dur=943.413µs
+2025/12/03 13:01:17.426598 [postgres] [check_view_via_group_member] lookup iter=200 resource=18011 user=1539 dur=1.080428ms
+2025/12/03 13:01:17.518620 [postgres] [check_view_via_group_member] lookup iter=300 resource=18129 user=1539 dur=805.536µs
+2025/12/03 13:01:17.633981 [postgres] [check_view_via_group_member] lookup iter=400 resource=18246 user=1539 dur=1.172032ms
+2025/12/03 13:01:17.764570 [postgres] [check_view_via_group_member] lookup iter=500 resource=18362 user=1539 dur=1.249452ms
+2025/12/03 13:01:17.918648 [postgres] [check_view_via_group_member] lookup iter=600 resource=18469 user=1539 dur=1.025388ms
+2025/12/03 13:01:18.077502 [postgres] [check_view_via_group_member] lookup iter=700 resource=18581 user=1539 dur=1.317921ms
+2025/12/03 13:01:18.251737 [postgres] [check_view_via_group_member] lookup iter=800 resource=18690 user=1539 dur=1.237053ms
+2025/12/03 13:01:18.362401 [postgres] [check_view_via_group_member] lookup iter=900 resource=18800 user=1539 dur=985.11µs
+2025/12/03 13:01:18.478710 [postgres] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:01:18.478728 [postgres] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:01:18.481632 [postgres] [lookup_resources_manage_super] iter=0 resources=821 duration=2ms
+2025/12/03 13:01:18.485047 [postgres] [lookup_resources_manage_super] iter=1 resources=821 duration=3ms
+2025/12/03 13:01:18.487419 [postgres] [lookup_resources_manage_super] iter=2 resources=821 duration=2ms
+2025/12/03 13:01:18.489149 [postgres] [lookup_resources_manage_super] iter=3 resources=821 duration=1ms
+2025/12/03 13:01:18.490848 [postgres] [lookup_resources_manage_super] iter=4 resources=821 duration=1ms
+2025/12/03 13:01:18.492590 [postgres] [lookup_resources_manage_super] iter=5 resources=821 duration=1ms
+2025/12/03 13:01:18.494347 [postgres] [lookup_resources_manage_super] iter=6 resources=821 duration=1ms
+2025/12/03 13:01:18.496477 [postgres] [lookup_resources_manage_super] iter=7 resources=821 duration=2ms
+2025/12/03 13:01:18.499316 [postgres] [lookup_resources_manage_super] iter=8 resources=821 duration=2ms
+2025/12/03 13:01:18.501308 [postgres] [lookup_resources_manage_super] iter=9 resources=821 duration=1ms
+2025/12/03 13:01:18.501317 [postgres] [lookup_resources_manage_super] DONE: iters=10 lastCount=821 avg=2.241673ms total=22.416736ms
+2025/12/03 13:01:18.501334 [postgres] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:01:18.505454 [postgres] [lookup_resources_view_regular] iter=0 resources=2360 duration=4ms
+2025/12/03 13:01:18.509631 [postgres] [lookup_resources_view_regular] iter=1 resources=2360 duration=4ms
+2025/12/03 13:01:18.515187 [postgres] [lookup_resources_view_regular] iter=2 resources=2360 duration=5ms
+2025/12/03 13:01:18.520316 [postgres] [lookup_resources_view_regular] iter=3 resources=2360 duration=5ms
+2025/12/03 13:01:18.525053 [postgres] [lookup_resources_view_regular] iter=4 resources=2360 duration=4ms
+2025/12/03 13:01:18.530774 [postgres] [lookup_resources_view_regular] iter=5 resources=2360 duration=5ms
+2025/12/03 13:01:18.537030 [postgres] [lookup_resources_view_regular] iter=6 resources=2360 duration=6ms
+2025/12/03 13:01:18.541306 [postgres] [lookup_resources_view_regular] iter=7 resources=2360 duration=4ms
+2025/12/03 13:01:18.545487 [postgres] [lookup_resources_view_regular] iter=8 resources=2360 duration=4ms
+2025/12/03 13:01:18.551181 [postgres] [lookup_resources_view_regular] iter=9 resources=2360 duration=5ms
+2025/12/03 13:01:18.551204 [postgres] [lookup_resources_view_regular] DONE: iters=10 lastCount=2360 avg=4.964996ms total=49.649965ms
+2025/12/03 13:01:18.551216 [postgres] == Postgres read benchmarks DONE ==
+[benchmark][postgres] sleep 5s
+[benchmark][postgres] run 3/3 (delay 5s after)
+2025/12/03 13:01:24.211780 [postgres] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:01:24.211888 [postgres] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:01:24.225492 [postgres] [check_manage_direct_user] lookup iter=0 resource=1 user=1388 dur=10.644017ms
+2025/12/03 13:01:24.311885 [postgres] [check_manage_direct_user] lookup iter=100 resource=192 user=1388 dur=828.818µs
+2025/12/03 13:01:24.397032 [postgres] [check_manage_direct_user] lookup iter=200 resource=390 user=1388 dur=773.062µs
+2025/12/03 13:01:24.488503 [postgres] [check_manage_direct_user] lookup iter=300 resource=597 user=1388 dur=822.862µs
+2025/12/03 13:01:24.574461 [postgres] [check_manage_direct_user] lookup iter=400 resource=792 user=1388 dur=792.226µs
+2025/12/03 13:01:24.657574 [postgres] [check_manage_direct_user] lookup iter=500 resource=1007 user=1388 dur=813.324µs
+2025/12/03 13:01:24.742699 [postgres] [check_manage_direct_user] lookup iter=600 resource=1210 user=1388 dur=872.677µs
+2025/12/03 13:01:24.829528 [postgres] [check_manage_direct_user] lookup iter=700 resource=1427 user=1388 dur=953.119µs
+2025/12/03 13:01:24.928590 [postgres] [check_manage_direct_user] lookup iter=800 resource=13163 user=1388 dur=814.045µs
+2025/12/03 13:01:25.015447 [postgres] [check_manage_direct_user] lookup iter=900 resource=144 user=1388 dur=778.507µs
+2025/12/03 13:01:25.107912 [postgres] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:01:25.107935 [postgres] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:01:25.110084 [postgres] [check_manage_org_admin] lookup iter=0 resource=1 user=1388 dur=819.584µs
+2025/12/03 13:01:25.201524 [postgres] [check_manage_org_admin] lookup iter=100 resource=192 user=1388 dur=855.359µs
+2025/12/03 13:01:25.282481 [postgres] [check_manage_org_admin] lookup iter=200 resource=390 user=1388 dur=665.062µs
+2025/12/03 13:01:25.354850 [postgres] [check_manage_org_admin] lookup iter=300 resource=597 user=1388 dur=673.637µs
+2025/12/03 13:01:25.428170 [postgres] [check_manage_org_admin] lookup iter=400 resource=792 user=1388 dur=634.998µs
+2025/12/03 13:01:25.496156 [postgres] [check_manage_org_admin] lookup iter=500 resource=1007 user=1388 dur=646.061µs
+2025/12/03 13:01:25.568772 [postgres] [check_manage_org_admin] lookup iter=600 resource=1210 user=1388 dur=751.686µs
+2025/12/03 13:01:25.644519 [postgres] [check_manage_org_admin] lookup iter=700 resource=1427 user=1388 dur=1.039766ms
+2025/12/03 13:01:25.718107 [postgres] [check_manage_org_admin] lookup iter=800 resource=13163 user=1388 dur=721.367µs
+2025/12/03 13:01:25.797325 [postgres] [check_manage_org_admin] lookup iter=900 resource=144 user=1388 dur=727.379µs
+2025/12/03 13:01:25.888430 [postgres] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:01:25.888446 [postgres] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:01:25.892760 [postgres] [check_view_via_group_member] lookup iter=0 resource=17792 user=1539 dur=1.036ms
+2025/12/03 13:01:25.999927 [postgres] [check_view_via_group_member] lookup iter=100 resource=17897 user=1539 dur=1.376695ms
+2025/12/03 13:01:26.098082 [postgres] [check_view_via_group_member] lookup iter=200 resource=18011 user=1539 dur=915.227µs
+2025/12/03 13:01:26.186212 [postgres] [check_view_via_group_member] lookup iter=300 resource=18129 user=1539 dur=794.707µs
+2025/12/03 13:01:26.295160 [postgres] [check_view_via_group_member] lookup iter=400 resource=18246 user=1539 dur=1.118843ms
+2025/12/03 13:01:26.436841 [postgres] [check_view_via_group_member] lookup iter=500 resource=18362 user=1539 dur=1.07414ms
+2025/12/03 13:01:26.559651 [postgres] [check_view_via_group_member] lookup iter=600 resource=18469 user=1539 dur=942.445µs
+2025/12/03 13:01:26.705352 [postgres] [check_view_via_group_member] lookup iter=700 resource=18581 user=1539 dur=1.205625ms
+2025/12/03 13:01:26.865494 [postgres] [check_view_via_group_member] lookup iter=800 resource=18690 user=1539 dur=1.199418ms
+2025/12/03 13:01:27.031719 [postgres] [check_view_via_group_member] lookup iter=900 resource=18800 user=1539 dur=1.65658ms
+2025/12/03 13:01:27.170287 [postgres] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:01:27.170318 [postgres] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:01:27.172562 [postgres] [lookup_resources_manage_super] iter=0 resources=821 duration=2ms
+2025/12/03 13:01:27.174483 [postgres] [lookup_resources_manage_super] iter=1 resources=821 duration=1ms
+2025/12/03 13:01:27.176210 [postgres] [lookup_resources_manage_super] iter=2 resources=821 duration=1ms
+2025/12/03 13:01:27.178233 [postgres] [lookup_resources_manage_super] iter=3 resources=821 duration=2ms
+2025/12/03 13:01:27.180450 [postgres] [lookup_resources_manage_super] iter=4 resources=821 duration=2ms
+2025/12/03 13:01:27.182775 [postgres] [lookup_resources_manage_super] iter=5 resources=821 duration=2ms
+2025/12/03 13:01:27.184934 [postgres] [lookup_resources_manage_super] iter=6 resources=821 duration=2ms
+2025/12/03 13:01:27.190025 [postgres] [lookup_resources_manage_super] iter=7 resources=821 duration=5ms
+2025/12/03 13:01:27.193298 [postgres] [lookup_resources_manage_super] iter=8 resources=821 duration=3ms
+2025/12/03 13:01:27.195268 [postgres] [lookup_resources_manage_super] iter=9 resources=821 duration=1ms
+2025/12/03 13:01:27.195277 [postgres] [lookup_resources_manage_super] DONE: iters=10 lastCount=821 avg=2.470291ms total=24.702917ms
+2025/12/03 13:01:27.195291 [postgres] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:01:27.199721 [postgres] [lookup_resources_view_regular] iter=0 resources=2360 duration=4ms
+2025/12/03 13:01:27.204381 [postgres] [lookup_resources_view_regular] iter=1 resources=2360 duration=4ms
+2025/12/03 13:01:27.208983 [postgres] [lookup_resources_view_regular] iter=2 resources=2360 duration=4ms
+2025/12/03 13:01:27.212925 [postgres] [lookup_resources_view_regular] iter=3 resources=2360 duration=3ms
+2025/12/03 13:01:27.216799 [postgres] [lookup_resources_view_regular] iter=4 resources=2360 duration=3ms
+2025/12/03 13:01:27.220475 [postgres] [lookup_resources_view_regular] iter=5 resources=2360 duration=3ms
+2025/12/03 13:01:27.224121 [postgres] [lookup_resources_view_regular] iter=6 resources=2360 duration=3ms
+2025/12/03 13:01:27.227877 [postgres] [lookup_resources_view_regular] iter=7 resources=2360 duration=3ms
+2025/12/03 13:01:27.231847 [postgres] [lookup_resources_view_regular] iter=8 resources=2360 duration=3ms
+2025/12/03 13:01:27.235857 [postgres] [lookup_resources_view_regular] iter=9 resources=2360 duration=3ms
+2025/12/03 13:01:27.235868 [postgres] [lookup_resources_view_regular] DONE: iters=10 lastCount=2360 avg=4.043049ms total=40.430494ms
+2025/12/03 13:01:27.235874 [postgres] == Postgres read benchmarks DONE ==
+
+==== ENGINE: mongodb ====
+[benchmark][mongodb] run 1/3 (delay 5s after)
+2025/12/03 13:02:51.185347 [mongodb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:02:51.185544 [mongodb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:02:51.193114 [mongodb] [check_manage_direct_user] iter=0 resource=10236 user=472 dur=1.009963ms
+2025/12/03 13:02:51.273455 [mongodb] [check_manage_direct_user] iter=100 resource=5845 user=1000 dur=560.525µs
+2025/12/03 13:02:51.439827 [mongodb] [check_manage_direct_user] iter=200 resource=6387 user=580 dur=607.703µs
+2025/12/03 13:02:51.501088 [mongodb] [check_manage_direct_user] iter=300 resource=8045 user=611 dur=563.782µs
+2025/12/03 13:02:51.559756 [mongodb] [check_manage_direct_user] iter=400 resource=15331 user=1240 dur=528.554µs
+2025/12/03 13:02:51.623932 [mongodb] [check_manage_direct_user] iter=500 resource=11465 user=101 dur=931.159µs
+2025/12/03 13:02:51.708063 [mongodb] [check_manage_direct_user] iter=600 resource=446 user=491 dur=802.26µs
+2025/12/03 13:02:51.820827 [mongodb] [check_manage_direct_user] iter=700 resource=1473 user=497 dur=692.783µs
+2025/12/03 13:02:51.914332 [mongodb] [check_manage_direct_user] iter=800 resource=3921 user=255 dur=763.808µs
+2025/12/03 13:02:52.004626 [mongodb] [check_manage_direct_user] iter=900 resource=4040 user=1337 dur=611.335µs
+2025/12/03 13:02:52.148686 [mongodb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:02:52.148723 [mongodb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:02:52.154721 [mongodb] [check_manage_org_admin] iter=0 resource=1 org=1 admin=1493 dur=1.274016ms
+2025/12/03 13:02:52.375337 [mongodb] [check_manage_org_admin] iter=100 resource=101 org=1 admin=1493 dur=946.288µs
+2025/12/03 13:02:52.632980 [mongodb] [check_manage_org_admin] iter=200 resource=201 org=1 admin=1493 dur=1.466825ms
+2025/12/03 13:02:52.778024 [mongodb] [check_manage_org_admin] iter=300 resource=301 org=1 admin=1493 dur=582.249µs
+2025/12/03 13:02:52.917697 [mongodb] [check_manage_org_admin] iter=400 resource=401 org=1 admin=1493 dur=1.117106ms
+2025/12/03 13:02:53.070327 [mongodb] [check_manage_org_admin] iter=500 resource=501 org=1 admin=1493 dur=544.152µs
+2025/12/03 13:02:53.193303 [mongodb] [check_manage_org_admin] iter=600 resource=601 org=1 admin=1493 dur=505.662µs
+2025/12/03 13:02:53.306046 [mongodb] [check_manage_org_admin] iter=700 resource=701 org=1 admin=1493 dur=610.704µs
+2025/12/03 13:02:53.424188 [mongodb] [check_manage_org_admin] iter=800 resource=801 org=1 admin=1493 dur=525.336µs
+2025/12/03 13:02:53.550768 [mongodb] [check_manage_org_admin] iter=900 resource=901 org=1 admin=1493 dur=860.064µs
+2025/12/03 13:02:53.739120 [mongodb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:02:53.739139 [mongodb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:02:53.752907 [mongodb] [check_view_via_group_member] iter=0 resource=2 group=1 user=1493 dur=1.473735ms
+2025/12/03 13:02:53.932153 [mongodb] [check_view_via_group_member] iter=100 resource=199 group=1 user=1493 dur=1.233638ms
+2025/12/03 13:02:54.188185 [mongodb] [check_view_via_group_member] iter=200 resource=397 group=2 user=1493 dur=1.685091ms
+2025/12/03 13:02:54.423213 [mongodb] [check_view_via_group_member] iter=300 resource=565 group=2 user=1493 dur=1.332239ms
+2025/12/03 13:02:54.723987 [mongodb] [check_view_via_group_member] iter=400 resource=764 group=1 user=1493 dur=5.524616ms
+2025/12/03 13:02:54.915115 [mongodb] [check_view_via_group_member] iter=500 resource=938 group=1 user=1493 dur=978.247µs
+2025/12/03 13:02:55.100795 [mongodb] [check_view_via_group_member] iter=600 resource=1157 group=1 user=1493 dur=1.078358ms
+2025/12/03 13:02:55.281604 [mongodb] [check_view_via_group_member] iter=700 resource=1356 group=2 user=1493 dur=1.335604ms
+2025/12/03 13:02:55.469820 [mongodb] [check_view_via_group_member] iter=800 resource=1585 group=13 user=248 dur=1.09346ms
+2025/12/03 13:02:55.646361 [mongodb] [check_view_via_group_member] iter=900 resource=1957 group=10 user=807 dur=1.102916ms
+2025/12/03 13:02:55.916448 [mongodb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:02:55.916772 [mongodb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:02:56.204288 [mongodb] [lookup_resources_manage_super] iter=0 resources=62 duration=287ms
+2025/12/03 13:02:56.478962 [mongodb] [lookup_resources_manage_super] iter=1 resources=62 duration=274ms
+2025/12/03 13:02:56.796685 [mongodb] [lookup_resources_manage_super] iter=2 resources=62 duration=317ms
+2025/12/03 13:02:57.194231 [mongodb] [lookup_resources_manage_super] iter=3 resources=62 duration=397ms
+2025/12/03 13:02:57.495653 [mongodb] [lookup_resources_manage_super] iter=4 resources=62 duration=301ms
+2025/12/03 13:02:57.777543 [mongodb] [lookup_resources_manage_super] iter=5 resources=62 duration=281ms
+2025/12/03 13:02:58.037862 [mongodb] [lookup_resources_manage_super] iter=6 resources=62 duration=260ms
+2025/12/03 13:02:58.328522 [mongodb] [lookup_resources_manage_super] iter=7 resources=62 duration=290ms
+2025/12/03 13:02:58.615618 [mongodb] [lookup_resources_manage_super] iter=8 resources=62 duration=287ms
+2025/12/03 13:02:58.923221 [mongodb] [lookup_resources_manage_super] iter=9 resources=62 duration=307ms
+2025/12/03 13:02:58.923238 [mongodb] [lookup_resources_manage_super] DONE: iters=10 lastCount=62 avg=300.58811ms total=3.005881102s
+2025/12/03 13:02:58.923250 [mongodb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:02:59.156904 [mongodb] [lookup_resources_view_regular] iter=0 resources=66 duration=233ms
+2025/12/03 13:02:59.307096 [mongodb] [lookup_resources_view_regular] iter=1 resources=66 duration=150ms
+2025/12/03 13:02:59.546353 [mongodb] [lookup_resources_view_regular] iter=2 resources=66 duration=239ms
+2025/12/03 13:02:59.806918 [mongodb] [lookup_resources_view_regular] iter=3 resources=66 duration=260ms
+2025/12/03 13:02:59.978006 [mongodb] [lookup_resources_view_regular] iter=4 resources=66 duration=171ms
+2025/12/03 13:03:00.130751 [mongodb] [lookup_resources_view_regular] iter=5 resources=66 duration=152ms
+2025/12/03 13:03:00.273762 [mongodb] [lookup_resources_view_regular] iter=6 resources=66 duration=142ms
+2025/12/03 13:03:00.412617 [mongodb] [lookup_resources_view_regular] iter=7 resources=66 duration=138ms
+2025/12/03 13:03:00.550112 [mongodb] [lookup_resources_view_regular] iter=8 resources=66 duration=137ms
+2025/12/03 13:03:00.697366 [mongodb] [lookup_resources_view_regular] iter=9 resources=66 duration=147ms
+2025/12/03 13:03:00.697397 [mongodb] [lookup_resources_view_regular] DONE: iters=10 lastCount=66 avg=177.387376ms total=1.773873765s
+2025/12/03 13:03:00.697402 [mongodb] == Mongo read benchmarks DONE ==
+[benchmark][mongodb] sleep 5s
+[benchmark][mongodb] run 2/3 (delay 5s after)
+2025/12/03 13:03:06.586036 [mongodb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:03:06.586143 [mongodb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:03:06.587958 [mongodb] [check_manage_direct_user] iter=0 resource=10236 user=472 dur=655.923µs
+2025/12/03 13:03:06.643470 [mongodb] [check_manage_direct_user] iter=100 resource=5845 user=1000 dur=553.519µs
+2025/12/03 13:03:06.792202 [mongodb] [check_manage_direct_user] iter=200 resource=6387 user=580 dur=576.526µs
+2025/12/03 13:03:06.850413 [mongodb] [check_manage_direct_user] iter=300 resource=8045 user=611 dur=566.05µs
+2025/12/03 13:03:06.911378 [mongodb] [check_manage_direct_user] iter=400 resource=15331 user=1240 dur=570.931µs
+2025/12/03 13:03:06.973059 [mongodb] [check_manage_direct_user] iter=500 resource=11465 user=101 dur=554.426µs
+2025/12/03 13:03:07.030395 [mongodb] [check_manage_direct_user] iter=600 resource=446 user=491 dur=511.567µs
+2025/12/03 13:03:07.086152 [mongodb] [check_manage_direct_user] iter=700 resource=1473 user=497 dur=561.312µs
+2025/12/03 13:03:07.142828 [mongodb] [check_manage_direct_user] iter=800 resource=3921 user=255 dur=470.762µs
+2025/12/03 13:03:07.197636 [mongodb] [check_manage_direct_user] iter=900 resource=4040 user=1337 dur=564.28µs
+2025/12/03 13:03:07.324721 [mongodb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:03:07.324736 [mongodb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:03:07.328765 [mongodb] [check_manage_org_admin] iter=0 resource=1 org=1 admin=1493 dur=1.008869ms
+2025/12/03 13:03:07.448154 [mongodb] [check_manage_org_admin] iter=100 resource=101 org=1 admin=1493 dur=852.254µs
+2025/12/03 13:03:07.604387 [mongodb] [check_manage_org_admin] iter=200 resource=201 org=1 admin=1493 dur=476.019µs
+2025/12/03 13:03:07.714994 [mongodb] [check_manage_org_admin] iter=300 resource=301 org=1 admin=1493 dur=479.847µs
+2025/12/03 13:03:07.828684 [mongodb] [check_manage_org_admin] iter=400 resource=401 org=1 admin=1493 dur=516.463µs
+2025/12/03 13:03:07.935192 [mongodb] [check_manage_org_admin] iter=500 resource=501 org=1 admin=1493 dur=749.868µs
+2025/12/03 13:03:08.107244 [mongodb] [check_manage_org_admin] iter=600 resource=601 org=1 admin=1493 dur=891.871µs
+2025/12/03 13:03:08.263927 [mongodb] [check_manage_org_admin] iter=700 resource=701 org=1 admin=1493 dur=501.445µs
+2025/12/03 13:03:08.370123 [mongodb] [check_manage_org_admin] iter=800 resource=801 org=1 admin=1493 dur=508.035µs
+2025/12/03 13:03:08.486614 [mongodb] [check_manage_org_admin] iter=900 resource=901 org=1 admin=1493 dur=525.415µs
+2025/12/03 13:03:08.623569 [mongodb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:03:08.623582 [mongodb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:03:08.627836 [mongodb] [check_view_via_group_member] iter=0 resource=2 group=1 user=1493 dur=1.811335ms
+2025/12/03 13:03:08.780864 [mongodb] [check_view_via_group_member] iter=100 resource=199 group=1 user=1493 dur=952.856µs
+2025/12/03 13:03:09.016703 [mongodb] [check_view_via_group_member] iter=200 resource=397 group=2 user=1493 dur=1.051075ms
+2025/12/03 13:03:09.179934 [mongodb] [check_view_via_group_member] iter=300 resource=565 group=2 user=1493 dur=901.114µs
+2025/12/03 13:03:09.353495 [mongodb] [check_view_via_group_member] iter=400 resource=764 group=1 user=1493 dur=967.113µs
+2025/12/03 13:03:09.537114 [mongodb] [check_view_via_group_member] iter=500 resource=938 group=1 user=1493 dur=1.085041ms
+2025/12/03 13:03:09.715008 [mongodb] [check_view_via_group_member] iter=600 resource=1157 group=1 user=1493 dur=1.408433ms
+2025/12/03 13:03:09.919723 [mongodb] [check_view_via_group_member] iter=700 resource=1356 group=2 user=1493 dur=1.744042ms
+2025/12/03 13:03:10.096901 [mongodb] [check_view_via_group_member] iter=800 resource=1585 group=13 user=248 dur=1.049986ms
+2025/12/03 13:03:10.268086 [mongodb] [check_view_via_group_member] iter=900 resource=1957 group=10 user=807 dur=1.06274ms
+2025/12/03 13:03:10.491602 [mongodb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:03:10.491622 [mongodb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:03:10.782183 [mongodb] [lookup_resources_manage_super] iter=0 resources=62 duration=290ms
+2025/12/03 13:03:11.046292 [mongodb] [lookup_resources_manage_super] iter=1 resources=62 duration=264ms
+2025/12/03 13:03:11.323443 [mongodb] [lookup_resources_manage_super] iter=2 resources=62 duration=277ms
+2025/12/03 13:03:11.625637 [mongodb] [lookup_resources_manage_super] iter=3 resources=62 duration=302ms
+2025/12/03 13:03:12.031787 [mongodb] [lookup_resources_manage_super] iter=4 resources=62 duration=405ms
+2025/12/03 13:03:12.301983 [mongodb] [lookup_resources_manage_super] iter=5 resources=62 duration=270ms
+2025/12/03 13:03:12.548600 [mongodb] [lookup_resources_manage_super] iter=6 resources=62 duration=246ms
+2025/12/03 13:03:12.797913 [mongodb] [lookup_resources_manage_super] iter=7 resources=62 duration=249ms
+2025/12/03 13:03:13.044650 [mongodb] [lookup_resources_manage_super] iter=8 resources=62 duration=246ms
+2025/12/03 13:03:13.309525 [mongodb] [lookup_resources_manage_super] iter=9 resources=62 duration=264ms
+2025/12/03 13:03:13.309540 [mongodb] [lookup_resources_manage_super] DONE: iters=10 lastCount=62 avg=281.733623ms total=2.817336231s
+2025/12/03 13:03:13.309556 [mongodb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:03:13.447033 [mongodb] [lookup_resources_view_regular] iter=0 resources=66 duration=137ms
+2025/12/03 13:03:13.588164 [mongodb] [lookup_resources_view_regular] iter=1 resources=66 duration=141ms
+2025/12/03 13:03:13.723189 [mongodb] [lookup_resources_view_regular] iter=2 resources=66 duration=135ms
+2025/12/03 13:03:13.854125 [mongodb] [lookup_resources_view_regular] iter=3 resources=66 duration=130ms
+2025/12/03 13:03:13.989334 [mongodb] [lookup_resources_view_regular] iter=4 resources=66 duration=135ms
+2025/12/03 13:03:14.118815 [mongodb] [lookup_resources_view_regular] iter=5 resources=66 duration=129ms
+2025/12/03 13:03:14.252579 [mongodb] [lookup_resources_view_regular] iter=6 resources=66 duration=133ms
+2025/12/03 13:03:14.398876 [mongodb] [lookup_resources_view_regular] iter=7 resources=66 duration=146ms
+2025/12/03 13:03:14.542450 [mongodb] [lookup_resources_view_regular] iter=8 resources=66 duration=143ms
+2025/12/03 13:03:14.689302 [mongodb] [lookup_resources_view_regular] iter=9 resources=66 duration=146ms
+2025/12/03 13:03:14.689318 [mongodb] [lookup_resources_view_regular] DONE: iters=10 lastCount=66 avg=137.954865ms total=1.379548654s
+2025/12/03 13:03:14.689323 [mongodb] == Mongo read benchmarks DONE ==
+[benchmark][mongodb] sleep 5s
+[benchmark][mongodb] run 3/3 (delay 5s after)
+2025/12/03 13:03:20.743277 [mongodb] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:03:20.743574 [mongodb] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:03:20.746003 [mongodb] [check_manage_direct_user] iter=0 resource=10236 user=472 dur=802.126µs
+2025/12/03 13:03:20.804293 [mongodb] [check_manage_direct_user] iter=100 resource=5845 user=1000 dur=498.466µs
+2025/12/03 13:03:20.953424 [mongodb] [check_manage_direct_user] iter=200 resource=6387 user=580 dur=539.41µs
+2025/12/03 13:03:21.012445 [mongodb] [check_manage_direct_user] iter=300 resource=8045 user=611 dur=1.070415ms
+2025/12/03 13:03:21.071866 [mongodb] [check_manage_direct_user] iter=400 resource=15331 user=1240 dur=543.238µs
+2025/12/03 13:03:21.145671 [mongodb] [check_manage_direct_user] iter=500 resource=11465 user=101 dur=711.866µs
+2025/12/03 13:03:21.239391 [mongodb] [check_manage_direct_user] iter=600 resource=446 user=491 dur=625.052µs
+2025/12/03 13:03:21.301445 [mongodb] [check_manage_direct_user] iter=700 resource=1473 user=497 dur=527.865µs
+2025/12/03 13:03:21.353757 [mongodb] [check_manage_direct_user] iter=800 resource=3921 user=255 dur=520.392µs
+2025/12/03 13:03:21.405354 [mongodb] [check_manage_direct_user] iter=900 resource=4040 user=1337 dur=509.989µs
+2025/12/03 13:03:21.517280 [mongodb] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:03:21.517294 [mongodb] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:03:21.520844 [mongodb] [check_manage_org_admin] iter=0 resource=1 org=1 admin=1493 dur=1.042814ms
+2025/12/03 13:03:21.626348 [mongodb] [check_manage_org_admin] iter=100 resource=101 org=1 admin=1493 dur=468.384µs
+2025/12/03 13:03:21.770813 [mongodb] [check_manage_org_admin] iter=200 resource=201 org=1 admin=1493 dur=470.042µs
+2025/12/03 13:03:21.893861 [mongodb] [check_manage_org_admin] iter=300 resource=301 org=1 admin=1493 dur=743.098µs
+2025/12/03 13:03:22.043654 [mongodb] [check_manage_org_admin] iter=400 resource=401 org=1 admin=1493 dur=657.934µs
+2025/12/03 13:03:22.156606 [mongodb] [check_manage_org_admin] iter=500 resource=501 org=1 admin=1493 dur=559.548µs
+2025/12/03 13:03:22.273392 [mongodb] [check_manage_org_admin] iter=600 resource=601 org=1 admin=1493 dur=593.162µs
+2025/12/03 13:03:22.390277 [mongodb] [check_manage_org_admin] iter=700 resource=701 org=1 admin=1493 dur=623.09µs
+2025/12/03 13:03:22.510327 [mongodb] [check_manage_org_admin] iter=800 resource=801 org=1 admin=1493 dur=611.821µs
+2025/12/03 13:03:22.623904 [mongodb] [check_manage_org_admin] iter=900 resource=901 org=1 admin=1493 dur=548.454µs
+2025/12/03 13:03:22.792721 [mongodb] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:03:22.792746 [mongodb] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:03:22.797077 [mongodb] [check_view_via_group_member] iter=0 resource=2 group=1 user=1493 dur=1.744489ms
+2025/12/03 13:03:22.972576 [mongodb] [check_view_via_group_member] iter=100 resource=199 group=1 user=1493 dur=1.018888ms
+2025/12/03 13:03:23.254662 [mongodb] [check_view_via_group_member] iter=200 resource=397 group=2 user=1493 dur=1.405841ms
+2025/12/03 13:03:23.457499 [mongodb] [check_view_via_group_member] iter=300 resource=565 group=2 user=1493 dur=1.273699ms
+2025/12/03 13:03:23.658275 [mongodb] [check_view_via_group_member] iter=400 resource=764 group=1 user=1493 dur=1.458391ms
+2025/12/03 13:03:23.861800 [mongodb] [check_view_via_group_member] iter=500 resource=938 group=1 user=1493 dur=1.046021ms
+2025/12/03 13:03:24.020204 [mongodb] [check_view_via_group_member] iter=600 resource=1157 group=1 user=1493 dur=1.361538ms
+2025/12/03 13:03:24.229772 [mongodb] [check_view_via_group_member] iter=700 resource=1356 group=2 user=1493 dur=1.530973ms
+2025/12/03 13:03:24.440735 [mongodb] [check_view_via_group_member] iter=800 resource=1585 group=13 user=248 dur=1.489233ms
+2025/12/03 13:03:24.668441 [mongodb] [check_view_via_group_member] iter=900 resource=1957 group=10 user=807 dur=1.075072ms
+2025/12/03 13:03:25.025221 [mongodb] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:03:25.025270 [mongodb] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:03:25.510886 [mongodb] [lookup_resources_manage_super] iter=0 resources=62 duration=485ms
+2025/12/03 13:03:25.985666 [mongodb] [lookup_resources_manage_super] iter=1 resources=62 duration=474ms
+2025/12/03 13:03:26.375899 [mongodb] [lookup_resources_manage_super] iter=2 resources=62 duration=390ms
+2025/12/03 13:03:26.641542 [mongodb] [lookup_resources_manage_super] iter=3 resources=62 duration=265ms
+2025/12/03 13:03:27.034455 [mongodb] [lookup_resources_manage_super] iter=4 resources=62 duration=392ms
+2025/12/03 13:03:27.284988 [mongodb] [lookup_resources_manage_super] iter=5 resources=62 duration=250ms
+2025/12/03 13:03:27.614165 [mongodb] [lookup_resources_manage_super] iter=6 resources=62 duration=329ms
+2025/12/03 13:03:28.093744 [mongodb] [lookup_resources_manage_super] iter=7 resources=62 duration=479ms
+2025/12/03 13:03:28.533200 [mongodb] [lookup_resources_manage_super] iter=8 resources=62 duration=439ms
+2025/12/03 13:03:28.822934 [mongodb] [lookup_resources_manage_super] iter=9 resources=62 duration=289ms
+2025/12/03 13:03:28.822949 [mongodb] [lookup_resources_manage_super] DONE: iters=10 lastCount=62 avg=379.728897ms total=3.797288978s
+2025/12/03 13:03:28.822961 [mongodb] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:03:28.960246 [mongodb] [lookup_resources_view_regular] iter=0 resources=66 duration=137ms
+2025/12/03 13:03:29.097440 [mongodb] [lookup_resources_view_regular] iter=1 resources=66 duration=137ms
+2025/12/03 13:03:29.234403 [mongodb] [lookup_resources_view_regular] iter=2 resources=66 duration=136ms
+2025/12/03 13:03:29.369286 [mongodb] [lookup_resources_view_regular] iter=3 resources=66 duration=134ms
+2025/12/03 13:03:29.548310 [mongodb] [lookup_resources_view_regular] iter=4 resources=66 duration=178ms
+2025/12/03 13:03:29.795465 [mongodb] [lookup_resources_view_regular] iter=5 resources=66 duration=247ms
+2025/12/03 13:03:30.001899 [mongodb] [lookup_resources_view_regular] iter=6 resources=66 duration=206ms
+2025/12/03 13:03:30.146197 [mongodb] [lookup_resources_view_regular] iter=7 resources=66 duration=144ms
+2025/12/03 13:03:30.292544 [mongodb] [lookup_resources_view_regular] iter=8 resources=66 duration=146ms
+2025/12/03 13:03:30.496183 [mongodb] [lookup_resources_view_regular] iter=9 resources=66 duration=203ms
+2025/12/03 13:03:30.496206 [mongodb] [lookup_resources_view_regular] DONE: iters=10 lastCount=66 avg=167.26865ms total=1.672686506s
+2025/12/03 13:03:30.496214 [mongodb] == Mongo read benchmarks DONE ==
+
+==== ENGINE: clickhouse ====
+[benchmark][clickhouse] run 1/3 (delay 5s after)
+2025/12/03 13:03:52.368539 [clickhouse] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:03:52.368666 [clickhouse] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:03:52.390674 [clickhouse] [check_manage_direct_user] lookup iter=0 resource=11383 user=1388 dur=10.723608ms
+2025/12/03 13:03:53.689217 [clickhouse] [check_manage_direct_user] lookup iter=100 resource=301 user=1388 dur=9.366594ms
+2025/12/03 13:03:54.511002 [clickhouse] [check_manage_direct_user] lookup iter=200 resource=1441 user=1388 dur=7.843556ms
+2025/12/03 13:03:54.661551 [clickhouse] [check_manage_direct_user] lookup-mode: insufficient resources returned for user=1388
+2025/12/03 13:03:55.234712 [clickhouse] [check_manage_direct_user] iter=300 resource=7215 user=97 dur=6.926813ms
+2025/12/03 13:03:55.919771 [clickhouse] [check_manage_direct_user] iter=400 resource=7267 user=511 dur=6.664393ms
+2025/12/03 13:03:56.640549 [clickhouse] [check_manage_direct_user] iter=500 resource=7202 user=1062 dur=6.736783ms
+2025/12/03 13:03:57.348394 [clickhouse] [check_manage_direct_user] iter=600 resource=7169 user=1682 dur=6.163512ms
+2025/12/03 13:03:58.051331 [clickhouse] [check_manage_direct_user] iter=700 resource=20354 user=293 dur=10.027327ms
+2025/12/03 13:03:58.788132 [clickhouse] [check_manage_direct_user] iter=800 resource=20383 user=809 dur=9.382177ms
+2025/12/03 13:03:59.608580 [clickhouse] [check_manage_direct_user] iter=900 resource=20413 user=1381 dur=9.427632ms
+2025/12/03 13:04:00.449819 [clickhouse] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:04:00.449832 [clickhouse] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:04:00.469003 [clickhouse] [check_manage_org_admin] lookup-mode: insufficient resources returned for user=1388
+2025/12/03 13:04:00.489866 [clickhouse] [check_manage_org_admin] iter=0 resource=1492 org=3 admin=248 dur=7.485954ms
+2025/12/03 13:04:01.516803 [clickhouse] [check_manage_org_admin] iter=100 resource=1592 org=3 admin=248 dur=6.918833ms
+2025/12/03 13:04:02.473161 [clickhouse] [check_manage_org_admin] iter=200 resource=1692 org=3 admin=248 dur=5.21873ms
+2025/12/03 13:04:03.375027 [clickhouse] [check_manage_org_admin] iter=300 resource=1792 org=3 admin=248 dur=5.114721ms
+2025/12/03 13:04:04.287866 [clickhouse] [check_manage_org_admin] iter=400 resource=1892 org=3 admin=248 dur=6.374043ms
+2025/12/03 13:04:05.184361 [clickhouse] [check_manage_org_admin] iter=500 resource=1992 org=3 admin=248 dur=5.403063ms
+2025/12/03 13:04:06.065140 [clickhouse] [check_manage_org_admin] iter=600 resource=13593 org=11 admin=56 dur=6.220216ms
+2025/12/03 13:04:06.962052 [clickhouse] [check_manage_org_admin] iter=700 resource=13693 org=11 admin=56 dur=5.222661ms
+2025/12/03 13:04:08.027706 [clickhouse] [check_manage_org_admin] iter=800 resource=13793 org=11 admin=56 dur=6.816685ms
+2025/12/03 13:04:08.964283 [clickhouse] [check_manage_org_admin] iter=900 resource=13893 org=11 admin=56 dur=4.985235ms
+2025/12/03 13:04:10.647384 [clickhouse] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:04:10.647403 [clickhouse] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:04:10.657919 [clickhouse] [check_view_via_group_member] lookup iter=0 resource=22050 user=1539 dur=5.593582ms
+2025/12/03 13:04:11.355515 [clickhouse] [check_view_via_group_member] lookup-mode: insufficient resources returned for user=1539
+2025/12/03 13:04:11.444386 [clickhouse] [check_view_via_group_member] iter=100 resource=7282 group=34 user=19 dur=8.278095ms
+2025/12/03 13:04:12.232281 [clickhouse] [check_view_via_group_member] iter=200 resource=9389 group=52 user=4 dur=4.631883ms
+2025/12/03 13:04:13.076360 [clickhouse] [check_view_via_group_member] iter=300 resource=9880 group=52 user=4 dur=4.185942ms
+2025/12/03 13:04:14.010397 [clickhouse] [check_view_via_group_member] iter=400 resource=9116 group=53 user=83 dur=10.182555ms
+2025/12/03 13:04:15.050551 [clickhouse] [check_view_via_group_member] iter=500 resource=9677 group=53 user=83 dur=6.865111ms
+2025/12/03 13:04:15.995159 [clickhouse] [check_view_via_group_member] iter=600 resource=10097 group=53 user=83 dur=5.531885ms
+2025/12/03 13:04:17.138376 [clickhouse] [check_view_via_group_member] iter=700 resource=9326 group=54 user=87 dur=7.855701ms
+2025/12/03 13:04:17.989153 [clickhouse] [check_view_via_group_member] iter=800 resource=9829 group=54 user=87 dur=5.789839ms
+2025/12/03 13:04:18.958483 [clickhouse] [check_view_via_group_member] iter=900 resource=9147 group=55 user=96 dur=7.630179ms
+2025/12/03 13:04:19.977576 [clickhouse] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:04:19.978294 [clickhouse] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:04:19.988418 [clickhouse] [lookup_resources_manage_super] iter=0 resources=221 duration=10ms
+2025/12/03 13:04:19.997672 [clickhouse] [lookup_resources_manage_super] iter=1 resources=221 duration=9ms
+2025/12/03 13:04:20.007559 [clickhouse] [lookup_resources_manage_super] iter=2 resources=221 duration=9ms
+2025/12/03 13:04:20.018555 [clickhouse] [lookup_resources_manage_super] iter=3 resources=221 duration=10ms
+2025/12/03 13:04:20.028464 [clickhouse] [lookup_resources_manage_super] iter=4 resources=221 duration=9ms
+2025/12/03 13:04:20.039004 [clickhouse] [lookup_resources_manage_super] iter=5 resources=221 duration=10ms
+2025/12/03 13:04:20.049565 [clickhouse] [lookup_resources_manage_super] iter=6 resources=221 duration=10ms
+2025/12/03 13:04:20.059396 [clickhouse] [lookup_resources_manage_super] iter=7 resources=221 duration=9ms
+2025/12/03 13:04:20.068592 [clickhouse] [lookup_resources_manage_super] iter=8 resources=221 duration=9ms
+2025/12/03 13:04:20.078457 [clickhouse] [lookup_resources_manage_super] iter=9 resources=221 duration=9ms
+2025/12/03 13:04:20.078469 [clickhouse] [lookup_resources_manage_super] DONE: iters=10 lastCount=221 avg=10.000074ms total=100.000749ms
+2025/12/03 13:04:20.078485 [clickhouse] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:04:20.091141 [clickhouse] [lookup_resources_view_regular] iter=0 resources=95 duration=12ms
+2025/12/03 13:04:20.101602 [clickhouse] [lookup_resources_view_regular] iter=1 resources=95 duration=10ms
+2025/12/03 13:04:20.113567 [clickhouse] [lookup_resources_view_regular] iter=2 resources=95 duration=11ms
+2025/12/03 13:04:20.123536 [clickhouse] [lookup_resources_view_regular] iter=3 resources=95 duration=9ms
+2025/12/03 13:04:20.134766 [clickhouse] [lookup_resources_view_regular] iter=4 resources=95 duration=11ms
+2025/12/03 13:04:20.145534 [clickhouse] [lookup_resources_view_regular] iter=5 resources=95 duration=10ms
+2025/12/03 13:04:20.155030 [clickhouse] [lookup_resources_view_regular] iter=6 resources=95 duration=9ms
+2025/12/03 13:04:20.164109 [clickhouse] [lookup_resources_view_regular] iter=7 resources=95 duration=9ms
+2025/12/03 13:04:20.173326 [clickhouse] [lookup_resources_view_regular] iter=8 resources=95 duration=9ms
+2025/12/03 13:04:20.182839 [clickhouse] [lookup_resources_view_regular] iter=9 resources=95 duration=9ms
+2025/12/03 13:04:20.182851 [clickhouse] [lookup_resources_view_regular] DONE: iters=10 lastCount=95 avg=10.41884ms total=104.188402ms
+2025/12/03 13:04:20.182858 [clickhouse] == ClickHouse read benchmarks DONE ==
+[benchmark][clickhouse] sleep 5s
+[benchmark][clickhouse] run 2/3 (delay 5s after)
+2025/12/03 13:04:26.143540 [clickhouse] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:04:26.143671 [clickhouse] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:04:26.158368 [clickhouse] [check_manage_direct_user] lookup iter=0 resource=11383 user=1388 dur=7.379803ms
+2025/12/03 13:04:26.651932 [clickhouse] [check_manage_direct_user] lookup iter=100 resource=301 user=1388 dur=4.455222ms
+2025/12/03 13:04:27.109991 [clickhouse] [check_manage_direct_user] lookup iter=200 resource=1441 user=1388 dur=6.23428ms
+2025/12/03 13:04:27.242618 [clickhouse] [check_manage_direct_user] lookup-mode: insufficient resources returned for user=1388
+2025/12/03 13:04:27.955665 [clickhouse] [check_manage_direct_user] iter=300 resource=7215 user=97 dur=5.722352ms
+2025/12/03 13:04:28.495725 [clickhouse] [check_manage_direct_user] iter=400 resource=7267 user=511 dur=4.195412ms
+2025/12/03 13:04:28.934576 [clickhouse] [check_manage_direct_user] iter=500 resource=7202 user=1062 dur=4.113598ms
+2025/12/03 13:04:29.464498 [clickhouse] [check_manage_direct_user] iter=600 resource=7169 user=1682 dur=5.706028ms
+2025/12/03 13:04:29.981225 [clickhouse] [check_manage_direct_user] iter=700 resource=20354 user=293 dur=5.302794ms
+2025/12/03 13:04:30.489970 [clickhouse] [check_manage_direct_user] iter=800 resource=20383 user=809 dur=5.909117ms
+2025/12/03 13:04:30.969589 [clickhouse] [check_manage_direct_user] iter=900 resource=20413 user=1381 dur=4.408438ms
+2025/12/03 13:04:31.578560 [clickhouse] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:04:31.578581 [clickhouse] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:04:31.592278 [clickhouse] [check_manage_org_admin] lookup-mode: insufficient resources returned for user=1388
+2025/12/03 13:04:31.616144 [clickhouse] [check_manage_org_admin] iter=0 resource=8904 org=7 admin=61 dur=9.51487ms
+2025/12/03 13:04:32.815103 [clickhouse] [check_manage_org_admin] iter=100 resource=6077 org=4 admin=62 dur=6.341412ms
+2025/12/03 13:04:33.926328 [clickhouse] [check_manage_org_admin] iter=200 resource=6177 org=4 admin=62 dur=5.002605ms
+2025/12/03 13:04:34.883115 [clickhouse] [check_manage_org_admin] iter=300 resource=6277 org=4 admin=62 dur=5.481616ms
+2025/12/03 13:04:35.813890 [clickhouse] [check_manage_org_admin] iter=400 resource=6377 org=4 admin=62 dur=7.113022ms
+2025/12/03 13:04:36.861121 [clickhouse] [check_manage_org_admin] iter=500 resource=6477 org=4 admin=62 dur=7.894273ms
+2025/12/03 13:04:37.996136 [clickhouse] [check_manage_org_admin] iter=600 resource=6577 org=4 admin=62 dur=5.543241ms
+2025/12/03 13:04:39.055093 [clickhouse] [check_manage_org_admin] iter=700 resource=6677 org=4 admin=62 dur=6.091541ms
+2025/12/03 13:04:40.062731 [clickhouse] [check_manage_org_admin] iter=800 resource=6777 org=4 admin=62 dur=6.34112ms
+2025/12/03 13:04:41.078710 [clickhouse] [check_manage_org_admin] iter=900 resource=6877 org=4 admin=62 dur=6.275908ms
+2025/12/03 13:04:42.119729 [clickhouse] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:04:42.119749 [clickhouse] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:04:42.132261 [clickhouse] [check_view_via_group_member] lookup iter=0 resource=22050 user=1539 dur=6.53644ms
+2025/12/03 13:04:42.549355 [clickhouse] [check_view_via_group_member] lookup-mode: insufficient resources returned for user=1539
+2025/12/03 13:04:42.603170 [clickhouse] [check_view_via_group_member] iter=100 resource=7282 group=34 user=19 dur=3.233519ms
+2025/12/03 13:04:43.704362 [clickhouse] [check_view_via_group_member] iter=200 resource=20355 group=142 user=2 dur=6.46534ms
+2025/12/03 13:04:44.622438 [clickhouse] [check_view_via_group_member] iter=300 resource=20372 group=144 user=2 dur=3.202429ms
+2025/12/03 13:04:45.578615 [clickhouse] [check_view_via_group_member] iter=400 resource=9228 group=52 user=4 dur=3.63194ms
+2025/12/03 13:04:46.321207 [clickhouse] [check_view_via_group_member] iter=500 resource=9730 group=52 user=4 dur=4.445334ms
+2025/12/03 13:04:47.131771 [clickhouse] [check_view_via_group_member] iter=600 resource=8971 group=53 user=83 dur=3.427361ms
+2025/12/03 13:04:47.876361 [clickhouse] [check_view_via_group_member] iter=700 resource=9476 group=53 user=83 dur=5.079908ms
+2025/12/03 13:04:48.676906 [clickhouse] [check_view_via_group_member] iter=800 resource=9934 group=53 user=83 dur=3.822601ms
+2025/12/03 13:04:49.452231 [clickhouse] [check_view_via_group_member] iter=900 resource=9176 group=54 user=87 dur=3.440708ms
+2025/12/03 13:04:50.329073 [clickhouse] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:04:50.329103 [clickhouse] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:04:50.344949 [clickhouse] [lookup_resources_manage_super] iter=0 resources=221 duration=15ms
+2025/12/03 13:04:50.359535 [clickhouse] [lookup_resources_manage_super] iter=1 resources=221 duration=14ms
+2025/12/03 13:04:50.382000 [clickhouse] [lookup_resources_manage_super] iter=2 resources=221 duration=22ms
+2025/12/03 13:04:50.399200 [clickhouse] [lookup_resources_manage_super] iter=3 resources=221 duration=17ms
+2025/12/03 13:04:50.413711 [clickhouse] [lookup_resources_manage_super] iter=4 resources=221 duration=14ms
+2025/12/03 13:04:50.430783 [clickhouse] [lookup_resources_manage_super] iter=5 resources=221 duration=17ms
+2025/12/03 13:04:50.444523 [clickhouse] [lookup_resources_manage_super] iter=6 resources=221 duration=13ms
+2025/12/03 13:04:50.461372 [clickhouse] [lookup_resources_manage_super] iter=7 resources=221 duration=16ms
+2025/12/03 13:04:50.485172 [clickhouse] [lookup_resources_manage_super] iter=8 resources=221 duration=23ms
+2025/12/03 13:04:50.497897 [clickhouse] [lookup_resources_manage_super] iter=9 resources=221 duration=12ms
+2025/12/03 13:04:50.497913 [clickhouse] [lookup_resources_manage_super] DONE: iters=10 lastCount=221 avg=16.846674ms total=168.466745ms
+2025/12/03 13:04:50.497929 [clickhouse] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:04:50.513079 [clickhouse] [lookup_resources_view_regular] iter=0 resources=95 duration=15ms
+2025/12/03 13:04:50.526291 [clickhouse] [lookup_resources_view_regular] iter=1 resources=95 duration=13ms
+2025/12/03 13:04:50.541354 [clickhouse] [lookup_resources_view_regular] iter=2 resources=95 duration=15ms
+2025/12/03 13:04:50.554978 [clickhouse] [lookup_resources_view_regular] iter=3 resources=95 duration=13ms
+2025/12/03 13:04:50.571397 [clickhouse] [lookup_resources_view_regular] iter=4 resources=95 duration=16ms
+2025/12/03 13:04:50.588485 [clickhouse] [lookup_resources_view_regular] iter=5 resources=95 duration=17ms
+2025/12/03 13:04:50.601410 [clickhouse] [lookup_resources_view_regular] iter=6 resources=95 duration=12ms
+2025/12/03 13:04:50.617590 [clickhouse] [lookup_resources_view_regular] iter=7 resources=95 duration=16ms
+2025/12/03 13:04:50.631969 [clickhouse] [lookup_resources_view_regular] iter=8 resources=95 duration=14ms
+2025/12/03 13:04:50.644254 [clickhouse] [lookup_resources_view_regular] iter=9 resources=95 duration=12ms
+2025/12/03 13:04:50.644270 [clickhouse] [lookup_resources_view_regular] DONE: iters=10 lastCount=95 avg=14.608176ms total=146.081765ms
+2025/12/03 13:04:50.644280 [clickhouse] == ClickHouse read benchmarks DONE ==
+[benchmark][clickhouse] sleep 5s
+[benchmark][clickhouse] run 3/3 (delay 5s after)
+2025/12/03 13:04:56.737082 [clickhouse] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:04:56.737210 [clickhouse] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:04:56.753453 [clickhouse] [check_manage_direct_user] lookup iter=0 resource=11505 user=1388 dur=7.85478ms
+2025/12/03 13:04:57.349144 [clickhouse] [check_manage_direct_user] lookup iter=100 resource=103 user=1388 dur=6.48416ms
+2025/12/03 13:04:58.029652 [clickhouse] [check_manage_direct_user] lookup iter=200 resource=1264 user=1388 dur=6.590539ms
+2025/12/03 13:04:58.166024 [clickhouse] [check_manage_direct_user] lookup-mode: insufficient resources returned for user=1388
+2025/12/03 13:04:58.653410 [clickhouse] [check_manage_direct_user] iter=300 resource=20421 user=465 dur=6.346944ms
+2025/12/03 13:04:59.189139 [clickhouse] [check_manage_direct_user] iter=400 resource=20394 user=974 dur=5.023759ms
+2025/12/03 13:04:59.736572 [clickhouse] [check_manage_direct_user] iter=500 resource=20417 user=1578 dur=5.946654ms
+2025/12/03 13:05:00.328099 [clickhouse] [check_manage_direct_user] iter=600 resource=8926 user=1379 dur=5.729644ms
+2025/12/03 13:05:01.119583 [clickhouse] [check_manage_direct_user] iter=700 resource=19102 user=447 dur=8.434806ms
+2025/12/03 13:05:02.077809 [clickhouse] [check_manage_direct_user] iter=800 resource=19165 user=1135 dur=8.232303ms
+2025/12/03 13:05:02.933113 [clickhouse] [check_manage_direct_user] iter=900 resource=19093 user=1654 dur=7.646725ms
+2025/12/03 13:05:03.658610 [clickhouse] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:05:03.658628 [clickhouse] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:05:03.668734 [clickhouse] [check_manage_org_admin] lookup-mode: insufficient resources returned for user=1388
+2025/12/03 13:05:03.683161 [clickhouse] [check_manage_org_admin] iter=0 resource=8904 org=7 admin=61 dur=3.683848ms
+2025/12/03 13:05:04.549539 [clickhouse] [check_manage_org_admin] iter=100 resource=6077 org=4 admin=62 dur=3.858153ms
+2025/12/03 13:05:05.405365 [clickhouse] [check_manage_org_admin] iter=200 resource=6177 org=4 admin=62 dur=3.793465ms
+2025/12/03 13:05:06.281450 [clickhouse] [check_manage_org_admin] iter=300 resource=6277 org=4 admin=62 dur=4.25171ms
+2025/12/03 13:05:07.089270 [clickhouse] [check_manage_org_admin] iter=400 resource=6377 org=4 admin=62 dur=3.396421ms
+2025/12/03 13:05:07.822405 [clickhouse] [check_manage_org_admin] iter=500 resource=6477 org=4 admin=62 dur=3.568314ms
+2025/12/03 13:05:08.570523 [clickhouse] [check_manage_org_admin] iter=600 resource=6577 org=4 admin=62 dur=3.841162ms
+2025/12/03 13:05:09.382222 [clickhouse] [check_manage_org_admin] iter=700 resource=6677 org=4 admin=62 dur=3.721919ms
+2025/12/03 13:05:10.196600 [clickhouse] [check_manage_org_admin] iter=800 resource=6777 org=4 admin=62 dur=4.233246ms
+2025/12/03 13:05:11.005530 [clickhouse] [check_manage_org_admin] iter=900 resource=6877 org=4 admin=62 dur=4.500844ms
+2025/12/03 13:05:11.783096 [clickhouse] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:05:11.783123 [clickhouse] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:05:11.796879 [clickhouse] [check_view_via_group_member] lookup iter=0 resource=22050 user=1539 dur=7.320075ms
+2025/12/03 13:05:12.218825 [clickhouse] [check_view_via_group_member] lookup-mode: insufficient resources returned for user=1539
+2025/12/03 13:05:12.289038 [clickhouse] [check_view_via_group_member] iter=100 resource=2652 group=9 user=4 dur=4.886897ms
+2025/12/03 13:05:13.089236 [clickhouse] [check_view_via_group_member] iter=200 resource=2698 group=13 user=47 dur=6.554553ms
+2025/12/03 13:05:13.992983 [clickhouse] [check_view_via_group_member] iter=300 resource=2667 group=19 user=6 dur=3.908959ms
+2025/12/03 13:05:14.752981 [clickhouse] [check_view_via_group_member] iter=400 resource=9264 group=52 user=4 dur=3.183554ms
+2025/12/03 13:05:15.485800 [clickhouse] [check_view_via_group_member] iter=500 resource=9768 group=52 user=4 dur=3.443874ms
+2025/12/03 13:05:16.158515 [clickhouse] [check_view_via_group_member] iter=600 resource=8994 group=53 user=83 dur=3.079955ms
+2025/12/03 13:05:16.951381 [clickhouse] [check_view_via_group_member] iter=700 resource=9514 group=53 user=83 dur=3.688766ms
+2025/12/03 13:05:17.721541 [clickhouse] [check_view_via_group_member] iter=800 resource=9950 group=53 user=83 dur=3.504389ms
+2025/12/03 13:05:18.435690 [clickhouse] [check_view_via_group_member] iter=900 resource=9197 group=54 user=87 dur=4.102381ms
+2025/12/03 13:05:19.255906 [clickhouse] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:05:19.255932 [clickhouse] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:05:19.267178 [clickhouse] [lookup_resources_manage_super] iter=0 resources=221 duration=11ms
+2025/12/03 13:05:19.277891 [clickhouse] [lookup_resources_manage_super] iter=1 resources=221 duration=10ms
+2025/12/03 13:05:19.289063 [clickhouse] [lookup_resources_manage_super] iter=2 resources=221 duration=11ms
+2025/12/03 13:05:19.299994 [clickhouse] [lookup_resources_manage_super] iter=3 resources=221 duration=10ms
+2025/12/03 13:05:19.311671 [clickhouse] [lookup_resources_manage_super] iter=4 resources=221 duration=11ms
+2025/12/03 13:05:19.322923 [clickhouse] [lookup_resources_manage_super] iter=5 resources=221 duration=11ms
+2025/12/03 13:05:19.333084 [clickhouse] [lookup_resources_manage_super] iter=6 resources=221 duration=10ms
+2025/12/03 13:05:19.344080 [clickhouse] [lookup_resources_manage_super] iter=7 resources=221 duration=10ms
+2025/12/03 13:05:19.354945 [clickhouse] [lookup_resources_manage_super] iter=8 resources=221 duration=10ms
+2025/12/03 13:05:19.366119 [clickhouse] [lookup_resources_manage_super] iter=9 resources=221 duration=11ms
+2025/12/03 13:05:19.366133 [clickhouse] [lookup_resources_manage_super] DONE: iters=10 lastCount=221 avg=10.99964ms total=109.996406ms
+2025/12/03 13:05:19.366151 [clickhouse] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:05:19.377214 [clickhouse] [lookup_resources_view_regular] iter=0 resources=95 duration=11ms
+2025/12/03 13:05:19.387845 [clickhouse] [lookup_resources_view_regular] iter=1 resources=95 duration=10ms
+2025/12/03 13:05:19.398650 [clickhouse] [lookup_resources_view_regular] iter=2 resources=95 duration=10ms
+2025/12/03 13:05:19.409609 [clickhouse] [lookup_resources_view_regular] iter=3 resources=95 duration=10ms
+2025/12/03 13:05:19.420416 [clickhouse] [lookup_resources_view_regular] iter=4 resources=95 duration=10ms
+2025/12/03 13:05:19.431207 [clickhouse] [lookup_resources_view_regular] iter=5 resources=95 duration=10ms
+2025/12/03 13:05:19.442336 [clickhouse] [lookup_resources_view_regular] iter=6 resources=95 duration=11ms
+2025/12/03 13:05:19.452931 [clickhouse] [lookup_resources_view_regular] iter=7 resources=95 duration=10ms
+2025/12/03 13:05:19.464493 [clickhouse] [lookup_resources_view_regular] iter=8 resources=95 duration=11ms
+2025/12/03 13:05:19.475730 [clickhouse] [lookup_resources_view_regular] iter=9 resources=95 duration=11ms
+2025/12/03 13:05:19.475744 [clickhouse] [lookup_resources_view_regular] DONE: iters=10 lastCount=95 avg=10.937556ms total=109.375566ms
+2025/12/03 13:05:19.475755 [clickhouse] == ClickHouse read benchmarks DONE ==
+
+==== ENGINE: elasticsearch ====
+[benchmark][elasticsearch] run 1/3 (delay 5s after)
+2025/12/03 13:06:17.707645 [elasticsearch] Using addresses=[http://localhost:9200] cloud_id_set=false auth_user=true timeout=5s insecure_tls=false
+2025/12/03 13:06:17.718448 [elasticsearch] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:06:17.718476 [elasticsearch] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:06:17.976584 [elasticsearch] [check_manage_direct_user] lookup iter=0 resource=1 user=1388 dur=331ns
+2025/12/03 13:06:17.976636 [elasticsearch] [check_manage_direct_user] lookup iter=100 resource=192 user=1388 dur=45ns
+2025/12/03 13:06:17.976654 [elasticsearch] [check_manage_direct_user] lookup iter=200 resource=390 user=1388 dur=43ns
+2025/12/03 13:06:17.976671 [elasticsearch] [check_manage_direct_user] lookup iter=300 resource=597 user=1388 dur=44ns
+2025/12/03 13:06:17.976688 [elasticsearch] [check_manage_direct_user] lookup iter=400 resource=792 user=1388 dur=41ns
+2025/12/03 13:06:17.976704 [elasticsearch] [check_manage_direct_user] lookup iter=500 resource=1007 user=1388 dur=42ns
+2025/12/03 13:06:17.976721 [elasticsearch] [check_manage_direct_user] lookup iter=600 resource=1210 user=1388 dur=43ns
+2025/12/03 13:06:17.976738 [elasticsearch] [check_manage_direct_user] lookup iter=700 resource=1427 user=1388 dur=44ns
+2025/12/03 13:06:17.976774 [elasticsearch] [check_manage_direct_user] lookup iter=800 resource=13163 user=1388 dur=45ns
+2025/12/03 13:06:18.120439 [elasticsearch] [check_manage_direct_user] lookup iter=900 resource=1080 user=1388 dur=44ns
+2025/12/03 13:06:19.061688 [elasticsearch] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:06:19.061709 [elasticsearch] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:06:19.100744 [elasticsearch] [check_manage_org_admin] lookup iter=0 resource=1 user=1388 dur=140ns
+2025/12/03 13:06:19.100776 [elasticsearch] [check_manage_org_admin] lookup iter=100 resource=192 user=1388 dur=35ns
+2025/12/03 13:06:19.100794 [elasticsearch] [check_manage_org_admin] lookup iter=200 resource=390 user=1388 dur=38ns
+2025/12/03 13:06:19.100821 [elasticsearch] [check_manage_org_admin] lookup iter=300 resource=597 user=1388 dur=35ns
+2025/12/03 13:06:19.100839 [elasticsearch] [check_manage_org_admin] lookup iter=400 resource=792 user=1388 dur=35ns
+2025/12/03 13:06:19.100856 [elasticsearch] [check_manage_org_admin] lookup iter=500 resource=1007 user=1388 dur=34ns
+2025/12/03 13:06:19.100873 [elasticsearch] [check_manage_org_admin] lookup iter=600 resource=1210 user=1388 dur=34ns
+2025/12/03 13:06:19.100890 [elasticsearch] [check_manage_org_admin] lookup iter=700 resource=1427 user=1388 dur=35ns
+2025/12/03 13:06:19.100907 [elasticsearch] [check_manage_org_admin] lookup iter=800 resource=13163 user=1388 dur=35ns
+2025/12/03 13:06:19.166632 [elasticsearch] [check_manage_org_admin] lookup iter=900 resource=1080 user=1388 dur=39ns
+2025/12/03 13:06:20.383522 [elasticsearch] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:06:20.383549 [elasticsearch] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:06:20.591464 [elasticsearch] [check_view_via_group_member] lookup iter=0 resource=17792 user=1539 dur=214ns
+2025/12/03 13:06:20.591518 [elasticsearch] [check_view_via_group_member] lookup iter=100 resource=17892 user=1539 dur=40ns
+2025/12/03 13:06:20.591537 [elasticsearch] [check_view_via_group_member] lookup iter=200 resource=17992 user=1539 dur=40ns
+2025/12/03 13:06:20.591558 [elasticsearch] [check_view_via_group_member] lookup iter=300 resource=18092 user=1539 dur=59ns
+2025/12/03 13:06:20.591581 [elasticsearch] [check_view_via_group_member] lookup iter=400 resource=18192 user=1539 dur=49ns
+2025/12/03 13:06:20.591602 [elasticsearch] [check_view_via_group_member] lookup iter=500 resource=18292 user=1539 dur=61ns
+2025/12/03 13:06:20.591626 [elasticsearch] [check_view_via_group_member] lookup iter=600 resource=18392 user=1539 dur=50ns
+2025/12/03 13:06:20.591649 [elasticsearch] [check_view_via_group_member] lookup iter=700 resource=18492 user=1539 dur=48ns
+2025/12/03 13:06:20.591673 [elasticsearch] [check_view_via_group_member] lookup iter=800 resource=18592 user=1539 dur=98ns
+2025/12/03 13:06:20.591691 [elasticsearch] [check_view_via_group_member] lookup iter=900 resource=18692 user=1539 dur=42ns
+2025/12/03 13:06:21.515030 [elasticsearch] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:06:21.515056 [elasticsearch] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:06:22.404318 [elasticsearch] [lookup_resources_manage_super] iter=0 resources=9821 duration=889ms
+2025/12/03 13:06:23.272150 [elasticsearch] [lookup_resources_manage_super] iter=1 resources=9821 duration=867ms
+2025/12/03 13:06:24.130716 [elasticsearch] [lookup_resources_manage_super] iter=2 resources=9821 duration=858ms
+2025/12/03 13:06:24.953032 [elasticsearch] [lookup_resources_manage_super] iter=3 resources=9821 duration=822ms
+2025/12/03 13:06:25.788077 [elasticsearch] [lookup_resources_manage_super] iter=4 resources=9821 duration=835ms
+2025/12/03 13:06:26.632088 [elasticsearch] [lookup_resources_manage_super] iter=5 resources=9821 duration=843ms
+2025/12/03 13:06:27.425331 [elasticsearch] [lookup_resources_manage_super] iter=6 resources=9821 duration=793ms
+2025/12/03 13:06:28.245842 [elasticsearch] [lookup_resources_manage_super] iter=7 resources=9821 duration=820ms
+2025/12/03 13:06:29.084309 [elasticsearch] [lookup_resources_manage_super] iter=8 resources=9821 duration=838ms
+2025/12/03 13:06:29.965657 [elasticsearch] [lookup_resources_manage_super] iter=9 resources=9821 duration=881ms
+2025/12/03 13:06:29.965672 [elasticsearch] [lookup_resources_manage_super] DONE: iters=10 lastCount=9821 avg=845.019479ms total=8.450194792s
+2025/12/03 13:06:29.965678 [elasticsearch] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:06:31.073381 [elasticsearch] [lookup_resources_view_regular] iter=0 resources=10000 duration=1.107s
+2025/12/03 13:06:32.227107 [elasticsearch] [lookup_resources_view_regular] iter=1 resources=10000 duration=1.153s
+2025/12/03 13:06:33.273565 [elasticsearch] [lookup_resources_view_regular] iter=2 resources=10000 duration=1.046s
+2025/12/03 13:06:34.307303 [elasticsearch] [lookup_resources_view_regular] iter=3 resources=10000 duration=1.033s
+2025/12/03 13:06:35.208416 [elasticsearch] [lookup_resources_view_regular] iter=4 resources=10000 duration=901ms
+2025/12/03 13:06:36.141808 [elasticsearch] [lookup_resources_view_regular] iter=5 resources=10000 duration=933ms
+2025/12/03 13:06:37.025336 [elasticsearch] [lookup_resources_view_regular] iter=6 resources=10000 duration=883ms
+2025/12/03 13:06:37.904179 [elasticsearch] [lookup_resources_view_regular] iter=7 resources=10000 duration=878ms
+2025/12/03 13:06:38.866155 [elasticsearch] [lookup_resources_view_regular] iter=8 resources=10000 duration=961ms
+2025/12/03 13:06:39.906316 [elasticsearch] [lookup_resources_view_regular] iter=9 resources=10000 duration=1.04s
+2025/12/03 13:06:39.906337 [elasticsearch] [lookup_resources_view_regular] DONE: iters=10 lastCount=10000 avg=994.018349ms total=9.940183499s
+2025/12/03 13:06:39.906341 [elasticsearch] == Elasticsearch read benchmarks DONE ==
+[benchmark][elasticsearch] sleep 5s
+[benchmark][elasticsearch] run 2/3 (delay 5s after)
+2025/12/03 13:06:45.933519 [elasticsearch] Using addresses=[http://localhost:9200] cloud_id_set=false auth_user=true timeout=5s insecure_tls=false
+2025/12/03 13:06:45.940506 [elasticsearch] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:06:45.940535 [elasticsearch] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:06:45.989538 [elasticsearch] [check_manage_direct_user] lookup iter=0 resource=1 user=1388 dur=198ns
+2025/12/03 13:06:45.989569 [elasticsearch] [check_manage_direct_user] lookup iter=100 resource=192 user=1388 dur=39ns
+2025/12/03 13:06:45.989585 [elasticsearch] [check_manage_direct_user] lookup iter=200 resource=390 user=1388 dur=41ns
+2025/12/03 13:06:45.989601 [elasticsearch] [check_manage_direct_user] lookup iter=300 resource=597 user=1388 dur=37ns
+2025/12/03 13:06:45.989615 [elasticsearch] [check_manage_direct_user] lookup iter=400 resource=792 user=1388 dur=40ns
+2025/12/03 13:06:45.989631 [elasticsearch] [check_manage_direct_user] lookup iter=500 resource=1007 user=1388 dur=39ns
+2025/12/03 13:06:45.989646 [elasticsearch] [check_manage_direct_user] lookup iter=600 resource=1210 user=1388 dur=39ns
+2025/12/03 13:06:45.989661 [elasticsearch] [check_manage_direct_user] lookup iter=700 resource=1427 user=1388 dur=40ns
+2025/12/03 13:06:45.989676 [elasticsearch] [check_manage_direct_user] lookup iter=800 resource=13163 user=1388 dur=40ns
+2025/12/03 13:06:46.058877 [elasticsearch] [check_manage_direct_user] lookup iter=900 resource=1080 user=1388 dur=36ns
+2025/12/03 13:06:46.833334 [elasticsearch] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:06:46.833354 [elasticsearch] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:06:46.866131 [elasticsearch] [check_manage_org_admin] lookup iter=0 resource=1 user=1388 dur=225ns
+2025/12/03 13:06:46.866160 [elasticsearch] [check_manage_org_admin] lookup iter=100 resource=192 user=1388 dur=35ns
+2025/12/03 13:06:46.866175 [elasticsearch] [check_manage_org_admin] lookup iter=200 resource=390 user=1388 dur=35ns
+2025/12/03 13:06:46.866188 [elasticsearch] [check_manage_org_admin] lookup iter=300 resource=597 user=1388 dur=34ns
+2025/12/03 13:06:46.866202 [elasticsearch] [check_manage_org_admin] lookup iter=400 resource=792 user=1388 dur=34ns
+2025/12/03 13:06:46.866215 [elasticsearch] [check_manage_org_admin] lookup iter=500 resource=1007 user=1388 dur=47ns
+2025/12/03 13:06:46.866228 [elasticsearch] [check_manage_org_admin] lookup iter=600 resource=1210 user=1388 dur=34ns
+2025/12/03 13:06:46.866242 [elasticsearch] [check_manage_org_admin] lookup iter=700 resource=1427 user=1388 dur=35ns
+2025/12/03 13:06:46.866255 [elasticsearch] [check_manage_org_admin] lookup iter=800 resource=13163 user=1388 dur=34ns
+2025/12/03 13:06:46.925489 [elasticsearch] [check_manage_org_admin] lookup iter=900 resource=1080 user=1388 dur=37ns
+2025/12/03 13:06:47.621357 [elasticsearch] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:06:47.621374 [elasticsearch] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:06:47.754801 [elasticsearch] [check_view_via_group_member] lookup iter=0 resource=17792 user=1539 dur=153ns
+2025/12/03 13:06:47.754833 [elasticsearch] [check_view_via_group_member] lookup iter=100 resource=17892 user=1539 dur=34ns
+2025/12/03 13:06:47.754849 [elasticsearch] [check_view_via_group_member] lookup iter=200 resource=17992 user=1539 dur=34ns
+2025/12/03 13:06:47.754862 [elasticsearch] [check_view_via_group_member] lookup iter=300 resource=18092 user=1539 dur=35ns
+2025/12/03 13:06:47.754876 [elasticsearch] [check_view_via_group_member] lookup iter=400 resource=18192 user=1539 dur=35ns
+2025/12/03 13:06:47.754889 [elasticsearch] [check_view_via_group_member] lookup iter=500 resource=18292 user=1539 dur=37ns
+2025/12/03 13:06:47.754902 [elasticsearch] [check_view_via_group_member] lookup iter=600 resource=18392 user=1539 dur=35ns
+2025/12/03 13:06:47.754915 [elasticsearch] [check_view_via_group_member] lookup iter=700 resource=18492 user=1539 dur=34ns
+2025/12/03 13:06:47.754929 [elasticsearch] [check_view_via_group_member] lookup iter=800 resource=18592 user=1539 dur=34ns
+2025/12/03 13:06:47.754943 [elasticsearch] [check_view_via_group_member] lookup iter=900 resource=18692 user=1539 dur=35ns
+2025/12/03 13:06:48.507729 [elasticsearch] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:06:48.507748 [elasticsearch] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:06:49.314836 [elasticsearch] [lookup_resources_manage_super] iter=0 resources=9821 duration=807ms
+2025/12/03 13:06:50.094841 [elasticsearch] [lookup_resources_manage_super] iter=1 resources=9821 duration=779ms
+2025/12/03 13:06:50.900817 [elasticsearch] [lookup_resources_manage_super] iter=2 resources=9821 duration=805ms
+2025/12/03 13:06:51.685143 [elasticsearch] [lookup_resources_manage_super] iter=3 resources=9821 duration=784ms
+2025/12/03 13:06:52.470924 [elasticsearch] [lookup_resources_manage_super] iter=4 resources=9821 duration=785ms
+2025/12/03 13:06:53.292106 [elasticsearch] [lookup_resources_manage_super] iter=5 resources=9821 duration=821ms
+2025/12/03 13:06:54.064714 [elasticsearch] [lookup_resources_manage_super] iter=6 resources=9821 duration=772ms
+2025/12/03 13:06:54.918900 [elasticsearch] [lookup_resources_manage_super] iter=7 resources=9821 duration=854ms
+2025/12/03 13:06:56.279524 [elasticsearch] [lookup_resources_manage_super] iter=8 resources=9821 duration=1.36s
+2025/12/03 13:06:57.247894 [elasticsearch] [lookup_resources_manage_super] iter=9 resources=9821 duration=968ms
+2025/12/03 13:06:57.247908 [elasticsearch] [lookup_resources_manage_super] DONE: iters=10 lastCount=9821 avg=873.976621ms total=8.739766215s
+2025/12/03 13:06:57.247921 [elasticsearch] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:06:58.238609 [elasticsearch] [lookup_resources_view_regular] iter=0 resources=10000 duration=990ms
+2025/12/03 13:06:59.256967 [elasticsearch] [lookup_resources_view_regular] iter=1 resources=10000 duration=1.018s
+2025/12/03 13:07:00.243930 [elasticsearch] [lookup_resources_view_regular] iter=2 resources=10000 duration=986ms
+2025/12/03 13:07:01.449120 [elasticsearch] [lookup_resources_view_regular] iter=3 resources=10000 duration=1.205s
+2025/12/03 13:07:02.747477 [elasticsearch] [lookup_resources_view_regular] iter=4 resources=10000 duration=1.298s
+2025/12/03 13:07:03.895572 [elasticsearch] [lookup_resources_view_regular] iter=5 resources=10000 duration=1.148s
+2025/12/03 13:07:05.000075 [elasticsearch] [lookup_resources_view_regular] iter=6 resources=10000 duration=1.104s
+2025/12/03 13:07:06.162649 [elasticsearch] [lookup_resources_view_regular] iter=7 resources=10000 duration=1.162s
+2025/12/03 13:07:07.438588 [elasticsearch] [lookup_resources_view_regular] iter=8 resources=10000 duration=1.275s
+2025/12/03 13:07:08.721886 [elasticsearch] [lookup_resources_view_regular] iter=9 resources=10000 duration=1.283s
+2025/12/03 13:07:08.721902 [elasticsearch] [lookup_resources_view_regular] DONE: iters=10 lastCount=10000 avg=1.147351463s total=11.473514633s
+2025/12/03 13:07:08.721907 [elasticsearch] == Elasticsearch read benchmarks DONE ==
+[benchmark][elasticsearch] sleep 5s
+[benchmark][elasticsearch] run 3/3 (delay 5s after)
+2025/12/03 13:07:14.889273 [elasticsearch] Using addresses=[http://localhost:9200] cloud_id_set=false auth_user=true timeout=5s insecure_tls=false
+2025/12/03 13:07:14.897993 [elasticsearch] Running in streaming-only mode (no precollection). elapsed=0s heavyManageUser="1388" regularViewUser="1539"
+2025/12/03 13:07:14.898057 [elasticsearch] [check_manage_direct_user] streaming mode. iterations=1000
+2025/12/03 13:07:14.948952 [elasticsearch] [check_manage_direct_user] lookup iter=0 resource=1 user=1388 dur=275ns
+2025/12/03 13:07:14.949015 [elasticsearch] [check_manage_direct_user] lookup iter=100 resource=192 user=1388 dur=56ns
+2025/12/03 13:07:14.949038 [elasticsearch] [check_manage_direct_user] lookup iter=200 resource=390 user=1388 dur=43ns
+2025/12/03 13:07:14.949056 [elasticsearch] [check_manage_direct_user] lookup iter=300 resource=597 user=1388 dur=46ns
+2025/12/03 13:07:14.949074 [elasticsearch] [check_manage_direct_user] lookup iter=400 resource=792 user=1388 dur=43ns
+2025/12/03 13:07:14.949093 [elasticsearch] [check_manage_direct_user] lookup iter=500 resource=1007 user=1388 dur=44ns
+2025/12/03 13:07:14.949113 [elasticsearch] [check_manage_direct_user] lookup iter=600 resource=1210 user=1388 dur=46ns
+2025/12/03 13:07:14.949132 [elasticsearch] [check_manage_direct_user] lookup iter=700 resource=1427 user=1388 dur=44ns
+2025/12/03 13:07:14.949149 [elasticsearch] [check_manage_direct_user] lookup iter=800 resource=13163 user=1388 dur=45ns
+2025/12/03 13:07:15.034010 [elasticsearch] [check_manage_direct_user] lookup iter=900 resource=1080 user=1388 dur=44ns
+2025/12/03 13:07:16.010135 [elasticsearch] [check_manage_direct_user] DONE: iters=1000
+2025/12/03 13:07:16.010159 [elasticsearch] [check_manage_org_admin] streaming mode. iterations=1000
+2025/12/03 13:07:16.052174 [elasticsearch] [check_manage_org_admin] lookup iter=0 resource=1 user=1388 dur=260ns
+2025/12/03 13:07:16.052218 [elasticsearch] [check_manage_org_admin] lookup iter=100 resource=192 user=1388 dur=46ns
+2025/12/03 13:07:16.052236 [elasticsearch] [check_manage_org_admin] lookup iter=200 resource=390 user=1388 dur=44ns
+2025/12/03 13:07:16.052253 [elasticsearch] [check_manage_org_admin] lookup iter=300 resource=597 user=1388 dur=45ns
+2025/12/03 13:07:16.052270 [elasticsearch] [check_manage_org_admin] lookup iter=400 resource=792 user=1388 dur=43ns
+2025/12/03 13:07:16.052287 [elasticsearch] [check_manage_org_admin] lookup iter=500 resource=1007 user=1388 dur=44ns
+2025/12/03 13:07:16.052305 [elasticsearch] [check_manage_org_admin] lookup iter=600 resource=1210 user=1388 dur=44ns
+2025/12/03 13:07:16.052322 [elasticsearch] [check_manage_org_admin] lookup iter=700 resource=1427 user=1388 dur=46ns
+2025/12/03 13:07:16.052357 [elasticsearch] [check_manage_org_admin] lookup iter=800 resource=13163 user=1388 dur=43ns
+2025/12/03 13:07:16.127870 [elasticsearch] [check_manage_org_admin] lookup iter=900 resource=1080 user=1388 dur=44ns
+2025/12/03 13:07:16.991081 [elasticsearch] [check_manage_org_admin] DONE: iters=1000
+2025/12/03 13:07:16.991100 [elasticsearch] [check_view_via_group_member] streaming mode. iterations=1000
+2025/12/03 13:07:17.152294 [elasticsearch] [check_view_via_group_member] lookup iter=0 resource=17792 user=1539 dur=192ns
+2025/12/03 13:07:17.152336 [elasticsearch] [check_view_via_group_member] lookup iter=100 resource=17892 user=1539 dur=43ns
+2025/12/03 13:07:17.152354 [elasticsearch] [check_view_via_group_member] lookup iter=200 resource=17992 user=1539 dur=44ns
+2025/12/03 13:07:17.152371 [elasticsearch] [check_view_via_group_member] lookup iter=300 resource=18092 user=1539 dur=42ns
+2025/12/03 13:07:17.152387 [elasticsearch] [check_view_via_group_member] lookup iter=400 resource=18192 user=1539 dur=45ns
+2025/12/03 13:07:17.152404 [elasticsearch] [check_view_via_group_member] lookup iter=500 resource=18292 user=1539 dur=44ns
+2025/12/03 13:07:17.152420 [elasticsearch] [check_view_via_group_member] lookup iter=600 resource=18392 user=1539 dur=43ns
+2025/12/03 13:07:17.152437 [elasticsearch] [check_view_via_group_member] lookup iter=700 resource=18492 user=1539 dur=43ns
+2025/12/03 13:07:17.152454 [elasticsearch] [check_view_via_group_member] lookup iter=800 resource=18592 user=1539 dur=42ns
+2025/12/03 13:07:17.152471 [elasticsearch] [check_view_via_group_member] lookup iter=900 resource=18692 user=1539 dur=44ns
+2025/12/03 13:07:18.050859 [elasticsearch] [check_view_via_group_member] DONE: iters=1000
+2025/12/03 13:07:18.050885 [elasticsearch] [lookup_resources_manage_super] iterations=10 user=1388
+2025/12/03 13:07:19.034147 [elasticsearch] [lookup_resources_manage_super] iter=0 resources=9821 duration=983ms
+2025/12/03 13:07:20.203759 [elasticsearch] [lookup_resources_manage_super] iter=1 resources=9821 duration=1.169s
+2025/12/03 13:07:21.575809 [elasticsearch] [lookup_resources_manage_super] iter=2 resources=9821 duration=1.371s
+2025/12/03 13:07:22.627308 [elasticsearch] [lookup_resources_manage_super] iter=3 resources=9821 duration=1.051s
+2025/12/03 13:07:23.711234 [elasticsearch] [lookup_resources_manage_super] iter=4 resources=9821 duration=1.083s
+2025/12/03 13:07:24.700257 [elasticsearch] [lookup_resources_manage_super] iter=5 resources=9821 duration=988ms
+2025/12/03 13:07:25.725457 [elasticsearch] [lookup_resources_manage_super] iter=6 resources=9821 duration=1.025s
+2025/12/03 13:07:26.931369 [elasticsearch] [lookup_resources_manage_super] iter=7 resources=9821 duration=1.205s
+2025/12/03 13:07:27.964558 [elasticsearch] [lookup_resources_manage_super] iter=8 resources=9821 duration=1.033s
+2025/12/03 13:07:28.988682 [elasticsearch] [lookup_resources_manage_super] iter=9 resources=9821 duration=1.024s
+2025/12/03 13:07:28.988704 [elasticsearch] [lookup_resources_manage_super] DONE: iters=10 lastCount=9821 avg=1.093722657s total=10.937226571s
+2025/12/03 13:07:28.988713 [elasticsearch] [lookup_resources_view_regular] iterations=10 user=1539
+2025/12/03 13:07:30.123183 [elasticsearch] [lookup_resources_view_regular] iter=0 resources=10000 duration=1.134s
+2025/12/03 13:07:31.275393 [elasticsearch] [lookup_resources_view_regular] iter=1 resources=10000 duration=1.152s
+2025/12/03 13:07:32.416634 [elasticsearch] [lookup_resources_view_regular] iter=2 resources=10000 duration=1.141s
+2025/12/03 13:07:33.580699 [elasticsearch] [lookup_resources_view_regular] iter=3 resources=10000 duration=1.164s
+2025/12/03 13:07:34.743308 [elasticsearch] [lookup_resources_view_regular] iter=4 resources=10000 duration=1.162s
+2025/12/03 13:07:35.904136 [elasticsearch] [lookup_resources_view_regular] iter=5 resources=10000 duration=1.16s
+2025/12/03 13:07:36.988766 [elasticsearch] [lookup_resources_view_regular] iter=6 resources=10000 duration=1.084s
+2025/12/03 13:07:38.022438 [elasticsearch] [lookup_resources_view_regular] iter=7 resources=10000 duration=1.033s
+2025/12/03 13:07:39.042635 [elasticsearch] [lookup_resources_view_regular] iter=8 resources=10000 duration=1.02s
+2025/12/03 13:07:40.020248 [elasticsearch] [lookup_resources_view_regular] iter=9 resources=10000 duration=977ms
+2025/12/03 13:07:40.020270 [elasticsearch] [lookup_resources_view_regular] DONE: iters=10 lastCount=10000 avg=1.103106933s total=11.031069335s
+2025/12/03 13:07:40.020276 [elasticsearch] == Elasticsearch read benchmarks DONE ==

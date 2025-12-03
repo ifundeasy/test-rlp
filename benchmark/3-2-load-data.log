@@ -1,0 +1,406 @@
+
+==== ENGINE: authzed_crdb ====
+2025/12/03 12:45:27.677951 [authzed_crdb] == Starting Authzed data import from CSV in "data" ==
+2025/12/03 12:45:28.106186 [authzed_crdb] Loaded org_memberships: 4117 relationships (cumulative=4117)
+2025/12/03 12:45:28.106711 [authzed_crdb] Loaded groups -> org.member_group: 170 relationships (cumulative=4287)
+2025/12/03 12:45:29.088108 [authzed_crdb] Loaded group_memberships progress: 10000 rows (cumulative=14287) elapsed=1.41s
+2025/12/03 12:45:29.462777 [authzed_crdb] Loaded group_memberships: 13441 relationships (cumulative=17728)
+2025/12/03 12:45:29.463209 [authzed_crdb] Loaded group_hierarchy: 14 relationships (cumulative=17742)
+2025/12/03 12:45:30.247909 [authzed_crdb] Loaded resources -> resource.org: 10000 relationships (cumulative=27742) elapsed=2.569s
+2025/12/03 12:45:31.181628 [authzed_crdb] Loaded resources -> resource.org: 20000 relationships (cumulative=37742) elapsed=3.503s
+2025/12/03 12:45:31.386895 [authzed_crdb] Loaded resources -> resource.org: 22084 relationships (cumulative=39826)
+2025/12/03 12:45:32.453832 [authzed_crdb] Loaded resource_acl progress: 10000 rows (cumulative=49826) elapsed=4.775s
+2025/12/03 12:45:33.858932 [authzed_crdb] Loaded resource_acl progress: 20000 rows (cumulative=59826) elapsed=6.18s
+2025/12/03 12:45:35.353404 [authzed_crdb] Loaded resource_acl progress: 30000 rows (cumulative=69826) elapsed=7.675s
+2025/12/03 12:45:36.739911 [authzed_crdb] Loaded resource_acl progress: 40000 rows (cumulative=79826) elapsed=9.061s
+2025/12/03 12:45:38.255933 [authzed_crdb] Loaded resource_acl progress: 50000 rows (cumulative=89826) elapsed=10.577s
+2025/12/03 12:45:39.296274 [authzed_crdb] Loaded resource_acl progress: 60000 rows (cumulative=99826) elapsed=11.618s
+2025/12/03 12:45:40.383399 [authzed_crdb] Loaded resource_acl progress: 70000 rows (cumulative=109826) elapsed=12.705s
+2025/12/03 12:45:41.535136 [authzed_crdb] Loaded resource_acl progress: 80000 rows (cumulative=119826) elapsed=13.856s
+2025/12/03 12:45:42.489482 [authzed_crdb] Loaded resource_acl progress: 90000 rows (cumulative=129826) elapsed=14.811s
+2025/12/03 12:45:43.672771 [authzed_crdb] Loaded resource_acl progress: 100000 rows (cumulative=139826) elapsed=15.994s
+2025/12/03 12:45:44.621436 [authzed_crdb] Loaded resource_acl progress: 110000 rows (cumulative=149826) elapsed=16.943s
+2025/12/03 12:45:45.863221 [authzed_crdb] Loaded resource_acl progress: 120000 rows (cumulative=159826) elapsed=18.184s
+2025/12/03 12:45:47.178865 [authzed_crdb] Loaded resource_acl progress: 130000 rows (cumulative=169826) elapsed=19.5s
+2025/12/03 12:45:48.281474 [authzed_crdb] Loaded resource_acl progress: 140000 rows (cumulative=179826) elapsed=20.603s
+2025/12/03 12:45:49.672883 [authzed_crdb] Loaded resource_acl progress: 150000 rows (cumulative=189826) elapsed=21.994s
+2025/12/03 12:45:50.821405 [authzed_crdb] Loaded resource_acl progress: 160000 rows (cumulative=199826) elapsed=23.142s
+2025/12/03 12:45:52.225934 [authzed_crdb] Loaded resource_acl progress: 170000 rows (cumulative=209826) elapsed=24.547s
+2025/12/03 12:45:53.506299 [authzed_crdb] Loaded resource_acl progress: 180000 rows (cumulative=219826) elapsed=25.827s
+2025/12/03 12:45:54.591162 [authzed_crdb] Loaded resource_acl progress: 190000 rows (cumulative=229826) elapsed=26.912s
+2025/12/03 12:45:55.947738 [authzed_crdb] Loaded resource_acl progress: 200000 rows (cumulative=239826) elapsed=28.269s
+2025/12/03 12:45:57.052202 [authzed_crdb] Loaded resource_acl progress: 210000 rows (cumulative=249826) elapsed=29.373s
+2025/12/03 12:45:58.443634 [authzed_crdb] Loaded resource_acl progress: 220000 rows (cumulative=259826) elapsed=30.765s
+2025/12/03 12:45:59.743589 [authzed_crdb] Loaded resource_acl progress: 230000 rows (cumulative=269826) elapsed=32.064s
+2025/12/03 12:46:01.110934 [authzed_crdb] Loaded resource_acl progress: 240000 rows (cumulative=279826) elapsed=33.432s
+2025/12/03 12:46:02.686120 [authzed_crdb] Loaded resource_acl progress: 250000 rows (cumulative=289826) elapsed=35.007s
+2025/12/03 12:46:03.717708 [authzed_crdb] Loaded resource_acl progress: 260000 rows (cumulative=299826) elapsed=36.038s
+2025/12/03 12:46:05.271578 [authzed_crdb] Loaded resource_acl progress: 270000 rows (cumulative=309826) elapsed=37.592s
+2025/12/03 12:46:06.581743 [authzed_crdb] Loaded resource_acl progress: 280000 rows (cumulative=319826) elapsed=38.902s
+2025/12/03 12:46:08.086090 [authzed_crdb] Loaded resource_acl progress: 290000 rows (cumulative=329826) elapsed=40.407s
+2025/12/03 12:46:09.826784 [authzed_crdb] Loaded resource_acl progress: 300000 rows (cumulative=339826) elapsed=42.147s
+2025/12/03 12:46:11.261798 [authzed_crdb] Loaded resource_acl progress: 310000 rows (cumulative=349826) elapsed=43.582s
+2025/12/03 12:46:13.108678 [authzed_crdb] Loaded resource_acl progress: 320000 rows (cumulative=359826) elapsed=45.429s
+2025/12/03 12:46:15.305329 [authzed_crdb] Loaded resource_acl progress: 330000 rows (cumulative=369826) elapsed=47.626s
+2025/12/03 12:46:17.021396 [authzed_crdb] Loaded resource_acl progress: 340000 rows (cumulative=379826) elapsed=49.342s
+2025/12/03 12:46:19.004977 [authzed_crdb] Loaded resource_acl progress: 350000 rows (cumulative=389826) elapsed=51.325s
+2025/12/03 12:46:20.551298 [authzed_crdb] Loaded resource_acl progress: 360000 rows (cumulative=399826) elapsed=52.872s
+2025/12/03 12:46:21.832427 [authzed_crdb] Loaded resource_acl: 364983 relationships (cumulative=404809)
+2025/12/03 12:46:21.947959 [authzed_crdb] Authzed data import DONE: totalRelationships=404809 elapsed=54.268s lastConsistencyToken=token:"GioKHjE3NjQ3NDA3ODE4NDAxNDcyNzUuMDAwMDAwMDAwMBIIMzVmNGIxMmQ="
+
+==== ENGINE: authzed_pgdb ====
+2025/12/03 12:48:24.752655 [authzed_pgdb] == Starting Authzed data import from CSV in "data" ==
+2025/12/03 12:48:24.998609 [authzed_pgdb] Loaded org_memberships: 4117 relationships (cumulative=4117)
+2025/12/03 12:48:24.999134 [authzed_pgdb] Loaded groups -> org.member_group: 170 relationships (cumulative=4287)
+2025/12/03 12:48:25.575972 [authzed_pgdb] Loaded group_memberships progress: 10000 rows (cumulative=14287) elapsed=823ms
+2025/12/03 12:48:25.750734 [authzed_pgdb] Loaded group_memberships: 13441 relationships (cumulative=17728)
+2025/12/03 12:48:25.751142 [authzed_pgdb] Loaded group_hierarchy: 14 relationships (cumulative=17742)
+2025/12/03 12:48:26.297143 [authzed_pgdb] Loaded resources -> resource.org: 10000 relationships (cumulative=27742) elapsed=1.544s
+2025/12/03 12:48:26.883805 [authzed_pgdb] Loaded resources -> resource.org: 20000 relationships (cumulative=37742) elapsed=2.131s
+2025/12/03 12:48:26.998362 [authzed_pgdb] Loaded resources -> resource.org: 22084 relationships (cumulative=39826)
+2025/12/03 12:48:27.608214 [authzed_pgdb] Loaded resource_acl progress: 10000 rows (cumulative=49826) elapsed=2.855s
+2025/12/03 12:48:28.228226 [authzed_pgdb] Loaded resource_acl progress: 20000 rows (cumulative=59826) elapsed=3.475s
+2025/12/03 12:48:29.017272 [authzed_pgdb] Loaded resource_acl progress: 30000 rows (cumulative=69826) elapsed=4.264s
+2025/12/03 12:48:29.877606 [authzed_pgdb] Loaded resource_acl progress: 40000 rows (cumulative=79826) elapsed=5.125s
+2025/12/03 12:48:30.514654 [authzed_pgdb] Loaded resource_acl progress: 50000 rows (cumulative=89826) elapsed=5.762s
+2025/12/03 12:48:31.172851 [authzed_pgdb] Loaded resource_acl progress: 60000 rows (cumulative=99826) elapsed=6.42s
+2025/12/03 12:48:31.877961 [authzed_pgdb] Loaded resource_acl progress: 70000 rows (cumulative=109826) elapsed=7.125s
+2025/12/03 12:48:32.511749 [authzed_pgdb] Loaded resource_acl progress: 80000 rows (cumulative=119826) elapsed=7.759s
+2025/12/03 12:48:33.134766 [authzed_pgdb] Loaded resource_acl progress: 90000 rows (cumulative=129826) elapsed=8.382s
+2025/12/03 12:48:33.794202 [authzed_pgdb] Loaded resource_acl progress: 100000 rows (cumulative=139826) elapsed=9.041s
+2025/12/03 12:48:34.406683 [authzed_pgdb] Loaded resource_acl progress: 110000 rows (cumulative=149826) elapsed=9.654s
+2025/12/03 12:48:35.063092 [authzed_pgdb] Loaded resource_acl progress: 120000 rows (cumulative=159826) elapsed=10.31s
+2025/12/03 12:48:35.711698 [authzed_pgdb] Loaded resource_acl progress: 130000 rows (cumulative=169826) elapsed=10.959s
+2025/12/03 12:48:36.312604 [authzed_pgdb] Loaded resource_acl progress: 140000 rows (cumulative=179826) elapsed=11.559s
+2025/12/03 12:48:36.968558 [authzed_pgdb] Loaded resource_acl progress: 150000 rows (cumulative=189826) elapsed=12.215s
+2025/12/03 12:48:37.626245 [authzed_pgdb] Loaded resource_acl progress: 160000 rows (cumulative=199826) elapsed=12.873s
+2025/12/03 12:48:38.391496 [authzed_pgdb] Loaded resource_acl progress: 170000 rows (cumulative=209826) elapsed=13.638s
+2025/12/03 12:48:39.096701 [authzed_pgdb] Loaded resource_acl progress: 180000 rows (cumulative=219826) elapsed=14.343s
+2025/12/03 12:48:39.815544 [authzed_pgdb] Loaded resource_acl progress: 190000 rows (cumulative=229826) elapsed=15.062s
+2025/12/03 12:48:40.473663 [authzed_pgdb] Loaded resource_acl progress: 200000 rows (cumulative=239826) elapsed=15.72s
+2025/12/03 12:48:41.229717 [authzed_pgdb] Loaded resource_acl progress: 210000 rows (cumulative=249826) elapsed=16.476s
+2025/12/03 12:48:41.990345 [authzed_pgdb] Loaded resource_acl progress: 220000 rows (cumulative=259826) elapsed=17.237s
+2025/12/03 12:48:42.752235 [authzed_pgdb] Loaded resource_acl progress: 230000 rows (cumulative=269826) elapsed=17.999s
+2025/12/03 12:48:43.579084 [authzed_pgdb] Loaded resource_acl progress: 240000 rows (cumulative=279826) elapsed=18.826s
+2025/12/03 12:48:44.310908 [authzed_pgdb] Loaded resource_acl progress: 250000 rows (cumulative=289826) elapsed=19.558s
+2025/12/03 12:48:45.144853 [authzed_pgdb] Loaded resource_acl progress: 260000 rows (cumulative=299826) elapsed=20.392s
+2025/12/03 12:48:45.892584 [authzed_pgdb] Loaded resource_acl progress: 270000 rows (cumulative=309826) elapsed=21.139s
+2025/12/03 12:48:46.567815 [authzed_pgdb] Loaded resource_acl progress: 280000 rows (cumulative=319826) elapsed=21.814s
+2025/12/03 12:48:47.236772 [authzed_pgdb] Loaded resource_acl progress: 290000 rows (cumulative=329826) elapsed=22.483s
+2025/12/03 12:48:47.929539 [authzed_pgdb] Loaded resource_acl progress: 300000 rows (cumulative=339826) elapsed=23.176s
+2025/12/03 12:48:48.577707 [authzed_pgdb] Loaded resource_acl progress: 310000 rows (cumulative=349826) elapsed=23.824s
+2025/12/03 12:48:49.261507 [authzed_pgdb] Loaded resource_acl progress: 320000 rows (cumulative=359826) elapsed=24.508s
+2025/12/03 12:48:49.963648 [authzed_pgdb] Loaded resource_acl progress: 330000 rows (cumulative=369826) elapsed=25.21s
+2025/12/03 12:48:50.679729 [authzed_pgdb] Loaded resource_acl progress: 340000 rows (cumulative=379826) elapsed=25.926s
+2025/12/03 12:48:51.380927 [authzed_pgdb] Loaded resource_acl progress: 350000 rows (cumulative=389826) elapsed=26.627s
+2025/12/03 12:48:52.100352 [authzed_pgdb] Loaded resource_acl progress: 360000 rows (cumulative=399826) elapsed=27.347s
+2025/12/03 12:48:52.487885 [authzed_pgdb] Loaded resource_acl: 364983 relationships (cumulative=404809)
+2025/12/03 12:48:52.548302 [authzed_pgdb] Authzed data import DONE: totalRelationships=404809 elapsed=27.795s lastConsistencyToken=token:"GhAKBENPRUoSCGQ4YWJhMDk2"
+
+==== ENGINE: scylladb ====
+2025/12/03 12:49:51.974754 [scylladb] Using hosts=[localhost] port=9042 keyspace="rlp" consistency=LOCAL_QUORUM
+2025/12/03 12:49:52.008818 [scylladb] == Loading CSV data into ScyllaDB ==
+2025/12/03 12:49:52.086103 [scylladb] Truncated organizations
+2025/12/03 12:49:52.167171 [scylladb] Truncated users
+2025/12/03 12:49:52.241205 [scylladb] Truncated groups
+2025/12/03 12:49:52.308695 [scylladb] Truncated org_memberships
+2025/12/03 12:49:52.363555 [scylladb] Truncated group_memberships
+2025/12/03 12:49:52.470206 [scylladb] Truncated group_hierarchy
+2025/12/03 12:49:52.575567 [scylladb] Truncated group_members_expanded
+2025/12/03 12:49:52.641496 [scylladb] Truncated resources
+2025/12/03 12:49:52.710459 [scylladb] Truncated resource_acl_by_resource
+2025/12/03 12:49:52.770336 [scylladb] Truncated resource_acl_by_subject
+2025/12/03 12:49:52.854004 [scylladb] Truncated user_resource_perms_by_user
+2025/12/03 12:49:52.938115 [scylladb] Truncated user_resource_perms_by_resource
+2025/12/03 12:49:52.944644 [scylladb] organizations: inserted 16 rows
+2025/12/03 12:49:52.982059 [scylladb] users: inserted 1950 rows
+2025/12/03 12:49:52.988180 [scylladb] groups: inserted 170 rows
+2025/12/03 12:49:53.028569 [scylladb] org_memberships: inserted 4117 rows
+2025/12/03 12:49:53.156029 [scylladb] group_memberships: inserted 13441 rows
+2025/12/03 12:49:53.160755 [scylladb] group_hierarchy: inserted 14 rows
+2025/12/03 12:49:53.345129 [scylladb] resources: inserted 22084 rows
+2025/12/03 12:49:58.590277 [scylladb] resource_acl: inserted 364983 rows
+2025/12/03 12:49:58.590316 [scylladb] Precomputing group_members_expanded (transitive closure) ...
+2025/12/03 12:49:58.948608 [scylladb] group_members_expanded: precomputed 27771 rows in 358ms
+2025/12/03 12:49:58.948661 [scylladb] Building user_resource_perms_by_user & _by_resource ...
+2025/12/03 12:49:58.957049 [scylladb] precomputed effective group memberships for 170 groups
+2025/12/03 12:50:00.957768 [scylladb] buildUserResourcePerms: processed=2516/22084 perms=304000 elapsed=2.009s flushedBatches=584
+2025/12/03 12:50:02.957249 [scylladb] buildUserResourcePerms: processed=3532/22084 perms=564000 elapsed=4.008s flushedBatches=1101
+2025/12/03 12:50:04.957310 [scylladb] buildUserResourcePerms: processed=4670/22084 perms=854000 elapsed=6.008s flushedBatches=1682
+2025/12/03 12:50:06.957432 [scylladb] buildUserResourcePerms: processed=5819/22084 perms=1149000 elapsed=8.008s flushedBatches=2270
+2025/12/03 12:50:08.957392 [scylladb] buildUserResourcePerms: processed=6929/22084 perms=1434000 elapsed=10.008s flushedBatches=2845
+2025/12/03 12:50:10.957328 [scylladb] buildUserResourcePerms: processed=7703/22084 perms=1652613 elapsed=12.008s flushedBatches=3282
+2025/12/03 12:50:12.957504 [scylladb] buildUserResourcePerms: processed=8326/22084 perms=1845000 elapsed=14.008s flushedBatches=3664
+2025/12/03 12:50:14.957806 [scylladb] buildUserResourcePerms: processed=9017/22084 perms=2047000 elapsed=16.008s flushedBatches=4072
+2025/12/03 12:50:16.957543 [scylladb] buildUserResourcePerms: processed=11172/22084 perms=2360000 elapsed=18.008s flushedBatches=4694
+2025/12/03 12:50:18.957650 [scylladb] buildUserResourcePerms: processed=11963/22084 perms=2569000 elapsed=20.008s flushedBatches=5117
+2025/12/03 12:50:20.957585 [scylladb] buildUserResourcePerms: processed=12607/22084 perms=2823000 elapsed=22.008s flushedBatches=5624
+2025/12/03 12:50:22.957567 [scylladb] buildUserResourcePerms: processed=13178/22084 perms=3048064 elapsed=24.008s flushedBatches=6075
+2025/12/03 12:50:24.958268 [scylladb] buildUserResourcePerms: processed=14554/22084 perms=3343000 elapsed=26.009s flushedBatches=6660
+2025/12/03 12:50:26.957766 [scylladb] buildUserResourcePerms: processed=15689/22084 perms=3555000 elapsed=28.008s flushedBatches=7085
+2025/12/03 12:50:28.957746 [scylladb] buildUserResourcePerms: processed=16602/22084 perms=3790486 elapsed=30.008s flushedBatches=7558
+2025/12/03 12:50:30.957747 [scylladb] buildUserResourcePerms: processed=17771/22084 perms=4094000 elapsed=32.008s flushedBatches=8164
+2025/12/03 12:50:32.957741 [scylladb] buildUserResourcePerms: processed=18432/22084 perms=4407119 elapsed=34.008s flushedBatches=8789
+2025/12/03 12:50:34.957798 [scylladb] buildUserResourcePerms: processed=19150/22084 perms=4748000 elapsed=36.008s flushedBatches=9475
+2025/12/03 12:50:36.958032 [scylladb] buildUserResourcePerms: processed=20609/22084 perms=5060000 elapsed=38.008s flushedBatches=10096
+2025/12/03 12:50:38.957903 [scylladb] buildUserResourcePerms: processed=21400/22084 perms=5252000 elapsed=40.008s flushedBatches=10479
+2025/12/03 12:50:40.117879 [scylladb] Built user_resource_perms_*: 5416405 user-resource rows in 41.168s (batches_flushed=10860)
+2025/12/03 12:50:40.117915 [scylladb] ScyllaDB data load DONE: elapsed=48.108s
+
+==== ENGINE: cockroachdb ====
+2025/12/03 12:51:36.757573 [cockroachdb] Connected host=localhost port=26257 db="rlp" user="root" sslmode=disable
+2025/12/03 12:51:36.757680 [cockroachdb] == Starting CockroachDB data import from CSV in "data" ==
+2025/12/03 12:51:36.773926 [cockroachdb] Loaded organizations: 16 rows (cumulative=16)
+2025/12/03 12:51:36.913231 [cockroachdb] Loaded users: 1950 rows (cumulative=1966)
+2025/12/03 12:51:36.944800 [cockroachdb] Loaded groups: 170 rows (cumulative=2136)
+2025/12/03 12:51:37.100142 [cockroachdb] Loaded org_memberships: 4117 rows (cumulative=6253)
+2025/12/03 12:51:37.591611 [cockroachdb] Loaded group_memberships: 13441 rows (cumulative=19694)
+2025/12/03 12:51:37.603623 [cockroachdb] Loaded group_hierarchy: 14 rows (cumulative=19708)
+2025/12/03 12:51:38.241600 [cockroachdb] Loaded resources: 22084 rows (cumulative=41792)
+2025/12/03 12:51:38.249052 [cockroachdb] Loaded resource_acl progress: 5000 rows (cumulative=46792) elapsed=1.491s
+2025/12/03 12:51:38.556242 [cockroachdb] Loaded resource_acl progress: 10000 rows (cumulative=51792) elapsed=1.798s
+2025/12/03 12:51:38.856640 [cockroachdb] Loaded resource_acl progress: 15000 rows (cumulative=56792) elapsed=2.098s
+2025/12/03 12:51:39.254906 [cockroachdb] Loaded resource_acl progress: 20000 rows (cumulative=61792) elapsed=2.497s
+2025/12/03 12:51:39.569911 [cockroachdb] Loaded resource_acl progress: 25000 rows (cumulative=66792) elapsed=2.812s
+2025/12/03 12:51:40.158536 [cockroachdb] Loaded resource_acl progress: 30000 rows (cumulative=71792) elapsed=3.4s
+2025/12/03 12:51:40.532597 [cockroachdb] Loaded resource_acl progress: 35000 rows (cumulative=76792) elapsed=3.774s
+2025/12/03 12:51:40.909680 [cockroachdb] Loaded resource_acl progress: 40000 rows (cumulative=81792) elapsed=4.151s
+2025/12/03 12:51:41.436921 [cockroachdb] Loaded resource_acl progress: 45000 rows (cumulative=86792) elapsed=4.679s
+2025/12/03 12:51:43.186032 [cockroachdb] Loaded resource_acl progress: 50000 rows (cumulative=91792) elapsed=6.428s
+2025/12/03 12:51:43.595930 [cockroachdb] Loaded resource_acl progress: 55000 rows (cumulative=96792) elapsed=6.838s
+2025/12/03 12:51:44.006506 [cockroachdb] Loaded resource_acl progress: 60000 rows (cumulative=101792) elapsed=7.248s
+2025/12/03 12:51:44.488833 [cockroachdb] Loaded resource_acl progress: 65000 rows (cumulative=106792) elapsed=7.731s
+2025/12/03 12:51:44.844882 [cockroachdb] Loaded resource_acl progress: 70000 rows (cumulative=111792) elapsed=8.087s
+2025/12/03 12:51:45.201691 [cockroachdb] Loaded resource_acl progress: 75000 rows (cumulative=116792) elapsed=8.443s
+2025/12/03 12:51:45.535086 [cockroachdb] Loaded resource_acl progress: 80000 rows (cumulative=121792) elapsed=8.777s
+2025/12/03 12:51:46.337670 [cockroachdb] Loaded resource_acl progress: 85000 rows (cumulative=126792) elapsed=9.579s
+2025/12/03 12:51:46.753319 [cockroachdb] Loaded resource_acl progress: 90000 rows (cumulative=131792) elapsed=9.995s
+2025/12/03 12:51:47.235666 [cockroachdb] Loaded resource_acl progress: 95000 rows (cumulative=136792) elapsed=10.477s
+2025/12/03 12:51:47.920454 [cockroachdb] Loaded resource_acl progress: 100000 rows (cumulative=141792) elapsed=11.162s
+2025/12/03 12:51:48.659981 [cockroachdb] Loaded resource_acl progress: 105000 rows (cumulative=146792) elapsed=11.902s
+2025/12/03 12:51:49.557359 [cockroachdb] Loaded resource_acl progress: 110000 rows (cumulative=151792) elapsed=12.799s
+2025/12/03 12:51:49.976135 [cockroachdb] Loaded resource_acl progress: 115000 rows (cumulative=156792) elapsed=13.218s
+2025/12/03 12:51:50.483399 [cockroachdb] Loaded resource_acl progress: 120000 rows (cumulative=161792) elapsed=13.725s
+2025/12/03 12:51:51.391922 [cockroachdb] Loaded resource_acl progress: 125000 rows (cumulative=166792) elapsed=14.633s
+2025/12/03 12:51:51.741706 [cockroachdb] Loaded resource_acl progress: 130000 rows (cumulative=171792) elapsed=14.983s
+2025/12/03 12:51:52.119358 [cockroachdb] Loaded resource_acl progress: 135000 rows (cumulative=176792) elapsed=15.361s
+2025/12/03 12:51:53.124964 [cockroachdb] Loaded resource_acl progress: 140000 rows (cumulative=181792) elapsed=16.366s
+2025/12/03 12:51:53.533136 [cockroachdb] Loaded resource_acl progress: 145000 rows (cumulative=186792) elapsed=16.775s
+2025/12/03 12:51:53.955136 [cockroachdb] Loaded resource_acl progress: 150000 rows (cumulative=191792) elapsed=17.197s
+2025/12/03 12:51:54.365854 [cockroachdb] Loaded resource_acl progress: 155000 rows (cumulative=196792) elapsed=17.607s
+2025/12/03 12:51:55.295082 [cockroachdb] Loaded resource_acl progress: 160000 rows (cumulative=201792) elapsed=18.537s
+2025/12/03 12:51:55.625573 [cockroachdb] Loaded resource_acl progress: 165000 rows (cumulative=206792) elapsed=18.867s
+2025/12/03 12:51:56.005192 [cockroachdb] Loaded resource_acl progress: 170000 rows (cumulative=211792) elapsed=19.247s
+2025/12/03 12:51:56.409987 [cockroachdb] Loaded resource_acl progress: 175000 rows (cumulative=216792) elapsed=19.651s
+2025/12/03 12:51:57.301001 [cockroachdb] Loaded resource_acl progress: 180000 rows (cumulative=221792) elapsed=20.542s
+2025/12/03 12:51:57.661440 [cockroachdb] Loaded resource_acl progress: 185000 rows (cumulative=226792) elapsed=20.903s
+2025/12/03 12:51:58.036711 [cockroachdb] Loaded resource_acl progress: 190000 rows (cumulative=231792) elapsed=21.278s
+2025/12/03 12:51:58.478725 [cockroachdb] Loaded resource_acl progress: 195000 rows (cumulative=236792) elapsed=21.72s
+2025/12/03 12:51:59.477258 [cockroachdb] Loaded resource_acl progress: 200000 rows (cumulative=241792) elapsed=22.719s
+2025/12/03 12:51:59.851560 [cockroachdb] Loaded resource_acl progress: 205000 rows (cumulative=246792) elapsed=23.093s
+2025/12/03 12:52:00.244020 [cockroachdb] Loaded resource_acl progress: 210000 rows (cumulative=251792) elapsed=23.485s
+2025/12/03 12:52:01.352710 [cockroachdb] Loaded resource_acl progress: 215000 rows (cumulative=256792) elapsed=24.594s
+2025/12/03 12:52:01.720662 [cockroachdb] Loaded resource_acl progress: 220000 rows (cumulative=261792) elapsed=24.962s
+2025/12/03 12:52:02.089543 [cockroachdb] Loaded resource_acl progress: 225000 rows (cumulative=266792) elapsed=25.331s
+2025/12/03 12:52:02.566126 [cockroachdb] Loaded resource_acl progress: 230000 rows (cumulative=271792) elapsed=25.807s
+2025/12/03 12:52:03.461621 [cockroachdb] Loaded resource_acl progress: 235000 rows (cumulative=276792) elapsed=26.703s
+2025/12/03 12:52:03.863180 [cockroachdb] Loaded resource_acl progress: 240000 rows (cumulative=281792) elapsed=27.105s
+2025/12/03 12:52:04.243805 [cockroachdb] Loaded resource_acl progress: 245000 rows (cumulative=286792) elapsed=27.485s
+2025/12/03 12:52:04.660591 [cockroachdb] Loaded resource_acl progress: 250000 rows (cumulative=291792) elapsed=27.902s
+2025/12/03 12:52:05.508641 [cockroachdb] Loaded resource_acl progress: 255000 rows (cumulative=296792) elapsed=28.75s
+2025/12/03 12:52:05.839951 [cockroachdb] Loaded resource_acl progress: 260000 rows (cumulative=301792) elapsed=29.081s
+2025/12/03 12:52:06.187035 [cockroachdb] Loaded resource_acl progress: 265000 rows (cumulative=306792) elapsed=29.428s
+2025/12/03 12:52:07.235731 [cockroachdb] Loaded resource_acl progress: 270000 rows (cumulative=311792) elapsed=30.477s
+2025/12/03 12:52:07.638391 [cockroachdb] Loaded resource_acl progress: 275000 rows (cumulative=316792) elapsed=30.88s
+2025/12/03 12:52:08.073764 [cockroachdb] Loaded resource_acl progress: 280000 rows (cumulative=321792) elapsed=31.315s
+2025/12/03 12:52:09.087388 [cockroachdb] Loaded resource_acl progress: 285000 rows (cumulative=326792) elapsed=32.329s
+2025/12/03 12:52:10.015432 [cockroachdb] Loaded resource_acl progress: 290000 rows (cumulative=331792) elapsed=33.257s
+2025/12/03 12:52:10.375927 [cockroachdb] Loaded resource_acl progress: 295000 rows (cumulative=336792) elapsed=33.617s
+2025/12/03 12:52:10.785083 [cockroachdb] Loaded resource_acl progress: 300000 rows (cumulative=341792) elapsed=34.026s
+2025/12/03 12:52:11.240907 [cockroachdb] Loaded resource_acl progress: 305000 rows (cumulative=346792) elapsed=34.482s
+2025/12/03 12:52:12.137249 [cockroachdb] Loaded resource_acl progress: 310000 rows (cumulative=351792) elapsed=35.378s
+2025/12/03 12:52:12.542742 [cockroachdb] Loaded resource_acl progress: 315000 rows (cumulative=356792) elapsed=35.784s
+2025/12/03 12:52:12.934899 [cockroachdb] Loaded resource_acl progress: 320000 rows (cumulative=361792) elapsed=36.176s
+2025/12/03 12:52:14.103049 [cockroachdb] Loaded resource_acl progress: 325000 rows (cumulative=366792) elapsed=37.344s
+2025/12/03 12:52:14.513697 [cockroachdb] Loaded resource_acl progress: 330000 rows (cumulative=371792) elapsed=37.755s
+2025/12/03 12:52:14.899838 [cockroachdb] Loaded resource_acl progress: 335000 rows (cumulative=376792) elapsed=38.141s
+2025/12/03 12:52:15.351202 [cockroachdb] Loaded resource_acl progress: 340000 rows (cumulative=381792) elapsed=38.592s
+2025/12/03 12:52:16.419096 [cockroachdb] Loaded resource_acl progress: 345000 rows (cumulative=386792) elapsed=39.66s
+2025/12/03 12:52:16.823622 [cockroachdb] Loaded resource_acl progress: 350000 rows (cumulative=391792) elapsed=40.065s
+2025/12/03 12:52:17.282159 [cockroachdb] Loaded resource_acl progress: 355000 rows (cumulative=396792) elapsed=40.523s
+2025/12/03 12:52:18.518329 [cockroachdb] Loaded resource_acl progress: 360000 rows (cumulative=401792) elapsed=41.759s
+2025/12/03 12:52:19.500551 [cockroachdb] Loaded resource_acl: 364983 rows (cumulative=406775) elapsed=42.742s
+2025/12/03 12:52:19.501017 [cockroachdb] CockroachDB data import DONE: totalRows=406775 elapsed=42.742s
+2025/12/03 12:52:19.506089 [cockroachdb] Connected host=localhost port=26257 db="rlp" user="root" sslmode=disable
+2025/12/03 12:52:19.506106 [cockroachdb] REFRESH MATERIALIZED VIEW user_resource_permissions ...
+2025/12/03 12:59:42.074708 [cockroachdb] REFRESH MATERIALIZED VIEW user_resource_permissions DONE
+
+==== ENGINE: postgres ====
+2025/12/03 13:00:32.085355 [postgres] == Starting Postgres data import from CSV in "data" ==
+2025/12/03 13:00:32.092261 [postgres] Loaded organizations: 16 rows (cumulative=16) elapsed=6ms
+2025/12/03 13:00:32.125518 [postgres] Loaded users: 1950 rows (cumulative=1966) elapsed=33ms
+2025/12/03 13:00:32.132818 [postgres] Loaded groups -> org.member_group: 170 rows (cumulative=2136) elapsed=7ms
+2025/12/03 13:00:32.220355 [postgres] Loaded org_memberships: 4117 rows (cumulative=6253) elapsed=87ms
+2025/12/03 13:00:32.233928 [postgres] Loaded group_memberships progress: 10000 rows (cumulative=6253) elapsed=13ms
+2025/12/03 13:00:32.451263 [postgres] Loaded group_memberships: 13441 rows (cumulative=19694) elapsed=230ms
+2025/12/03 13:00:32.458383 [postgres] Loaded group_hierarchy: 14 rows (cumulative=19708) elapsed=6ms
+2025/12/03 13:00:32.467407 [postgres] Loaded resources -> resource.org: 10000 rows (cumulative=19708) elapsed=8ms
+2025/12/03 13:00:32.474087 [postgres] Loaded resources -> resource.org: 20000 rows (cumulative=19708) elapsed=15ms
+2025/12/03 13:00:32.693227 [postgres] Loaded resources -> resource.org: 22084 rows (cumulative=41792) elapsed=234ms
+2025/12/03 13:00:32.709066 [postgres] Loaded resource_acl progress: 10000 rows (cumulative=41792) elapsed=15ms
+2025/12/03 13:00:32.716972 [postgres] Loaded resource_acl progress: 20000 rows (cumulative=41792) elapsed=23ms
+2025/12/03 13:00:32.725087 [postgres] Loaded resource_acl progress: 30000 rows (cumulative=41792) elapsed=31ms
+2025/12/03 13:00:32.733574 [postgres] Loaded resource_acl progress: 40000 rows (cumulative=41792) elapsed=40ms
+2025/12/03 13:00:32.741596 [postgres] Loaded resource_acl progress: 50000 rows (cumulative=41792) elapsed=48ms
+2025/12/03 13:00:32.749917 [postgres] Loaded resource_acl progress: 60000 rows (cumulative=41792) elapsed=56ms
+2025/12/03 13:00:32.758600 [postgres] Loaded resource_acl progress: 70000 rows (cumulative=41792) elapsed=65ms
+2025/12/03 13:00:32.767122 [postgres] Loaded resource_acl progress: 80000 rows (cumulative=41792) elapsed=73ms
+2025/12/03 13:00:32.777070 [postgres] Loaded resource_acl progress: 90000 rows (cumulative=41792) elapsed=83ms
+2025/12/03 13:00:32.787573 [postgres] Loaded resource_acl progress: 100000 rows (cumulative=41792) elapsed=94ms
+2025/12/03 13:00:32.798127 [postgres] Loaded resource_acl progress: 110000 rows (cumulative=41792) elapsed=104ms
+2025/12/03 13:00:32.810775 [postgres] Loaded resource_acl progress: 120000 rows (cumulative=41792) elapsed=117ms
+2025/12/03 13:00:32.821001 [postgres] Loaded resource_acl progress: 130000 rows (cumulative=41792) elapsed=127ms
+2025/12/03 13:00:32.832313 [postgres] Loaded resource_acl progress: 140000 rows (cumulative=41792) elapsed=138ms
+2025/12/03 13:00:32.842222 [postgres] Loaded resource_acl progress: 150000 rows (cumulative=41792) elapsed=148ms
+2025/12/03 13:00:32.853011 [postgres] Loaded resource_acl progress: 160000 rows (cumulative=41792) elapsed=159ms
+2025/12/03 13:00:32.862796 [postgres] Loaded resource_acl progress: 170000 rows (cumulative=41792) elapsed=169ms
+2025/12/03 13:00:32.873794 [postgres] Loaded resource_acl progress: 180000 rows (cumulative=41792) elapsed=180ms
+2025/12/03 13:00:32.886857 [postgres] Loaded resource_acl progress: 190000 rows (cumulative=41792) elapsed=193ms
+2025/12/03 13:00:32.897969 [postgres] Loaded resource_acl progress: 200000 rows (cumulative=41792) elapsed=204ms
+2025/12/03 13:00:32.908210 [postgres] Loaded resource_acl progress: 210000 rows (cumulative=41792) elapsed=214ms
+2025/12/03 13:00:32.918074 [postgres] Loaded resource_acl progress: 220000 rows (cumulative=41792) elapsed=224ms
+2025/12/03 13:00:32.927696 [postgres] Loaded resource_acl progress: 230000 rows (cumulative=41792) elapsed=234ms
+2025/12/03 13:00:32.937461 [postgres] Loaded resource_acl progress: 240000 rows (cumulative=41792) elapsed=244ms
+2025/12/03 13:00:32.947273 [postgres] Loaded resource_acl progress: 250000 rows (cumulative=41792) elapsed=253ms
+2025/12/03 13:00:32.956985 [postgres] Loaded resource_acl progress: 260000 rows (cumulative=41792) elapsed=263ms
+2025/12/03 13:00:32.967264 [postgres] Loaded resource_acl progress: 270000 rows (cumulative=41792) elapsed=273ms
+2025/12/03 13:00:32.976842 [postgres] Loaded resource_acl progress: 280000 rows (cumulative=41792) elapsed=283ms
+2025/12/03 13:00:32.987568 [postgres] Loaded resource_acl progress: 290000 rows (cumulative=41792) elapsed=294ms
+2025/12/03 13:00:32.997951 [postgres] Loaded resource_acl progress: 300000 rows (cumulative=41792) elapsed=304ms
+2025/12/03 13:00:33.007741 [postgres] Loaded resource_acl progress: 310000 rows (cumulative=41792) elapsed=314ms
+2025/12/03 13:00:33.017888 [postgres] Loaded resource_acl progress: 320000 rows (cumulative=41792) elapsed=324ms
+2025/12/03 13:00:33.027650 [postgres] Loaded resource_acl progress: 330000 rows (cumulative=41792) elapsed=334ms
+2025/12/03 13:00:33.037474 [postgres] Loaded resource_acl progress: 340000 rows (cumulative=41792) elapsed=344ms
+2025/12/03 13:00:33.047298 [postgres] Loaded resource_acl progress: 350000 rows (cumulative=41792) elapsed=353ms
+2025/12/03 13:00:33.057802 [postgres] Loaded resource_acl progress: 360000 rows (cumulative=41792) elapsed=364ms
+2025/12/03 13:00:42.638147 [postgres] Loaded resource_acl: 364983 rows (cumulative=406775) elapsed=9.944s
+2025/12/03 13:01:05.577413 [postgres] refresh_user_resource_permissions: DONE in 22.938s
+2025/12/03 13:01:05.577584 [postgres] Postgres data import DONE: totalRows=406775 elapsed=33.491s
+
+==== ENGINE: mongodb ====
+2025/12/03 13:01:42.071411 [mongodb] == Starting Mongo data import from CSV in "data" ==
+2025/12/03 13:01:43.243988 [mongodb] Loaded org_memberships: 4117 rows
+2025/12/03 13:01:43.267714 [mongodb] Loaded groups: 170 rows
+2025/12/03 13:01:45.128236 [mongodb] Loaded group_memberships progress: 10000 rows elapsed=3.056s
+2025/12/03 13:01:45.892164 [mongodb] Loaded group_memberships: 13441 rows
+2025/12/03 13:01:45.896368 [mongodb] Loaded group_hierarchy: 14 rows
+2025/12/03 13:01:47.261825 [mongodb] Loaded resources progress: 10000 rows elapsed=5.19s
+2025/12/03 13:01:48.595060 [mongodb] Loaded resources progress: 20000 rows elapsed=6.523s
+2025/12/03 13:01:48.903492 [mongodb] Loaded resources: 22084 rows
+2025/12/03 13:01:50.289185 [mongodb] Loaded resource_acl progress: 10000 rows elapsed=8.217s
+2025/12/03 13:01:51.913512 [mongodb] Loaded resource_acl progress: 20000 rows elapsed=9.841s
+2025/12/03 13:01:53.300710 [mongodb] Loaded resource_acl progress: 30000 rows elapsed=11.229s
+2025/12/03 13:01:55.128558 [mongodb] Loaded resource_acl progress: 40000 rows elapsed=13.056s
+2025/12/03 13:01:57.549686 [mongodb] Loaded resource_acl progress: 50000 rows elapsed=15.477s
+2025/12/03 13:01:59.073053 [mongodb] Loaded resource_acl progress: 60000 rows elapsed=17.001s
+2025/12/03 13:02:01.289735 [mongodb] Loaded resource_acl progress: 70000 rows elapsed=19.217s
+2025/12/03 13:02:03.270051 [mongodb] Loaded resource_acl progress: 80000 rows elapsed=21.198s
+2025/12/03 13:02:05.024924 [mongodb] Loaded resource_acl progress: 90000 rows elapsed=22.952s
+2025/12/03 13:02:06.713152 [mongodb] Loaded resource_acl progress: 100000 rows elapsed=24.641s
+2025/12/03 13:02:08.360888 [mongodb] Loaded resource_acl progress: 110000 rows elapsed=26.288s
+2025/12/03 13:02:09.820821 [mongodb] Loaded resource_acl progress: 120000 rows elapsed=27.748s
+2025/12/03 13:02:11.526049 [mongodb] Loaded resource_acl progress: 130000 rows elapsed=29.453s
+2025/12/03 13:02:13.092691 [mongodb] Loaded resource_acl progress: 140000 rows elapsed=31.02s
+2025/12/03 13:02:14.591155 [mongodb] Loaded resource_acl progress: 150000 rows elapsed=32.519s
+2025/12/03 13:02:16.201905 [mongodb] Loaded resource_acl progress: 160000 rows elapsed=34.129s
+2025/12/03 13:02:18.383004 [mongodb] Loaded resource_acl progress: 170000 rows elapsed=36.31s
+2025/12/03 13:02:20.022892 [mongodb] Loaded resource_acl progress: 180000 rows elapsed=37.95s
+2025/12/03 13:02:21.664670 [mongodb] Loaded resource_acl progress: 190000 rows elapsed=39.592s
+2025/12/03 13:02:23.017263 [mongodb] Loaded resource_acl progress: 200000 rows elapsed=40.944s
+2025/12/03 13:02:24.800950 [mongodb] Loaded resource_acl progress: 210000 rows elapsed=42.728s
+2025/12/03 13:02:26.551866 [mongodb] Loaded resource_acl progress: 220000 rows elapsed=44.479s
+2025/12/03 13:02:28.682523 [mongodb] Loaded resource_acl progress: 230000 rows elapsed=46.61s
+2025/12/03 13:02:30.114735 [mongodb] Loaded resource_acl progress: 240000 rows elapsed=48.042s
+2025/12/03 13:02:31.505129 [mongodb] Loaded resource_acl progress: 250000 rows elapsed=49.432s
+2025/12/03 13:02:33.037081 [mongodb] Loaded resource_acl progress: 260000 rows elapsed=50.964s
+2025/12/03 13:02:34.475692 [mongodb] Loaded resource_acl progress: 270000 rows elapsed=52.403s
+2025/12/03 13:02:35.902706 [mongodb] Loaded resource_acl progress: 280000 rows elapsed=53.83s
+2025/12/03 13:02:37.381665 [mongodb] Loaded resource_acl progress: 290000 rows elapsed=55.308s
+2025/12/03 13:02:39.676541 [mongodb] Loaded resource_acl progress: 300000 rows elapsed=57.603s
+2025/12/03 13:02:41.396715 [mongodb] Loaded resource_acl progress: 310000 rows elapsed=59.323s
+2025/12/03 13:02:43.073558 [mongodb] Loaded resource_acl progress: 320000 rows elapsed=1m1s
+2025/12/03 13:02:44.612961 [mongodb] Loaded resource_acl progress: 330000 rows elapsed=1m2.54s
+2025/12/03 13:02:46.047722 [mongodb] Loaded resource_acl progress: 340000 rows elapsed=1m3.974s
+2025/12/03 13:02:47.698756 [mongodb] Loaded resource_acl progress: 350000 rows elapsed=1m5.625s
+2025/12/03 13:02:49.291641 [mongodb] Loaded resource_acl progress: 360000 rows elapsed=1m7.218s
+2025/12/03 13:02:50.142295 [mongodb] Loaded resource_acl: 364983 rows
+2025/12/03 13:02:50.142659 [mongodb] Mongo data import DONE: elapsed=1m8.069s
+
+==== ENGINE: clickhouse ====
+2025/12/03 13:03:47.705961 [clickhouse] == Starting Clickhouse data import from CSV in "data" ==
+2025/12/03 13:03:47.815028 [clickhouse] Loaded organizations: 16 rows
+2025/12/03 13:03:47.844640 [clickhouse] Loaded users: 1950 rows
+2025/12/03 13:03:47.889503 [clickhouse] Loaded groups: 170 rows
+2025/12/03 13:03:48.003119 [clickhouse] Loaded org_memberships: 4117 rows
+2025/12/03 13:03:48.055680 [clickhouse] Loaded group_memberships progress: 10000 rows elapsed=349ms
+2025/12/03 13:03:48.087905 [clickhouse] Loaded group_memberships: 13441 rows
+2025/12/03 13:03:48.094987 [clickhouse] Loaded group_hierarchy: 14 rows
+2025/12/03 13:03:48.162035 [clickhouse] Loaded resources progress: 10000 rows elapsed=456ms
+2025/12/03 13:03:48.236815 [clickhouse] Loaded resources progress: 20000 rows elapsed=530ms
+2025/12/03 13:03:48.272647 [clickhouse] Loaded resources: 22084 rows
+2025/12/03 13:03:48.363778 [clickhouse] Loaded resource_acl progress: 10000 rows elapsed=657ms
+2025/12/03 13:03:48.464803 [clickhouse] Loaded resource_acl progress: 20000 rows elapsed=758ms
+2025/12/03 13:03:48.669764 [clickhouse] Loaded resource_acl progress: 30000 rows elapsed=963ms
+2025/12/03 13:03:48.791898 [clickhouse] Loaded resource_acl progress: 40000 rows elapsed=1.085s
+2025/12/03 13:03:48.973465 [clickhouse] Loaded resource_acl progress: 50000 rows elapsed=1.267s
+2025/12/03 13:03:49.085897 [clickhouse] Loaded resource_acl progress: 60000 rows elapsed=1.379s
+2025/12/03 13:03:49.175967 [clickhouse] Loaded resource_acl progress: 70000 rows elapsed=1.469s
+2025/12/03 13:03:49.264620 [clickhouse] Loaded resource_acl progress: 80000 rows elapsed=1.558s
+2025/12/03 13:03:49.351300 [clickhouse] Loaded resource_acl progress: 90000 rows elapsed=1.645s
+2025/12/03 13:03:49.437743 [clickhouse] Loaded resource_acl progress: 100000 rows elapsed=1.731s
+2025/12/03 13:03:49.524431 [clickhouse] Loaded resource_acl progress: 110000 rows elapsed=1.818s
+2025/12/03 13:03:49.619791 [clickhouse] Loaded resource_acl progress: 120000 rows elapsed=1.913s
+2025/12/03 13:03:49.708143 [clickhouse] Loaded resource_acl progress: 130000 rows elapsed=2.002s
+2025/12/03 13:03:49.799878 [clickhouse] Loaded resource_acl progress: 140000 rows elapsed=2.093s
+2025/12/03 13:03:49.884963 [clickhouse] Loaded resource_acl progress: 150000 rows elapsed=2.178s
+2025/12/03 13:03:49.971041 [clickhouse] Loaded resource_acl progress: 160000 rows elapsed=2.265s
+2025/12/03 13:03:50.053470 [clickhouse] Loaded resource_acl progress: 170000 rows elapsed=2.347s
+2025/12/03 13:03:50.131090 [clickhouse] Loaded resource_acl progress: 180000 rows elapsed=2.425s
+2025/12/03 13:03:50.216975 [clickhouse] Loaded resource_acl progress: 190000 rows elapsed=2.51s
+2025/12/03 13:03:50.304710 [clickhouse] Loaded resource_acl progress: 200000 rows elapsed=2.598s
+2025/12/03 13:03:50.383053 [clickhouse] Loaded resource_acl progress: 210000 rows elapsed=2.677s
+2025/12/03 13:03:50.470020 [clickhouse] Loaded resource_acl progress: 220000 rows elapsed=2.763s
+2025/12/03 13:03:50.554940 [clickhouse] Loaded resource_acl progress: 230000 rows elapsed=2.848s
+2025/12/03 13:03:50.643256 [clickhouse] Loaded resource_acl progress: 240000 rows elapsed=2.937s
+2025/12/03 13:03:50.739526 [clickhouse] Loaded resource_acl progress: 250000 rows elapsed=3.033s
+2025/12/03 13:03:50.820981 [clickhouse] Loaded resource_acl progress: 260000 rows elapsed=3.114s
+2025/12/03 13:03:50.901964 [clickhouse] Loaded resource_acl progress: 270000 rows elapsed=3.195s
+2025/12/03 13:03:50.993596 [clickhouse] Loaded resource_acl progress: 280000 rows elapsed=3.287s
+2025/12/03 13:03:51.090963 [clickhouse] Loaded resource_acl progress: 290000 rows elapsed=3.384s
+2025/12/03 13:03:51.183433 [clickhouse] Loaded resource_acl progress: 300000 rows elapsed=3.477s
+2025/12/03 13:03:51.264735 [clickhouse] Loaded resource_acl progress: 310000 rows elapsed=3.558s
+2025/12/03 13:03:51.357287 [clickhouse] Loaded resource_acl progress: 320000 rows elapsed=3.651s
+2025/12/03 13:03:51.444924 [clickhouse] Loaded resource_acl progress: 330000 rows elapsed=3.738s
+2025/12/03 13:03:51.548251 [clickhouse] Loaded resource_acl progress: 340000 rows elapsed=3.842s
+2025/12/03 13:03:51.658066 [clickhouse] Loaded resource_acl progress: 350000 rows elapsed=3.952s
+2025/12/03 13:03:51.739252 [clickhouse] Loaded resource_acl progress: 360000 rows elapsed=4.033s
+2025/12/03 13:03:51.800511 [clickhouse] Loaded resource_acl: 364983 rows
+2025/12/03 13:03:51.864916 [clickhouse] Populated group_members_expanded: 13853 rows
+2025/12/03 13:03:51.864929 [clickhouse] Clickhouse data import DONE: elapsed=4.158s
+
+==== ENGINE: elasticsearch ====
+2025/12/03 13:06:08.931774 [elasticsearch] Using addresses=[http://localhost:9200] cloud_id_set=false auth_user=true timeout=5s insecure_tls=false
+2025/12/03 13:06:08.940861 [elasticsearch] == Starting Elasticsearch data import from CSV in "data" ==
+2025/12/03 13:06:08.941009 [elasticsearch] Using addresses=[http://localhost:9200] cloud_id_set=false auth_user=true timeout=5s insecure_tls=false
+2025/12/03 13:06:08.965901 [elasticsearch] ensured mappings on "rlp"
+2025/12/03 13:06:08.974100 [elasticsearch] Loaded resources: 22084 rows
+2025/12/03 13:06:08.976217 [elasticsearch] Loaded org_memberships: 4117 rows
+2025/12/03 13:06:08.982988 [elasticsearch] Loaded group_memberships: 13441 rows
+2025/12/03 13:06:08.983382 [elasticsearch] Loaded group_hierarchy: 14 rows
+2025/12/03 13:06:09.040007 [elasticsearch] Loaded resource_acl progress: 100000 rows
+2025/12/03 13:06:09.093095 [elasticsearch] Loaded resource_acl progress: 200000 rows
+2025/12/03 13:06:09.147767 [elasticsearch] Loaded resource_acl progress: 300000 rows
+2025/12/03 13:06:09.182920 [elasticsearch] Loaded resource_acl: 364983 rows
+2025/12/03 13:06:09.238267 [elasticsearch] Cleared existing documents in index "rlp"
+2025/12/03 13:06:17.031456 [elasticsearch] Indexed 22084 resource docs into "rlp" in 7.791s
+2025/12/03 13:06:17.031485 [elasticsearch] Elasticsearch data import DONE: elapsed=8.09s
